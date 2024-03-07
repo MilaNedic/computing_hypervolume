@@ -2,6 +2,10 @@
     for calculating the hypervolume.
 """
 
+import warnings as _warnings
+import bisect as _bisect
+import fractions
+
 inf = float('inf')
 
 class moarchiving(list):
