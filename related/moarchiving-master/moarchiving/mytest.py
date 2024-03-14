@@ -51,3 +51,15 @@ a3.add([2, 2])
 print(a3)
 print(a3.hypervolume) 
 print(a3.compute_hypervolume(a3.reference_point))
+
+# ------------------------------------- new test --------------------------------------------
+
+from moarchiving import BiobjectiveNondominatedSortedList as NDA
+a = NDA([[1.2, 0.1], [0.5, 1]])
+print(len(a))
+print(a.dominators([2, 3]) == a)
+print(a.dominators([0.5, 1]))
+print(len(a.dominators([0.6, 3])), a.dominators([0.6, 3], number_only=True))
+print(a.dominators([0.5, 0.9]))
+
+
