@@ -17,12 +17,12 @@ def join(p1, p2):
     return [max(p1[0], p2[0]), max(p1[1], p2[1])]
 
 # for 3D points    
-def lexicographic_less_3d(a, b):
-    return a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and a[2] <= b[2])))
+def lexicographic_less(a, b):
+    return a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))
 
-# for 4D points
-def lexicographic_less_4d(a, b):
-    return a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and (a[2] < b[2] or (a[2] == b[2] and a[3] <= b[3])))))
+## for 4D points
+#def lexicographic_less_4d(a, b):
+#    return a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and (a[2] < b[2] or (a[2] == b[2] and a[3] <= b[3])))))
 
 # -------------------------- class definition ------------------------------------- 
 #class Dlnode:
@@ -42,8 +42,8 @@ def lexicographic_less_4d(a, b):
 #        self.head = [None, None]  # Head in list for different dimensions
         
 class Dlnode:
-    def __init__(self, d):
-        self.x = [0.0] * d  # Point coordinates
+    def __init__(self, x, d):
+        self.x = x if x else [0.0] * d  # Point coordinates
         self.closest = [None, None]  # Closest points
         self.area = 0
         self.volume = 0
@@ -162,63 +162,170 @@ def point_to_struct(list_head, p, v):
     clear_point(list_head, p)
     return p
 
-# ---------------- test1 -------------------------
-#if __name__ == "__main__":
-#    # Example usage for init_sentinels
-#    list_head = Dlnode(4)  # Assuming 4 dimensions
-#    reference_point = [1.0, 2.0, 3.0, 4.0]  # Example reference point
-#    sentinel_head = init_sentinels(list_head, reference_point, 4)
-#    print("Sentinel nodes initialized.")
+
+# ------------------------ test (working correctly) ---------------------------------
+
+## Example usage for add_to_history and remove_from_history
+#list_head = Dlnode(None, 3)  # Assuming 3 dimensions
+#list_head.next[0] = list_head
+#list_head.prev[0] = list_head
+#point1 = Dlnode(None, 3)
+#point2 = Dlnode(None, 3)
+#point3 = Dlnode(None, 3)
 #
-#    # Example usage for clear_point
-#    point_to_clear = Dlnode(4)  # Assuming 4 dimensions
-#    clear_point(list_head, point_to_clear)
-#    print("Point cleared.")
+## Add points to history
+#add_to_history(list_head, point1)
+#add_to_history(list_head, point2)
+#add_to_history(list_head, point3)
 #
-#    # Example usage for point_to_struct
-#    new_point = Dlnode(4)  # Assuming 4 dimensions
-#    point_values = [2.0, 3.0, 4.0, 5.0]  # Example point values
-#    point_to_struct(list_head, new_point, point_values)
-#    print("New point initialized with values:", new_point.x)
-
-# ------------------------ test2 -----------------------------
-if __name__ == "__main__":
-    # Example usage for add_to_history and remove_from_history
-    list_head = Dlnode(3)  # Assuming 3 dimensions
-    list_head.next[0] = list_head
-    list_head.prev[0] = list_head
-    point1 = Dlnode(3)
-    point2 = Dlnode(3)
-    point3 = Dlnode(3)
-
-    # Add points to history
-    add_to_history(list_head, point1)
-    add_to_history(list_head, point2)
-    add_to_history(list_head, point3)
-
-    # Print the order of points in the history
-    current_node = list_head.next[0]
-    print("Points in history after addition:")
-    while current_node != list_head:
-        print("Point coordinates:", current_node.x)
-        current_node = current_node.next[0]
-
-    # Remove point2 from history
-    remove_from_history(point2)
-
-    # Print the order of points in the history after removal
-    current_node = list_head.next[0]
-    print("\nPoints in history after removal of point2:")
-    while current_node != list_head:
-        print("Point coordinates:", current_node.x)
-        current_node = current_node.next[0]
+## Print the order of points in the history
+#current_node = list_head.next[0]
+#print("Points in history after addition:")
+#while current_node != list_head:
+#    print("Point coordinates:", current_node.x)
+#    current_node = current_node.next[0]
+#    
+## Remove point2 from history
+#remove_from_history(point2)
+#
+## Print the order of points in the history after removal
+#current_node = list_head.next[0]
+#print("\nPoints in history after removal of point2:")
+#while current_node != list_head:
+#    print("Point coordinates:", current_node.x)
+#    current_node = current_node.next[0]
+#        
+#
+## Example usage for point_to_struct - initialize a 3D point
+#list_head = Dlnode(None,3) # Initialize list_head of appropriate dimensions 
+#new_point = Dlnode(None,3)  # Assuming 3 dimensions
+#point_values = [2.0, 7.5, 5.0]  # Example point values
+#point_to_struct(list_head, new_point, point_values)
+#print("New point initialized with values:", new_point.x)
 
 
 
 
 
+# --------------------------- update data structures -----------------------------------
+
+def add_to_z(new):
+    if new.prev[2] is not None:
+        new.next[2] = new.prev[2].next[2] if new.prev[2].next[2] is not None else None  # in case new->next[2] was removed for being dominated
+    else:
+        new.next[2] = None
+        
+    if new.next[2] is not None:
+        new.next[2].prev[2] = new
+    if new.prev[2] is not None:
+        new.prev[2].next[2] = new
+
+def remove_from_z(old):
+    if old.prev[2] is not None and old.prev[2].next[2] is not None:
+        old.prev[2].next[2] = old.next[2] if old.next[2] is not None else None
+    if old.next[2] is not None and old.next[2].prev[2] is not None:
+        old.next[2].prev[2] = old.prev[2] if old.prev[2] is not None else None
 
 
+def setup_z_and_closest(list_head, new):
+    closest1 = list_head if list_head is not None else None
+    closest0 = list_head.next[2] if list_head is not None and list_head.next[2] is not None else None
+
+    q = list_head.next[2].next[2] if list_head is not None and list_head.next[2] is not None and list_head.next[2].next[2] is not None else None
+    newx = new.x if new is not None else None
+    
+    while q is not None and lexicographic_less(q.x, newx):
+        if q.x[0] <= newx[0] and q.x[1] <= newx[1]:
+            new.ndomr += 1
+            new.domr = q
+        elif q.x[1] < newx[1] and (q.x[0] < closest0.x[0] or (q.x[0] == closest0.x[0] and q.x[1] < closest0.x[1])):
+            closest0 = q
+        elif q.x[0] < newx[0] and (q.x[1] < closest1.x[1] or (q.x[1] == closest1.x[1] and q.x[0] < closest1.x[0])):
+            closest1 = q
+            
+        q = q.next[2] if q is not None else None
+        
+    new.closest[0] = new.cnext[0] = closest0
+    new.closest[1] = new.cnext[1] = closest1
+
+    new.prev[2] = q.prev[2] if q is not None else None
+    new.next[2] = q if q is not None else None
+
+def add_to_data_structure(list_head, new, determine_insertion_points):
+    if determine_insertion_points:
+        setup_z_and_closest(list_head, new)
+    add_to_z(new)
+    
+    p = new.next[2]
+    stop = list_head.prev[2]
+    ndom = 0
+    all_delimiters_visited = 0
+    while p != stop and all_delimiters_visited < 2:
+        if p.x[0] <= new.x[0] and p.x[1] <= new.x[1] and (p.x[0] < new.x[0] or p.x[1] < new.x[1]):
+            all_delimiters_visited += 1
+        else:
+            if all_delimiters_visited == 0 or p.ndomr > 0:
+                if new.x[0] <= p.x[0]:
+                    if new.x[1] <= p.x[1]:
+                        p.ndomr += 1
+                        p.domr = new
+                        ndom += 1
+                    elif new.x[0] < p.x[0] and (new.x[1] < p.closest[1].x[1] or (new.x[1] == p.closest[1].x[1] and (new.x[0] < p.closest[1].x[0] or (new.x[0] == p.closest[1].x[0] and new.x[2] < p.closest[1].x[2])))):
+                        p.closest[1] = new
+                elif new.x[1] < p.x[1] and (new.x[0] < p.closest[0].x[0] or (new.x[0] == p.closest[0].x[0] and (new.x[1] < p.closest[0].x[1] or (new.x[1] == p.closest[0].x[1] and new.x[2] < p.closest[0].x[2])))):
+                    p.closest[0] = new
+
+                if p.ndomr > 1:
+                    remove_from_z(p)
+        p = p.next[2]
+    
+    return ndom
+
+
+# ------------------------------------------ test (working) -----------------------------
+
+# Creating a list head
+list_head = Dlnode([0.0, 0.0, 0.0], 3)  # Assuming 3 dimensions
+list_head.next[0] = list_head
+list_head.prev[0] = list_head
+
+# Creating a new node
+new_node = Dlnode([1, 2, 3], 3)  # Example coordinates
+
+# Example usage of add_to_z
+add_to_z(new_node)
+print("Node added to z.")
+
+add_to_data_structure(list_head, new_node, determine_insertion_points=True)
+print("Node added to data structure.")
+
+# Example usage of remove_from_z
+# For this example, let's assume we have a node to remove called `node_to_remove`
+node_to_remove = Dlnode([1, 2, 3], 3)
+remove_from_z(node_to_remove)
+print("Node removed from z.")
+
+# Define the number of nodes
+num_nodes = 5
+
+# Create an empty list to hold the nodes
+list_of_nodes = []
+
+# Create nodes and append them to the list
+for i in range(num_nodes):
+    node = Dlnode([i, i, i], 3)  # Assuming 3 dimensions, with coordinates [i, i, i]
+    list_of_nodes.append(node)
+
+# Print the list of nodes
+print("List of Nodes:")
+for node in list_of_nodes:
+    print(node)
+
+# Example usage of setup_z_and_closest
+# For this example, let's assume we have a list of nodes called `list_of_nodes`
+for node in list_of_nodes:
+    setup_z_and_closest(list_head, node)
+print("Z and closest setup completed.")
 
 
 # -------------------------------- sort -----------------------------------
