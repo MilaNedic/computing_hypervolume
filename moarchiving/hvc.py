@@ -330,9 +330,9 @@ print("Z and closest setup completed.")
 
 # -------------------------------- sort -----------------------------------
 
-# compare two points in 3D with coordinates (x1, y1, z1) and (x2, y2, z2)
+# compare two points in 3D with coordinates (z1, y1, x1) and (z2, y2, x2)
 def compare_points_3d(p1, p2):
-    for i in range(3):
+    for i in range(2, -1, -1):
         c1 = p1[i] # current coordinate of the first point
         c2 = p2[i] # current coordnate of the second point
         if c1 < c2:
@@ -342,9 +342,9 @@ def compare_points_3d(p1, p2):
     return 0 # p1 and p2 are equal
         
         
-# compare two points in 4D with coordinates (x1, y1, z1, w1) and (x2, y2, z2, w2)
+# compare two points in 4D with coordinates (w1, z1, y1, x1) and (w2, z2, y2, x2)
 def compare_points_4d(p1, p2):
-    for i in range(4):
+    for i in range(3, -1, -1):
         c1 = p1[i] # current coordinate of the first point
         c2 = p2[i] # current coordnate of the second point
         if c1 < c2:
