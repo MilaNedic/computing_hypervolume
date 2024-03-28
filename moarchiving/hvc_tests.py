@@ -1,4 +1,8 @@
 import hvc
+from avltree import AvlTree
+avl_tree: AvlTree[int, str] = AvlTree[int, str]({0: "0", 1: "1"})
+print(list(avl_tree))
+print(len(avl_tree))
 
 print(hvc.compare_points_3d([0,0,0],[1,1,1]))
 print(hvc.compare_points_4d([0,0,0,0],[1,1,1,1]))

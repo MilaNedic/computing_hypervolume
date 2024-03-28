@@ -3,6 +3,8 @@
     It is a transcription of the original hvc class, which is written in c.
     
 """
+# -------------------- AVL tree ---------------
+from avltree import AvlTree
 # --------------------------- auxiliary functions ------------------------
 
 " max and min functions are already defined in python "
@@ -18,11 +20,11 @@ def join(p1, p2):
 
 # for 3D points    
 def lexicographic_less(a, b):
-    return a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and a[2] <= b[2])))
+    return a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))
 
 ## for 4D points
 def lexicographic_less_4d(a, b):
-    return a[0] < b[0] or (a[0] == b[0] and (a[1] < b[1] or (a[1] == b[1] and (a[2] < b[2] or (a[2] == b[2] and a[3] <= b[3])))))
+    return a[3] < b[3] or (a[3] == b[3] and (a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))))
 
 # -------------------------- class definition ------------------------------------- 
 #class Dlnode:
@@ -330,9 +332,9 @@ print("Z and closest setup completed.")
 
 # -------------------------------- sort -----------------------------------
 
-# compare two points in 3D with coordinates (x1, y1, z1) and (x2, y2, z2)
+# compare two points in 3D with coordinates (z1, y1, x1) and (z2, y2, x2)
 def compare_points_3d(p1, p2):
-    for i in range(3):
+    for i in range(2,-1,-1):
         c1 = p1[i] # current coordinate of the first point
         c2 = p2[i] # current coordnate of the second point
         if c1 < c2:
@@ -342,9 +344,9 @@ def compare_points_3d(p1, p2):
     return 0 # p1 and p2 are equal
         
         
-# compare two points in 4D with coordinates (x1, y1, z1, w1) and (x2, y2, z2, w2)
+# compare two points in 4D with coordinates (w1, z1, y1, x1) and (w2, z2, y2, x2)
 def compare_points_4d(p1, p2):
-    for i in range(4):
+    for i in range(3,-1,-1):
         c1 = p1[i] # current coordinate of the first point
         c2 = p2[i] # current coordnate of the second point
         if c1 < c2:
@@ -353,6 +355,12 @@ def compare_points_4d(p1, p2):
             return 1
     return 0
 
+
+
+
+
+
+# ------------------ preprocessing ------------------------------------------
 
 def compare_tree_asc_y(p1, p2):
     y1 = p1[1]
