@@ -6,6 +6,10 @@ from avltree import AvlTree
 def lexicographic_less(a, b):
     return a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))
 
+# for 4D points
+def lexicographic_less_4d(a, b):
+    return a[3] < b[3] or (a[3] == b[3] and (a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))))
+
 # ------------------- Data Structure ------------------------
 
 class DLNode:
@@ -241,3 +245,68 @@ def remove_from_z(old):
 #print("\nAfter removing node2:")
 #print("new_node next:", new_node.next[2] == node3)
 #print("node3 prev:", node3.prev[2] == new_node)
+
+def setup_z_and_closest(list, new):
+    closest1 = list
+    closest0 = list.next[2]
+
+    q = list.next[2].next[2]
+
+    newx = new.x
+
+    while q and lexicographic_less(q.x, newx):
+        if q.x[0] <= newx[0] and q.x[1] <= newx[1]:
+            new.ndomr += 1
+        elif q.x[1] < newx[1] and (q.x[0] < closest0.x[0] or (q.x[0] == closest0.x[0] and q.x[1] < closest0.x[1])):
+            closest0 = q
+        elif q.x[0] < newx[0] and (q.x[1] < closest1.x[1] or (q.x[1] == closest1.x[1] and q.x[0] < closest1.x[0])):
+            closest1 = q
+
+        q = q.next[2]
+
+    new.closest[0] = new.cnext[0] = closest0
+    new.closest[1] = new.cnext[1] = closest1
+
+    # Handling the case where q is None, indicating we've reached the end of the list
+    if q:
+        new.prev[2] = q.prev[2]
+        q.prev[2].next[2] = new
+        new.next[2] = q
+    else:
+        # Assuming we're adding at the end if q is None
+        tail = closest1
+        while tail.next[2] is not None:
+            tail = tail.next[2]
+        new.prev[2] = tail
+        tail.next[2] = new
+        new.next[2] = None
+        
+# Assuming DLNode class and setup_z_and_closest function are defined as previously described
+
+# Initialize sentinel nodes to start and end the list
+sentinel_start = DLNode()
+sentinel_end = DLNode()
+
+# Setting up the sentinel nodes with extreme values to simulate the start and end of the list
+sentinel_start.x = [0.0, 0.0, 0.0, 0.0]
+sentinel_end.x = [10.0, 10.0, 10.0, 0.0]
+
+# Linking the sentinel nodes
+sentinel_start.next[2] = sentinel_end
+sentinel_end.prev[2] = sentinel_start
+
+# Create a new node with specific values
+new_node = DLNode()
+new_node.x = [1.0, 2.0, 3.0, 4.0]  # This node should be inserted between the sentinel nodes
+
+# Use setup_z_and_closest to properly insert the new node into the list
+setup_z_and_closest(sentinel_start, new_node)
+
+# Verify the structure and links
+print("New node x:", new_node.x)
+print("Is the new node correctly placed after sentinel_start and before sentinel_end?")
+print("Next to sentinel_start:", sentinel_start.next[2] == new_node)
+print("Previous to sentinel_end:", sentinel_end.prev[2] == new_node)
+print("New node's closest[0]:", new_node.closest[0].x if new_node.closest[0] else "None")
+print("New node's closest[1]:", new_node.closest[1].x if new_node.closest[1] else "None")
+
