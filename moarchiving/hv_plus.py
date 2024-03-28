@@ -288,8 +288,8 @@ sentinel_start = DLNode()
 sentinel_end = DLNode()
 
 # Setting up the sentinel nodes with extreme values to simulate the start and end of the list
-sentinel_start.x = [0.0, 0.0, 0.0, 0.0]
-sentinel_end.x = [10.0, 10.0, 10.0, 0.0]
+sentinel_start.x = [20.0, 20.0, 20.0, 20.0]
+sentinel_end.x = [-10.0, -10.0, -10.0, -10.0]
 
 # Linking the sentinel nodes
 sentinel_start.next[2] = sentinel_end
