@@ -356,9 +356,6 @@ def compare_points_4d(p1, p2):
             return 1
     return 0
 
-
-
-
 # ------------------ preprocessing ------------------------------------------
 
 def compare_tree_asc_y(p1, p2):
