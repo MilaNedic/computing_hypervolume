@@ -460,7 +460,9 @@ def setup_cdllist(data, naloc, n, d, ref):
 
     return head
 
-
+def free_cdllist(list):
+    # In Python, garbage collection handles memory deallocation
+    del list
 
 # Define a small set of 3D points as flat data
 data = [
@@ -489,6 +491,9 @@ def print_cdllist(head, di):
 
 # Print the list to check if it's set up correctly
 print_cdllist(head, d - 1)
+
+    
+free_cdllist(head)
 
 
 
