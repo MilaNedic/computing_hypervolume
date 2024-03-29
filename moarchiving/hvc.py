@@ -5,6 +5,7 @@
 """
 # -------------------- AVL tree ---------------
 from avltree import AvlTree
+from functools import cmp_to_key
 # --------------------------- auxiliary functions ------------------------
 
 " max and min functions are already defined in python "
@@ -287,47 +288,47 @@ def add_to_data_structure(list_head, new, determine_insertion_points):
 # ------------------------------------------ test (working) -----------------------------
 
 # Creating a list head
-list_head = Dlnode([0.0, 0.0, 0.0], 3)  # Assuming 3 dimensions
-list_head.next[0] = list_head
-list_head.prev[0] = list_head
-
-# Creating a new node
-new_node = Dlnode([1, 2, 3], 3)  # Example coordinates
-
-# Example usage of add_to_z
-add_to_z(new_node)
-print("Node added to z.")
-
-add_to_data_structure(list_head, new_node, determine_insertion_points=True)
-print("Node added to data structure.")
-
-# Example usage of remove_from_z
-# For this example, let's assume we have a node to remove called `node_to_remove`
-node_to_remove = Dlnode([1, 2, 3], 3)
-remove_from_z(node_to_remove)
-print("Node removed from z.")
-
-# Define the number of nodes
-num_nodes = 5
-
-# Create an empty list to hold the nodes
-list_of_nodes = []
-
-# Create nodes and append them to the list
-for i in range(num_nodes):
-    node = Dlnode([i, i, i], 3)  # Assuming 3 dimensions, with coordinates [i, i, i]
-    list_of_nodes.append(node)
-
-# Print the list of nodes
-print("List of Nodes:")
-for node in list_of_nodes:
-    print(node)
-
-# Example usage of setup_z_and_closest
-# For this example, let's assume we have a list of nodes called `list_of_nodes`
-for node in list_of_nodes:
-    setup_z_and_closest(list_head, node)
-print("Z and closest setup completed.")
+#list_head = Dlnode([0.0, 0.0, 0.0], 3)  # Assuming 3 dimensions
+#list_head.next[0] = list_head
+#list_head.prev[0] = list_head
+#
+## Creating a new node
+#new_node = Dlnode([1, 2, 3], 3)  # Example coordinates
+#
+## Example usage of add_to_z
+#add_to_z(new_node)
+#print("Node added to z.")
+#
+#add_to_data_structure(list_head, new_node, determine_insertion_points=True)
+#print("Node added to data structure.")
+#
+## Example usage of remove_from_z
+## For this example, let's assume we have a node to remove called `node_to_remove`
+#node_to_remove = Dlnode([1, 2, 3], 3)
+#remove_from_z(node_to_remove)
+#print("Node removed from z.")
+#
+## Define the number of nodes
+#num_nodes = 5
+#
+## Create an empty list to hold the nodes
+#list_of_nodes = []
+#
+## Create nodes and append them to the list
+#for i in range(num_nodes):
+#    node = Dlnode([i, i, i], 3)  # Assuming 3 dimensions, with coordinates [i, i, i]
+#    list_of_nodes.append(node)
+#
+## Print the list of nodes
+#print("List of Nodes:")
+#for node in list_of_nodes:
+#    print(node)
+#
+## Example usage of setup_z_and_closest
+## For this example, let's assume we have a list of nodes called `list_of_nodes`
+#for node in list_of_nodes:
+#    setup_z_and_closest(list_head, node)
+#print("Z and closest setup completed.")
 
 
 # -------------------------------- sort -----------------------------------
@@ -354,8 +355,6 @@ def compare_points_4d(p1, p2):
         elif c2 < c1:
             return 1
     return 0
-
-
 
 
 
