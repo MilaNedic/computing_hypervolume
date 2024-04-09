@@ -147,7 +147,7 @@ ALL_LDFLAGS = $(LDFLAGS) $(OPT_LDFLAGS)
 #----------------------------------------------------------------------
 default: hvc hvc-examples
 
-all: clean hvc hvc-examples
+all: clean hvc hvc-examples main-test
 
 clean:
 	$(call ECHO,---> Removing hv <---)
@@ -160,6 +160,7 @@ clean:
 	@$(RM) *~
 	@$(RM) *.o
 	@$(RM) hvc-examples
+	@$(RM) main-test
 	
 	
 
@@ -193,6 +194,9 @@ hvc-examples: main-examples.o timer.o io.o avl.o examples.o hvc-class.o hvc.o -l
 	$(call ECHO,---> Building $@ version $(VERSION) <---)
 	$(QUIET_LINK)$(CC) $(ALL_LDFLAGS) -o $@ $^
 	
+main-test: main-test.o 
+	$(call ECHO,---> Building $@ version $(VERSION) <---)
+	$(QUIET_LINK)$(CC) $(ALL_LDFLAGS) -o $@ $^
 	
 hv.ps: hv-plus.c
 	a2ps -E -g -o hv.ps hv-plus.c

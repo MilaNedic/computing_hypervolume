@@ -536,13 +536,16 @@ static double computeAreaSimple(double * p, int di, dlnode_t * s, dlnode_t * u){
 
 //does what setupZandClosest does while reconstructing L at z = new->x[2]
 static void restartBaseSetupZandClosest(dlnode_t * list, dlnode_t * new){
-    
 
     dlnode_t * p = list->next[2]->next[2];
     double * closest1 = (double *) (list);
     double * closest0 = (double *) (list->next[2]);
 
     double * newx = new->x;
+    int loop;
+
+    printf("list\n");
+    printf("%f %f %f %f\n", list[0], list[1], list[2], list[3]);    
     
     restartListy(list);
     
@@ -570,8 +573,10 @@ static void restartBaseSetupZandClosest(dlnode_t * list, dlnode_t * new){
         }
     
         p = p->next[2];
+
     }
-    
+    printf("newx\n");
+    printf("%f %f %f %f\n", newx[0], newx[1], newx[2], newx[3]);    
     
     new->closest[0] = (dlnode_t *) closest0;
     new->closest[1] = (dlnode_t *) closest1;
@@ -579,7 +584,12 @@ static void restartBaseSetupZandClosest(dlnode_t * list, dlnode_t * new){
     new->prev[2] = p->prev[2];
     new->next[2] = p;
     
-    
+    printf("p\n");
+    printf("%f %f %f %f\n", p->x[0], p->x[1], p->x[2], p->x[3]);    
+    printf("closest0\n");
+    printf("%f %f %f %f\n", closest0[0], closest0[1], closest0[2], closest0[3]);     
+    printf("closest1\n");
+    printf("%f %f %f %f\n", closest1[0], closest1[1], closest1[2], closest1[3]);    
 }
 
 static double oneContribution3d(dlnode_t * list, dlnode_t * new){
@@ -672,7 +682,8 @@ static double hv3dplus(dlnode_t * list){
         p = p->next[2];
     }
     
-    
+    //printf("hv3dplusU");
+
     return volume;
     
 }
@@ -702,6 +713,7 @@ double hv4dplusR(dlnode_t * list)
     
         new = new->next[3];
     }
+    
         
     return hv;
 }
@@ -733,6 +745,7 @@ double hv4dplusU(dlnode_t * list)
         new = new->next[3];
     }
         
+    //printf("hv4dplusU");
 
     return hv;
     
@@ -769,3 +782,13 @@ double hvplus(double *data, int d, int n, double *ref, int recompute)
     return hv;
 }
 
+
+int main() {
+    printf("Hello world!\n");
+    float testArray[5][4] = {{1.0, 1.0, 1.0, 4.0},{2.0, 2.0, 2.0, 4.0},{3.0, 3.0, 3.0, 4.0},{4.0, 4.0, 4.0, 4.0},{5.0, 5.0, 5.0, 4.0}}; 
+    float testPoint[4] = {4.6, 4.6, 4.6, 4.0};
+    double a[3] = {10.0, 1.0, 1.0};
+    double b[3] = {1.0, 1.0, 1.0};
+    // int c = lexicographicLess(a, b);
+    // printf("%f", c);
+}
