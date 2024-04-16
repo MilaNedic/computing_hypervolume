@@ -19,7 +19,13 @@ int main() {
     float testPoint[4] = {4.6, 4.6, 4.6, 4.0};
     double a[3] = {10.0, 1.0, 1.0};
     double b[3] = {1.0, 1.0, 1.0};    
-    hvc3d(NULL, 1);
-    lexicographicLessNew(a, b);
-    // printf("%f", c);
+    //hvc3d(NULL, 1);
+    int c = lexicographicLessNew(a, b);
+    //const p1 = {3.0, 1.0, 3.0};
+    //const p2 = {2.0, 2.0, 4.0};
+    //const q1 = {3.0, 1.0, 3.0, 5.0};
+    //const q2 = {2.0, 2.0, 4.0, 6.0};
+    //compare_point3d(p1, p2);
+    //compare_point4d(q1, q2);
+    printf("Result of lexicographicless: %d", c);
 }

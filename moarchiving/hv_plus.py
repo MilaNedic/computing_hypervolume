@@ -1,6 +1,7 @@
 # -------------------- AVL Tree ---------------
 from avltree import AvlTree
 from functools import cmp_to_key
+import numpy as np
 
 # --------------- Auxiliary Functions ---------------------
 
@@ -75,6 +76,35 @@ def init_sentinels(ref, d):
 
     return s1
 
+def init_sentinels_new(list_nodes, ref, d):
+    s1, s2, s3 = list_nodes[0], list_nodes[1], list_nodes[2]
+
+    # Initialize s1 node
+    s1.x = [float('-inf'), ref[1], float('-inf'), float('-inf')]
+    s1.closest = [s2, s1]
+    s1.next = [None, None, s2, s2]
+    s1.cnext = [None, None]
+    s1.prev = [None, None, s3, s3]
+    s1.ndomr = 0
+
+    # Initialize s2 node
+    s2.x = [ref[0], float('-inf'), float('-inf'), float('-inf')]
+    s2.closest = [s2, s1]
+    s2.next = [None, None, s3, s3]
+    s2.cnext = [None, None]
+    s2.prev = [None, None, s1, s1]
+    s2.ndomr = 0
+
+    # Initialize s3 node
+    s3.x = [float('-inf'), float('-inf'), ref[2], ref[3] if d == 4 else float('-inf')]
+    s3.closest = [s2, s1]
+    s3.next = [None, None, s1, None]
+    s3.cnext = [None, None]
+    s3.prev = [None, None, s2, s2]
+    s3.ndomr = 0
+
+    return s1
+
 
 # ------------
 
@@ -98,10 +128,6 @@ def point2struct(list, p, v, d):
     
     return p
 
-# Initialize the sentinel nodes with a reference point and dimension
-ref_point = [1.0, 2.0, 3.0, 4.0]
-dimension = 3
-sentinels = init_sentinels(ref_point, dimension)
 
 
 # --------------------- Updating Data Structures --------------------------
@@ -213,16 +239,7 @@ def compare_points_4d(p1, p2):
             return 1
     return 0
 
-
 # --------- Auxiliary function that compares points in 3d or in 4d and sorts them in ascending order of the last coorinate ---------------
-
-#def key_point3d(point):
-#    # Return a tuple that Python can use to sort the points
-#    return (point[2], point[1], point[0])
-#
-#def key_point4d(point):
-#    # Return a tuple that Python can use to sort the points
-#    return (point[3], point[2], point[1], point[0])
 
 def sort_3d(list):
     #return sorted(list, key=key_point3d)
@@ -232,25 +249,6 @@ def sort_4d(list):
     #return sorted(list, key=key_point4d)
     return sorted(list, key=cmp_to_key(compare_points_4d))
 
-# Example usage for sorting lists of 3D and 4D points:
-#points_3d = [
-#    [1.0, 3.0, 5.0],
-#    [2.0, 2.0, 4.0],
-#    [3.0, 1.0, 3.0],
-#]
-#
-#points_4d = [
-#    [1.0, 3.0, 5.0, 7.0],
-#    [2.0, 2.0, 4.0, 6.0],
-#    [3.0, 1.0, 3.0, 5.0],
-#]
-
-# Sort the lists
-#sorted_points_3d = sort_3d(points_3d) # Ascending order of the last coodinate
-#sorted_points_4d = sort_4d(points_4d) 
-#
-#print("Sorted 3D points:", sorted_points_3d)
-#print("Sorted 4D points:", sorted_points_4d)
 
 def setup_cdllist(data, naloc, n, d, ref):
     head = init_sentinels(ref, d)
@@ -276,40 +274,47 @@ def setup_cdllist(data, naloc, n, d, ref):
 
     return head
 
+" This is not the correct implementation of setup_cdlist "
+def setup_cdllist_new(data, naloc, n, d, ref):
+    head = [DLNode() for _ in range(naloc + 3)]
+    init_sentinels_new(head[0:3], ref, d) # init_sentinels_new accepts a list at the beginning, therefore we use head[0:3]
+    di = d - 1
+
+    if n > 0:
+        # Convert data to a structured format suitable for sorting and linking
+        points = np.array(data).reshape(n, d)
+        if d == 3:
+            # Using np.lexsort to sort by z, y, x in ascending order
+            sorted_indices = np.lexsort((points[:, 0], points[:, 1], points[:, 2]))
+        elif d == 4:
+            # Using np.lexsort to sort by w, z, y, x in ascending order
+            sorted_indices = np.lexsort((points[:, 0], points[:, 1], points[:, 2], points[:, 3]))
+        sorted_points = points[sorted_indices]
+
+        # Create nodes from sorted points
+        for i, index in enumerate(sorted_indices):
+            head[i + 3].x = points[index].tolist()
+
+        # Link nodes
+        s = head[0].next[di]
+        s.next[di] = head[3]
+        head[3].prev[di] = s
+
+        for i in range(3, n+2):
+            head[i].next[di] = head[i+1] if i+1 < len(head) else head[0]
+            head[i+1].prev[di] = head[i]
+
+        s = head[0].prev[di]
+        s.prev[di] = head[n+2]
+        head[n+2].next[di] = s
+
+    return head[0]
+
+
 def free_cdllist(list):
     # In Python, garbage collection handles memory deallocation
     del list
 
-# Define a small set of 3D points as flat data
-data = [
-    [1.0, 2.0, 3.0],  # Point 1
-    [4.0, 5.0, 6.0],  # Point 2
-    [7.0, 8.0, 9.0]   # Point 3
-]
-
-# Set the reference point for initializing sentinels
-ref_point = [0.0, 0.0, 0.0]
-
-# Define the number of points and dimension
-n = 3  # Number of points
-d = 3  # Dimension
-
-# Call the function to setup the CDLL
-head = setup_cdllist(data, n + 3, n, d, ref_point)
-#
-# Function to print the circular doubly-linked list
-def print_cdllist(head, di):
-    print("Circular Doubly-Linked List:")
-    current = head.next[di]
-    while current != head:
-        print(current.x)
-        current = current.next[di]
-
-# Print the list to check if it's set up correctly
-print_cdllist(head, d - 1)
-print("\n")
-    
-free_cdllist(head)
 
 
 # ------------------------- Hyperovlume Indicator Algorithms ---------------------------------------
@@ -339,72 +344,6 @@ def compute_area_simple(p, di, s, u):
     
     return area
 
-
-# ----------------------------- Example 1 -----------------------------
-
-## Create the sentinel nodes for the list
-#sentinel_start = DLNode()
-#sentinel_end = DLNode()
-#sentinel_start.x = [-float('inf'), -float('inf'), -float('inf'), -float('inf')]
-#sentinel_end.x = [float('inf'), float('inf'), float('inf'), float('inf')]
-#
-#
-## Link the sentinel nodes
-#sentinel_start.next[2] = sentinel_end  # Assume dimension 2 is y-dimension
-#sentinel_end.prev[2] = sentinel_start
-#
-## Create a few DLNode instances and link them in the list
-#node1 = DLNode([4.0, 1.0, 1.0])
-#node2 = DLNode([3.0, 2.0, 2.0])
-#node3 = DLNode([2.0, 3.0, 3.0])
-#
-#
-#
-#nodes = [node1, node2, node3]
-#
-## Link the nodes into the list
-#prev_node = sentinel_start
-#for node in nodes:
-#    node.next[2] = sentinel_end
-#    node.prev[2] = prev_node
-#    prev_node.next[2] = node
-#    prev_node = node
-#    
-## Close the circular doubly-linked list
-#sentinel_end.prev[2] = nodes[-1]
-#
-## Initialize cnext pointers using restart_list_y function
-#restart_list_y(sentinel_start)
-#
-## Now you can call compute_area_simple with these nodes
-## For example, let's compute the area for the first node in the list
-#p = [5.0, 3.0, 3.0]  # Some point p
-#q = [0.0, 1.0, 3.0] # Some point q
-#di = 0  # Dimension to compute the area over
-##s = nodes[0]
-##u = nodes[1]
-#
-#area = compute_area_simple(p, di, nodes[0], nodes[1])
-#print(f"The computed area for p, node1 and node2 is: {area}")
-#
-#area = compute_area_simple(p, di, nodes[1], nodes[2])
-#print(f"The computed area for p, node2 and node3 is: {area}")
-#
-#area = compute_area_simple(p, di, nodes[0], nodes[2])
-#print(f"The computed area for p, node1 and node3 is: {area}")
-#
-#print("\n")
-#
-#area = compute_area_simple(p, di+1, nodes[2], nodes[1])
-#print(f"The computed area for p, node1 and node2 is: {area}")
-#
-#area = compute_area_simple(p, di+1, nodes[1], nodes[0])
-#print(f"The computed area for p, node2 and node3 is: {area}")
-#
-#area = compute_area_simple(p, di+1, nodes[2], nodes[0])
-#print(f"The computed area for p, node1 and node3 is: {area}")
-#
-#print("\n")
 
 
 # ----------------------------------------------------------------
@@ -461,96 +400,6 @@ def restart_base_setup_z_and_closest(head, new_node):
     new_node.cnext[0] = closest0
     new_node.cnext[1] = closest1
 
-
-## -------- example 1 ----------------
-
-# Create a list and populate it with nodes. This is an example for a 3D case.
-# Define a list with sentinel nodes
-head = DLNode()
-head.next[2] = DLNode([-float('inf'), 10.0, -float('inf'), -float('inf')])  # Sentinel
-head.next[2].next[2] = DLNode([ref_point[0], -float('inf'), -float('inf'), -float('inf')])  # Sentinel
-head.next[2].next[2].next[2] = head  # Make it circular
-
-# Define a new node with coordinates
-new_node = DLNode([1.0, 1.0, 2.0, 3.0])
-new_node2 = DLNode([5.0, 0.0, 1.0, 1.0])
-#Now call the function with the list and the new node.
-
-restart_base_setup_z_and_closest(head, new_node)
-restart_base_setup_z_and_closest(head, new_node2)
-
-# Print the results
-print(f"New node's closest[0]: {new_node.closest[0].x if new_node.closest[0] else None}")
-print(f"New node's closest[1]: {new_node.closest[1].x if new_node.closest[1] else None}")
-print(f"New node's ndomr: {new_node.ndomr}")
-
-print("\n")
-
-print(f"New node2's closest[0]: {new_node2.closest[0].x if new_node2.closest[0] else None}")
-print(f"New node2's closest[1]: {new_node2.closest[1].x if new_node2.closest[1] else None}")
-print(f"New node2's ndomr: {new_node2.ndomr}")
-
-print("\n")
-
-# ------------------ example 2 ----------------------
-
-# Create the sentinel nodes for the list
-ref_point = [10.0, 10.0, 10.0, 10.0]
-sentinel_start = DLNode([-float('inf'), ref_point[1], -float('inf'), -float('inf')])
-sentinel_end = DLNode([ref_point[0], -float('inf'), -float('inf'), -float('inf')])
-
-# Link sentinel nodes to form a circular list in the z-dimension
-sentinel_start.next[2] = sentinel_end
-sentinel_end.prev[2] = sentinel_start
-
-# Initialize a list with some DLNode objects representing 3D points
-# The points are sorted in increasing z order
-points = [
-    [1.0, 1.0, 1.0, 4.0],  
-    [2.0, 2.0, 2.0, 4.0],  
-    [3.0, 3.0, 3.0, 4.0],  
-    [4.0, 4.0, 4.0, 4.0],  
-    [5.0, 5.0, 5.0, 4.0]   
-]
-
-# Create the nodes and link them into the list
-current = sentinel_start
-
-for point in points:
-    idx = points.index(point)
-    node = DLNode(point)
-    node.next[2] = sentinel_end
-    node.prev[2] = current
-    current.next[2] = node
-    current = node
-
-
-# Close the circular doubly-linked list in the z-dimension
-sentinel_end.prev[2] = current
-
-# Define a new node with coordinates that is supposed to be inserted
-new_node = DLNode([6.1, 0.1, 2.1, 4.0]) 
-" the closest node in x coordinate is [2.0, 2.0, 2.0, 4.0] and the closest node in y coordinate is [3.0, 3.0, 3.0, 4.0]"
-
-# Call the function to insert the new_node into the list
-restart_base_setup_z_and_closest(sentinel_start, new_node)
-
-
-# Function to print the list for debugging purposes
-def print_list(node):
-    while node:
-        print(f"Node: {node.x}, Closest[0]: {node.closest[0].x if node.closest[0] else 'None'}, Closest[1]: {node.closest[1].x if node.closest[1] else 'None'}")
-        node = node.next[2] if node.next[2] != sentinel_start else None
-
-
-# Print the list starting from the first sentinel node
-print_list(sentinel_start.next[2])
-# Print the details of the new_node
-print(f"New Node: {new_node.x}, Closest[0]: {new_node.closest[0].x if new_node.closest[0] else 'None'}, Closest[1]: {new_node.closest[1].x if new_node.closest[1] else 'None'}, ndomr: {new_node.ndomr}")
-
-#print(new_node.closest[0].x == [2.0, 2.0, 2.0, 4.0])
-#print(new_node.closest[1].x == [3.0, 3.0, 3.0, 4.0])
-print("\n")
 
 
 
