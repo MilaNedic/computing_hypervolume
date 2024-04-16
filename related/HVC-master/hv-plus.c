@@ -57,7 +57,7 @@
 
 /* ---------------------------------- Auxiliar Functions ----------------------------------*/
 //3D points
-static inline int lexicographicLess(double * a, double * b){
+int lexicographicLessNew(double * a, double * b){
     return (a[2] < b[2] || (a[2] == b[2] && (a[1] < b[1] || (a[1] == b[1] && a[0] <= b[0]))));
 }
 
@@ -216,7 +216,7 @@ static void setupZandClosest(dlnode_t * list, dlnode_t * new){
     double * newx = new->x;
     
     
-    while(lexicographicLess(q->x, newx)){
+    while(lexicographicLessNew(q->x, newx)){
         if(q->x[0] <= newx[0] && q->x[1] <= newx[1]){
                 
             new->ndomr += 1;
@@ -549,7 +549,7 @@ static void restartBaseSetupZandClosest(dlnode_t * list, dlnode_t * new){
     
     restartListy(list);
     
-    while(lexicographicLess(p->x, newx)){
+    while(lexicographicLessNew(p->x, newx)){
         
         //reconstruct
         p->cnext[0] = p->closest[0];
@@ -783,12 +783,3 @@ double hvplus(double *data, int d, int n, double *ref, int recompute)
 }
 
 
-int main() {
-    printf("Hello world!\n");
-    float testArray[5][4] = {{1.0, 1.0, 1.0, 4.0},{2.0, 2.0, 2.0, 4.0},{3.0, 3.0, 3.0, 4.0},{4.0, 4.0, 4.0, 4.0},{5.0, 5.0, 5.0, 4.0}}; 
-    float testPoint[4] = {4.6, 4.6, 4.6, 4.0};
-    double a[3] = {10.0, 1.0, 1.0};
-    double b[3] = {1.0, 1.0, 1.0};
-    // int c = lexicographicLess(a, b);
-    // printf("%f", c);
-}

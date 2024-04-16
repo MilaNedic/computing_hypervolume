@@ -44,7 +44,6 @@
 #include "hvc.h"
 #include "timer.h"
  
-
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -69,7 +68,7 @@ static char *suffix = NULL;
 static int ksub = -1;
 static int outflag = 0; //0 - index and contribution (default), 1 - accumulated contribution
 static int recompute = 0; //0 - do not recompute (faster version - only computes what changes), 1 - recompute
-static int hvprobcom = 0; //0 - hv, 1, hvc, 2 - gHSSD
+static int hvproblem  = 0; //0 - hv, 1, hvc, 2 - gHSSD
 
 static void usage(void)
 {
@@ -98,7 +97,7 @@ static void usage(void)
 " -s, --suffix=STRING Create an output file for each input file by appending\n"
 "                     this suffix. This is ignored when reading from stdin. \n"
 "                     If missing, output is sent to stdout.                 \n"
-" -P, --problem=(0|1|2) Select the problem to be huted.                  \n"
+" -P, --problem=(0|1|2) Select the problem to be computed.                  \n"
 "                     (0: hypervolume indicator (default))                  \n"
 "                     (1: all contributions)                                \n"
 "                     (2: decremental greedy approximation of the           \n"

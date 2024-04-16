@@ -37,7 +37,10 @@
 extern "C" {
 #endif
 
+
 double hvplus(double *data, int d, int n, const double *ref, int recompute);
+
+int lexicographicLessNew(double * a, double * b);
 
 #ifdef __cplusplus
 }

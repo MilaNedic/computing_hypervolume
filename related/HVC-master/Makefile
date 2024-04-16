@@ -194,7 +194,7 @@ hvc-examples: main-examples.o timer.o io.o avl.o examples.o hvc-class.o hvc.o -l
 	$(call ECHO,---> Building $@ version $(VERSION) <---)
 	$(QUIET_LINK)$(CC) $(ALL_LDFLAGS) -o $@ $^
 	
-main-test: main-test.o 
+main-test: main-test.o avl.o hvc.a
 	$(call ECHO,---> Building $@ version $(VERSION) <---)
 	$(QUIET_LINK)$(CC) $(ALL_LDFLAGS) -o $@ $^
 	

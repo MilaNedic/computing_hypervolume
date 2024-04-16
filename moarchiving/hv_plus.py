@@ -123,41 +123,6 @@ def remove_from_z(old):
     if old.next[2] is not None and old.next[2].prev[2] is not None:
         old.next[2].prev[2] = old.prev[2] if old.prev[2] is not None else None
 
-# --------- Example ------------------
-# Create a simple linked structure with 3 nodes for demonstration
-#node1 = DLNode()
-#node2 = DLNode()
-#node3 = DLNode()
-#
-## Manually link nodes
-#node1.next[2] = node2
-#node2.prev[2] = node1
-#node2.next[2] = node3
-#node3.prev[2] = node2
-#
-## Create a new node to add
-#new_node = DLNode()
-#
-## Set up new_node's prev[2] to node1 to insert it between node1 and node2
-#new_node.prev[2] = node1
-#
-## Add new_node to the list
-#add_to_z(new_node)
-#
-## Verify the linkage
-#print("After adding new_node:")
-#print("node1 next:", node1.next[2] == new_node)
-#print("new_node next:", new_node.next[2] == node2)
-#print("new_node prev:", new_node.prev[2] == node1)
-#
-## Now remove node2
-#remove_from_z(node2)
-#
-## Verify the linkage after removal
-#print("\nAfter removing node2:")
-#print("new_node next:", new_node.next[2] == node3)
-#print("node3 prev:", node3.prev[2] == new_node)
-
 
 
 def setup_z_and_closest(head, new):
@@ -187,38 +152,19 @@ def setup_z_and_closest(head, new):
     # Insert new_node before q in the z dimension
     new.prev[2] = q.prev[2]
     new.next[2] = q
-    q.prev[2].next[2] = new  # Link the previous node's next to new_node
-    q.prev[2] = new  # Link q's prev to new_node
     
+    #q.prev[2].next[2] = new  # Link the previous node's next to new_node
+    #q.prev[2] = new  # Link q's prev to new_node
+#
     #q.next[2].prev[2] = new  # Link the previous node's next to new_node
     #q.next[2] = new  # Link q's prev to new_node
 
     return new  # Return the newly inserted node for verification if needed
 
-# ----------------------------  Example usage -----------------------------------
-## Create sentinel nodes to simulate the start and end of the list
-#sentinel_start = DLNode([-15, -15, -15]) # Minimum possible values
-#sentinel_end = DLNode([10, 10, 10]) # Maximum possible values
-#
-## Manually link the sentinel nodes
-#sentinel_start.next[2] = sentinel_end
-#sentinel_end.prev[2] = sentinel_start
-#
-#
-#new_node = DLNode()
-#new_node.x = [0, 0, 0]
-#setup_z_and_closest(sentinel_start, new_node)
-#
-## Output the results
-#print("sentinel_start next is new_node:", sentinel_start.next[2] is new_node)
-#print("new_node next is sentinel_end:", new_node.next[2] is sentinel_end)
-#print("sentinel_end prev is new_node:", sentinel_end.prev[2] is new_node)
-#print("new_node closest[0]:", new_node.closest[0].x)
-#print("new_node closest[1]:", new_node.closest[1].x)
 
 
 # ------------------- Update Links --------------------
-"update_links doesn't seem to work correctly :("
+
 
 def update_links(head, new, p):
     stop = head.prev[2]
@@ -241,40 +187,6 @@ def update_links(head, new, p):
         p = p.next[2]
 
     return ndom
-
-# ----------------------------- Example usage ------------------------------
-
-## Initialize start and end nodes
-#sentinel_start = DLNode([-float('inf'), -float('inf'), -float('inf')])
-#sentinel_end = DLNode([float('inf'), float('inf'), float('inf')])
-##sentinel_start.next[2] = sentinel_end
-##sentinel_end.prev[2] = sentinel_start
-#
-## Create some nodes to form a list
-#p1 = DLNode([2.0, 2.0, 2.0])
-#p2 = DLNode([3.0, 3.0, 3.0])
-#p3 = DLNode([4.0, 4.0, 4.0])
-#
-## Link the nodes
-#sentinel_start.next[2] = p1
-#p1.prev[2] = sentinel_start
-#p1.next[2] = p2
-#p2.prev[2] = p1
-#p2.next[2] = p3
-#p3.prev[2] = p2
-#p3.next[2] = sentinel_end
-#sentinel_end.prev[2] = p3
-#
-## Create a new node that will be checked against the existing nodes
-#new_node = DLNode()
-#new_node.x = [2.5, 2.5, 2.5]
-#
-## Call update_links
-#number_of_dominators = update_links(sentinel_start, new_node, sentinel_start.next[2])
-#
-## Output the number of dominators found
-#print("Number of dominators:", number_of_dominators)
-##
 
 # ----------------------------------------- Sort -----------------------------------
 
