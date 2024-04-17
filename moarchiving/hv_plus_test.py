@@ -1,4 +1,4 @@
-from hv_plus import DLNode, lexicographic_less, init_sentinels, clear_point, point2struct, add_to_z, remove_from_z, setup_z_and_closest, update_links, compare_points_3d, compare_points_4d, sort_3d, sort_4d, setup_cdllist, free_cdllist, restart_list_y, compute_area_simple, restart_base_setup_z_and_closest, one_contribution_3d, hv3dplus
+from hv_plus import DLNode, lexicographic_less, init_sentinels, clear_point, point2struct, add_to_z, remove_from_z, setup_z_and_closest, update_links, compare_points_3d, compare_points_4d, sort_3d, sort_4d, setup_cdllist, free_cdllist, restart_list_y, compute_area_simple, restart_base_setup_z_and_closest, one_contribution_3d
 
 
 # -------------------- Example for the DLNode class -------------------
@@ -472,11 +472,53 @@ print(f"The computed area for p, node1 and node3 is: {area}")
 print("\n")
 
 
+# example for restart bas esetup z and closest
+print('Example for restart_base_setup_z_and_closest')
+
+# Example setup
+list_node = DLNode([0.0, 0.0, 0.0, 0.0])
+node1 = DLNode([1.0, 1.0, 1.0, 1.0])
+node2 = DLNode([2.0, 2.0, 2.0, 2.0])
+node3 = DLNode([3.0, 3.0, 3.0, 3.0])
+
+# Link the nodes in the list for z coordinates (third coordinate, index 2)
+list_node.next[2] = node1
+node1.prev[2] = list_node
+node1.next[2] = node2
+node2.prev[2] = node1
+node2.next[2] = node3
+node3.prev[2] = node2
+
+# Set closest for node1 and node2 (arbitrarily for this example)
+node1.closest = [list_node, list_node]
+node2.closest = [node1, node1]
+
+# New node to be inserted
+new_node = DLNode([2.8, 1.8, 1.8, 1.8])
+
+#list_nodes = [node1, node2, node3]
+#init_sentinels_new(list_nodes, list_node.x, 4)
+
+# Call the function to setup z and closest
+restart_base_setup_z_and_closest(list_node, new_node)
+
+# Check if the new node's closest and prev/next are correctly set
+print(f"New node's closest in x: {new_node.closest[0].x if new_node.closest[0] else None}")
+print(f"New node's closest in y: {new_node.closest[1].x if new_node.closest[1] else None}")
+print(f"New node's previous node in z: {new_node.prev[2].x if new_node.prev[2] else None}")
+print(f"New node's next node in z: {new_node.next[2].x if new_node.next[2] else None}")
+print('\n')
+
+
+
+
+
+
 ## -------- example 1 ----------------
 
 # Create a list and populate it with nodes. This is an example for a 3D case.
 # Define a list with sentinel nodes
-#ref_point = [1.0 for i in range(3)]
+#ref_point = [1.0 for i in range(4 )]
 #head = DLNode()
 #head.next[2] = DLNode([-float('inf'), 10.0, -float('inf'), -float('inf')])  # Sentinel
 #head.next[2].next[2] = DLNode([ref_point[0], -float('inf'), -float('inf'), -float('inf')])  # Sentinel
@@ -563,4 +605,49 @@ print("\n")
 ##print(new_node.closest[1].x == [3.0, 3.0, 3.0, 4.0])
 #print("\n")
 #
+from hv_plus import compare_tree_asc_ym, hv3dplus
 
+print('Example for hv3dplus - points are the same as in test.inp')
+points = [
+    0.16, 0.86, 0.47,
+    0.66, 0.37, 0.29,
+    0.79, 0.79, 0.04,
+    0.28, 0.99, 0.29,
+    0.51, 0.37, 0.38,
+    0.92, 0.62, 0.07,
+    0.16, 0.53, 0.70,
+    0.01, 0.98, 0.94,
+    0.67, 0.17, 0.54,
+    0.79, 0.72, 0.05
+]
+
+d = 3
+
+ref_p = [0.0, 0.0, 0.0]
+
+# Call setup_cdllist function - this seorts the node in ascending z coordinate
+head_node = setup_cdllist_new(points, 10, 10, 3, ref_p)
+print_cdllist(head_node, d - 1)
+print("\n")
+
+
+
+def cdllist_to_list(head, di):
+    nodes_list = []
+    print("List of doubly-linked dlnodes:")
+    current = head.next[di]
+    while current != head:
+        nodes_list.append(current)
+        # print(current.x)
+        current = current.next[di]
+    return nodes_list
+        
+nodes_list = cdllist_to_list(head_node, d-1) # list of dlnodes which we feed into preprocessing, after that we can call hv3dplus
+print(len(nodes_list))
+for node in nodes_list:
+    print(node.x)
+    
+# missing preprocessing(nodes_list)    
+    
+#hypervolume = hv3dplus(nodes_list)
+#print("Hypervolume:", hypervolume)

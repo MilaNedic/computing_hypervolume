@@ -239,6 +239,18 @@ def compare_points_4d(p1, p2):
             return 1
     return 0
 
+def compare_tree_asc_y(p1, p2):
+    x1 = p1[1]
+    x2 = p2[1]
+
+    if x1 < x2:
+        return -1
+    elif x1 > x2:
+        return 1
+    else:
+        return 0
+
+
 # --------- Auxiliary function that compares points in 3d or in 4d and sorts them in ascending order of the last coorinate ---------------
 
 def sort_3d(list):
@@ -274,7 +286,18 @@ def setup_cdllist(data, naloc, n, d, ref):
 
     return head
 
-" This is not the correct implementation of setup_cdlist "
+" auxiliary function which return a list of dlnodes, setup in the order which setup_cdllist returns"
+def cdllist_to_list(head, di): # head = setup_cdllist_new(points, nalloc, n, d, ref_p) the output of setup_cdlllist
+    nodes_list = []
+    print("List of doubly-linked dlnodes:")
+    current = head.next[di]
+    while current != head:
+        nodes_list.append(current)
+        # print(current.x)
+        current = current.next[di]
+    return nodes_list
+
+" This is now the correct implementation of setup_cdlist "
 def setup_cdllist_new(data, naloc, n, d, ref):
     head = [DLNode() for _ in range(naloc + 3)]
     init_sentinels_new(head[0:3], ref, d) # init_sentinels_new accepts a list at the beginning, therefore we use head[0:3]
@@ -318,9 +341,10 @@ def free_cdllist(list):
 
 
 # ------------------------- Hyperovlume Indicator Algorithms ---------------------------------------
-def restart_list_y(list):
-    list.next[2].cnext[1] = list  # Link the y-dimension sentinel
-    list.cnext[0] = list.next[2]  # Link the x-dimension sentinel
+def restart_list_y(list_node): # head == list
+    # This function resets the cnext pointers for the y-dimension.
+    list_node.next[2].cnext[1] = list_node
+    list_node.cnext[0] = list_node.next[2]
 
 def compute_area_simple(p, di, s, u):
     dj = 1 - di
@@ -345,14 +369,11 @@ def compute_area_simple(p, di, s, u):
     return area
 
 
+"The function compute_area_simple seems to return weird answers for d = 2 (if points are 3-dimensional)"
+"Maybe i should try setting up a 4d case"
 
 # ----------------------------------------------------------------
 
-
-def restart_list_y(head): # head == list
-    # This function resets the cnext pointers for the y-dimension.
-    head.next[2].cnext[1] = head
-    head.cnext[0] = head.next[2]
 
 
 
@@ -385,9 +406,6 @@ def restart_base_setup_z_and_closest(head, new_node):
                 closest1 = next_p
                 next_p = next_p.next[2]
 
-    # Assuming restart_list_y is correctly defined elsewhere.
-    restart_list_y(head)
-    
     # Link the new_node into the list
     new_node.prev[2] = p.prev[2]
     new_node.next[2] = p
@@ -399,8 +417,6 @@ def restart_base_setup_z_and_closest(head, new_node):
     new_node.closest[1] = closest1
     new_node.cnext[0] = closest0
     new_node.cnext[1] = closest1
-
-
 
 
 # --------------- one contribution 3d ------------------
@@ -521,31 +537,35 @@ def one_contribution_3d(list_node, new_node):
 #
 
 
+" this is very straightfoward and same as the c code "
+" the problem occrus when seeting up examples "
 def hv3dplus(list_node):
-    restart_list_y(list_node)  # Prepare the list; ensure this function is correctly defined.
-    p = list_node.next[2].next[2]  # Start from the first actual node, skipping the sentinel.
+    p = list_node
+    area = 0
+    volume = 0
 
-    volume = 0.0
+    restart_list_y(list_node)
+    p = p.next[2].next[2]
 
-    while p and p != sentinel_end:  # Loop until the end sentinel is reached.
+    stop = list_node.prev[2]
+
+    while p != stop:
         if p.ndomr < 1:
             p.cnext[0] = p.closest[0]
             p.cnext[1] = p.closest[1]
 
-            # Compute the area. Ensure compute_area_simple function is adapted to your use case.
-            area = compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
+            area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
 
-            # Update cnext pointers for continuity in the list.
-            if p.cnext[0]: p.cnext[0].cnext[1] = p
-            if p.cnext[1]: p.cnext[1].cnext[0] = p
-
-            # Accumulate volume.
-            volume += area * (p.next[2].x[2] - p.x[2]) if p.next[2] else 0
+            p.cnext[0].cnext[1] = p
+            p.cnext[1].cnext[0] = p
         else:
-            remove_from_z(p)  # Ensure this function properly handles node removal.
+            remove_from_z(p)
 
-        p = p.next[2]  # Move to the next node.
+        volume += area * (p.next[2].x[2] - p.x[2])
+
+        p = p.next[2]
 
     return volume
+
 
 
