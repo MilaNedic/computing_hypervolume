@@ -1,4 +1,4 @@
-from hv_plus import DLNode, lexicographic_less, init_sentinels, clear_point, point2struct, add_to_z, remove_from_z, setup_z_and_closest, update_links, compare_points_3d, compare_points_4d, sort_3d, sort_4d, setup_cdllist, free_cdllist, restart_list_y, compute_area_simple, restart_base_setup_z_and_closest, one_contribution_3d
+from hv_plus import DLNode, lexicographic_less, init_sentinels, clear_point, point2struct, add_to_z, remove_from_z, setup_z_and_closest, update_links, compare_points_3d, compare_points_4d, sort_3d, sort_4d, free_cdllist, restart_list_y, compute_area_simple, restart_base_setup_z_and_closest, one_contribution_3d
 
 
 # -------------------- Example for the DLNode class -------------------
@@ -308,61 +308,9 @@ print(sentinels.x)
 
 print("\n")
 
-from hv_plus import setup_cdllist_new
+from hv_plus import setup_cdllist_new, print_cdllist
 from random import uniform
 print('Example for setup_cdlist and setup_cdlist_new')
-print('setup_cdlist_new works correctly')
-
-# Define a small set of 3D points as flat data
-data = [
-    [1.0, 2.0, 3.0],  # Point 1
-    [4.0, 5.0, 6.0],  # Point 2
-    [7.0, 8.0, 9.0]   # Point 3
-]
-
-# Set the reference point for initializing sentinels
-ref_point = [0.0, 0.0, 0.0]
-
-# Define the number of points and dimension
-n = 3  # Number of points
-d = 3  # Dimension
-
-# Call the function to setup the CDLL
-head = setup_cdllist(data, n + 3, n, d, ref_point)
-#
-# Function to print the circular doubly-linked list
-def print_cdllist(head, di):
-    print("Circular Doubly-Linked List:")
-    current = head.next[di]
-    while current != head:
-        print(current.x)
-        current = current.next[di]
-
-# Print the list to check if it's set up correctly
-print_cdllist(head, d - 1)
-print("\n")
-    
-free_cdllist(head)
-
-head = init_sentinels([1.0 for i in range(4)], 4)
-print(head.x)
-
-from hv_plus import setup_cdllist_new
-# Define some multidimensional data
-# Example use case
-data = [
-    1.0, 2.0, 3.0,  # Point 1
-    4.0, 5.0, -6.0,  # Point 2
-    7.0, 8.0, -9.0   # Point 3
-]
-ref = [0.0, 0.0, 0.0]
-
-# Call setup_cdllist function
-head_node = setup_cdllist_new(data, 10, 3, 3, ref)
-print_cdllist(head_node, d - 1)
-print("\n")
-
-# test for 4D
 
 # Define a small set of 3D points as flat data
 data = [
@@ -378,10 +326,6 @@ ref_point = [0.0, 0.0, 0.0, 0.0]
 n = 3  # Number of points
 d = 4  # Dimension
 
-# Call the function to setup the CDLL
-head = setup_cdllist(data, n + 3, n, d, ref_point)
-print_cdllist(head, d - 1)
-print("\n")
 
 # Example 4D data
 data_4d = [
@@ -394,7 +338,7 @@ data_4d = [
 ref_4d = [0.0, 0.0, 0.0, 0.0]
 
 # Call setup_cdllist function for 4D data
-head_node_4d = setup_cdllist_new(data_4d, 10, 4, 4, ref_4d)
+head_node_4d = setup_cdllist_new(data_4d, 4, 4, 4, ref_4d)
 
 # Let's print out the list to check
 current = head_node_4d.next[3]
@@ -404,9 +348,9 @@ while current is not None and current != head_node_4d:
     
 print('\n')
 
-# Example for compute_area_simple
 
-# ----------------------------- Example 1 -----------------------------
+# ---------------- Example for compute_area_simple -------------------
+print("Example for compute_area_simple")
 
 # Create the sentinel nodes for the list
 sentinel_start = DLNode()
@@ -605,11 +549,11 @@ print('\n')
 ##print(new_node.closest[1].x == [3.0, 3.0, 3.0, 4.0])
 #print("\n")
 #
-from hv_plus import compare_tree_asc_ym, hv3dplus
+from hv_plus import compare_tree_asc_y, hv3dplus
 
 print('Example for hv3dplus - points are the same as in test.inp')
 points = [
-    0.16, 0.86, 0.47,
+    0.16, 0.86, 0.47, 
     0.66, 0.37, 0.29,
     0.79, 0.79, 0.04,
     0.28, 0.99, 0.29,
@@ -630,22 +574,12 @@ head_node = setup_cdllist_new(points, 10, 10, 3, ref_p)
 print_cdllist(head_node, d - 1)
 print("\n")
 
-
-
-def cdllist_to_list(head, di):
-    nodes_list = []
-    print("List of doubly-linked dlnodes:")
-    current = head.next[di]
-    while current != head:
-        nodes_list.append(current)
-        # print(current.x)
-        current = current.next[di]
-    return nodes_list
+from hv_plus import cdllist_to_list
         
 nodes_list = cdllist_to_list(head_node, d-1) # list of dlnodes which we feed into preprocessing, after that we can call hv3dplus
-print(len(nodes_list))
-for node in nodes_list:
-    print(node.x)
+print("List of doubly-linked dlnodes:")
+#for node in nodes_list:
+#    print(node.x)
     
 # missing preprocessing(nodes_list)    
     

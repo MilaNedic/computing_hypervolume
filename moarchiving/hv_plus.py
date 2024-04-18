@@ -1,5 +1,5 @@
 # -------------------- AVL Tree ---------------
-from avltree import AvlTree
+from avltree import AvlTree, _avl_tree_node
 from functools import cmp_to_key
 import numpy as np
 
@@ -262,40 +262,33 @@ def sort_4d(list):
     return sorted(list, key=cmp_to_key(compare_points_4d))
 
 
-def setup_cdllist(data, naloc, n, d, ref):
-    head = init_sentinels(ref, d)
-    di = d - 1
-
-    if n > 0:
-        # Sort the points based on dimensionality
-        data.sort(key=cmp_to_key(compare_points_3d if d == 3 else compare_points_4d))
-
-        # Initialize nodes and update them with the sorted data
-        nodes = [DLNode() for _ in range(n)]
-        for i, point in enumerate(data):
-            nodes[i] = point2struct(head, nodes[i], point, d)
-
-        # Link the nodes into a circular doubly-linked list
-        s = head.prev[di]  # Sentinel tail node
-        for i in range(n):
-            nodes[i].prev[di] = s
-            s.next[di] = nodes[i]
-            s = nodes[i]
-        s.next[di] = head  # Close the loop
-        head.prev[di] = nodes[-1]
-
-    return head
-
-" auxiliary function which return a list of dlnodes, setup in the order which setup_cdllist returns"
+"Auxiliary function which return a list of dlnodes, setup in the order which setup_cdllist returns"
 def cdllist_to_list(head, di): # head = setup_cdllist_new(points, nalloc, n, d, ref_p) the output of setup_cdlllist
     nodes_list = []
-    print("List of doubly-linked dlnodes:")
     current = head.next[di]
     while current != head:
         nodes_list.append(current)
         # print(current.x)
         current = current.next[di]
-    return nodes_list
+    return nodes_list # return a list of DLNodes
+
+def cdllist_to_list_tuples(head, di): # head = setup_cdllist_new(points, nalloc, n, d, ref_p) the output of setup_cdlllist
+    nodes_list_tuples = []
+    current = head.next[di]
+    while current != head:
+        point = current.x
+        nodes_list_tuples.append(tuple(point))
+        # print(current.x)
+        current = current.next[di]
+    return nodes_list_tuples # return a list of DLNodes
+
+"Auxiliary function for printing element of cdllist"
+def print_cdllist(head, di):
+    print("Circular Doubly-Linked List:")
+    current = head.next[di]
+    while current is not None and current != head:
+        print(current.x)
+        current = current.next[di] if current.next[di] != head else None
 
 " This is now the correct implementation of setup_cdlist "
 def setup_cdllist_new(data, naloc, n, d, ref):
@@ -477,66 +470,6 @@ def one_contribution_3d(list_node, new_node):
     return volume
 
 
-
-
-# ------------------- example 1 --------------------------
-
-## Nodes sorted by the z-coordinate.
-#nodes = [
-#    DLNode([1.0, 5.0, 3.0]),  # Node 0
-#    DLNode([1.5, 4.0, 3.5]),  # Node 1
-#    DLNode([5.0, 1.0, 3.7])   # Node 2
-#]
-#
-#
-## Link the nodes in sorted order.
-## In a real-world scenario, you would have a function to insert nodes maintaining the sorted order.
-#sentinel_start = DLNode([-float('inf'), -float('inf'), -float('inf')])  # Sentinel at start
-#sentinel_end = DLNode([float('inf'), float('inf'), float('inf')])        # Sentinel at end
-#
-## New node - not dominated by any existing node.
-#new_node = DLNode([2.0, 2.0, 4.0]) 
-#
-## Function to print the list for debugging purposes
-#def print_list(node):
-#    while node:
-#        print(f"Node: {node.x}, Closest[0]: {node.closest[0].x if node.closest[0] else 'None'}, Closest[1]: {node.closest[1].x if node.closest[1] else 'None'}")
-#        node = node.next[2] if node.next[2] != sentinel_start else None
-#        
-#print_list(sentinel_start.next[2])
-#
-## Assuming DLNode and restart_base_setup_z_and_closest functions are correctly defined.
-#
-## First, correctly link the sentinel nodes to the start and end of the list.
-#sentinel_start.next[2] = nodes[0]
-#nodes[0].prev[2] = sentinel_start
-#nodes[-1].next[2] = sentinel_end
-#sentinel_end.prev[2] = nodes[-1]
-#
-## Properly link the existing nodes.
-#for i in range(len(nodes) - 1):
-#    nodes[i].next[2] = nodes[i + 1]
-#    nodes[i + 1].prev[2] = nodes[i]
-#
-
-#
-## Once the existing nodes have their closest correctly set, we can introduce the new node.
-## Assume the new_node's x[2] (z-coordinate) is larger than any existing node.x[2],
-## meaning it should be added at the end just before the sentinel_end.
-#new_node.prev[2] = nodes[-1]
-#new_node.next[2] = sentinel_end
-#nodes[-1].next[2] = new_node
-#sentinel_end.prev[2] = new_node
-#
-## Apply restart_base_setup_z_and_closest for the new node to ensure its closest nodes are correctly set.
-#restart_base_setup_z_and_closest(sentinel_start, new_node)
-#
-## Now, calculate the hypervolume contribution of the new node.
-#hypervolume_contribution = one_contribution_3d(sentinel_start, new_node)
-#print(f"Hypervolume contribution of the new node: {hypervolume_contribution}")
-#
-
-
 " this is very straightfoward and same as the c code "
 " the problem occrus when seeting up examples "
 def hv3dplus(list_node):
@@ -568,4 +501,62 @@ def hv3dplus(list_node):
     return volume
 
 
+#def preprocessing(node_list): # input is a lsit of dlnodes
+#    avl_tree = AvlTree()  # Initialize an empty AVL tree
+#
+#    for idx, node in enumerate(node_list[1:-1]):  # Skip the head and tail sentinels
+#        # The node's coordinates are reversed before being inserted into the AVL tree,
+#        # because the last coordinate is supposed to be the most significant for sorting
+#        point = tuple(reversed(node.x))
+#        avl_tree[point] = str(idx)  # Use the index as the key, and the point as the value
+
+def preprocessing(node_list):
+    # Assuming the list_node is the start of a linked list of DLNodes
+
+    # Create an AVL tree with a custom comparator for the y-coordinate
+    avl_tree = AvlTree()
+    
+    def find_le(tree, point):
+        le_node = None
+        for node_point in tree:
+            if node_point <= point:
+                if le_node is None or node_point > le_node:
+                    le_node = node_point
+        return le_node
+
+    for idx, node in enumerate(node_list[1:-1], start=1):  # Skip sentinel nodes
+        point = tuple(node.x)  # No need to reverse since we're using the avl_tree package
+        avl_tree[point] = idx  # Index in node_list as key, point as value
+        
+    p = node_list[1].next[2]  # Skip the head sentinel
+    stop = node_list[-2]  # Stop before the tail sentinel
+
+    while p != stop:
+        point = tuple(p.x)
+        le_point = find_le(avl_tree, point)
+        
+        # If a node to the left exists, perform comparisons
+        if le_point is not None:
+            le_idx = avl_tree[le_point]
+            # Find the previous node that is not dominated by p
+            while le_point is not None and le_point[0] >= point[0]:
+                # Find the next node that could potentially dominate p
+                higher_points = [k for k in avl_tree if k > le_point]
+                if higher_points:
+                    le_point = min(higher_points, key=lambda x: (x[1], x[0]))
+                else:
+                    le_point = None
+
+            if le_point is not None:
+                le_idx = avl_tree[le_point]
+                p.closest[0] = le_point
+                p.closest[1] = le_idx
+
+        # The point is not dominated, insert it into the tree
+        if p.ndomr == 0:
+            avl_tree[point] = idx
+        
+        p = p.next[2]
+
+    return avl_tree
 
