@@ -272,15 +272,6 @@ def cdllist_to_list(head, di): # head = setup_cdllist_new(points, nalloc, n, d, 
         current = current.next[di]
     return nodes_list # return a list of DLNodes
 
-def cdllist_to_list_tuples(head, di): # head = setup_cdllist_new(points, nalloc, n, d, ref_p) the output of setup_cdlllist
-    nodes_list_tuples = []
-    current = head.next[di]
-    while current != head:
-        point = current.x
-        nodes_list_tuples.append(tuple(point))
-        # print(current.x)
-        current = current.next[di]
-    return nodes_list_tuples # return a list of DLNodes
 
 "Auxiliary function for printing element of cdllist"
 def print_cdllist(head, di):
@@ -338,28 +329,28 @@ def restart_list_y(list_node): # head == list
     # This function resets the cnext pointers for the y-dimension.
     list_node.next[2].cnext[1] = list_node
     list_node.cnext[0] = list_node.next[2]
-
+    
 def compute_area_simple(p, di, s, u):
     dj = 1 - di
     area = 0
     q = s
     
-    # Make sure 's' and 'u' are not None before trying to access their 'x' attribute
-    if s is not None and u is not None:
-        area += (q.x[dj] - p[dj]) * (u.x[di] - p[di])
-    else:
-        # If 's' or 'u' is None, we can't compute the area, so return 0
+    if s is None or u is None or s.cnext[di] is None or u.cnext[dj] is None:
         return 0
+
+    # Since 's' and 'u' are not None here, it's safe to access their 'x' attribute
+    area += (q.x[dj] - p[dj]) * (u.x[di] - p[di])
     
     while p[dj] < u.x[dj]:
         q = u
         u = u.cnext[di]
-        if u is None or q is None:
-            # If 'u' or 'q' becomes None, it means we've reached the end of the list or cnext isn't set
+        if u is None:
+            # If 'u' becomes None, it means we've reached the end of the list or cnext isn't set
             break
         area += (q.x[dj] - p[dj]) * (u.x[di] - q.x[di])
     
     return area
+
 
 
 "The function compute_area_simple seems to return weird answers for d = 2 (if points are 3-dimensional)"
@@ -473,7 +464,7 @@ def one_contribution_3d(list_node, new_node):
 " this is very straightfoward and same as the c code "
 " the problem occrus when seeting up examples "
 def hv3dplus(list_node):
-    p = list_node
+    p = list_node # list of DLNodes or DLNode?
     area = 0
     volume = 0
 
@@ -531,7 +522,9 @@ def preprocessing(node_list):
     p = node_list[1].next[2]  # Skip the head sentinel
     stop = node_list[-2]  # Stop before the tail sentinel
 
+
     while p != stop:
+        #print("curent point in preprocessing", p)
         point = tuple(p.x)
         le_point = find_le(avl_tree, point)
         
@@ -559,4 +552,57 @@ def preprocessing(node_list):
         p = p.next[2]
 
     return avl_tree
+
+
+def preprocessing_new(head_node):
+    # Assuming head_node is the head of a circular doubly linked list of DLNodes
+    # and the first two and the last node are sentinels
+
+    # Create an AVL tree with a custom comparator for the y-coordinate
+    avl_tree = AvlTree()
+    
+    def find_le(tree, point):
+        le_node = None
+        for node_point in tree:
+            if node_point <= point:
+                if le_node is None or node_point > le_node:
+                    le_node = node_point
+        return le_node
+
+    # Start from the node next to the head sentinel
+    p = head_node.next[2]
+
+    # Continue until we reach the head sentinel again (full circle)
+    while p != head_node and p.next[2] != head_node:
+        point = tuple(p.x)
+        le_point = find_le(avl_tree, point)
+        
+        # If a node to the left exists, perform comparisons
+        if le_point is not None:
+            le_idx = avl_tree[le_point]
+            # Find the previous node that is not dominated by p
+            while le_point is not None and le_point[0] >= point[0]:
+                # Find the next node that could potentially dominate p
+                higher_points = [k for k in avl_tree if k > le_point]
+                if higher_points:
+                    le_point = min(higher_points, key=lambda x: (x[1], x[0]))
+                else:
+                    le_point = None
+
+            if le_point is not None:
+                le_idx = avl_tree[le_point]
+                p.closest[0] = le_point
+                p.closest[1] = le_idx
+
+        # The point is not dominated, insert it into the tree
+        if p.ndomr == 0:
+            avl_tree[point] = p  # Here we insert the node itself instead of the index
+
+        # Move to the next node in the list
+        p = p.next[2]
+
+    return avl_tree
+
+
+
 

@@ -36,13 +36,29 @@ for node in nodes_list[1:-1]: # first and last dlnode indicate the start and end
 
 del avl_tree[tuple(ref_p)] # delete the reference point
 
+print("List of nodes in the AVL tree - points are (z,y,x)")
 print(list(avl_tree))
 
+print("Minimum element in the AVL tree")
 print(avl_tree.minimum()) # min in the first corodinate
+print("Maximum element in the AVL tree")
 print(avl_tree.maximum()) # max in the first coordinate
 
+print("\n")
 from hv_plus import preprocessing
 preprocessing(nodes_list)
-print(preprocessing(nodes_list))
+print("List of nodes in the AVL tree after preprocessing")
+print(list(preprocessing(nodes_list)))
+print("\n")
 
+
+from avl import AVLTree
+print("AVL tree gotten with the avl.py file")
+Tree = AVLTree()       
+root = None
+for node in nodes_list[1:-1]:
+    point = node.x
+    root = Tree.insert_node(root,tuple(point))
+    
+Tree.preOrder(root)
 

@@ -49,9 +49,9 @@ def print_node_details(node, node_name):
     print("---")
     
 # Printing details of the sentinel nodes
-print_node_details(sentinel, "Sentinel1")
-print_node_details(sentinel.next[2], "Sentinel2")
-print_node_details(sentinel.prev[2], "Sentinel3")
+print_node_details(sentinel, "Reference point")
+print_node_details(sentinel.next[2], "next[2]")
+print_node_details(sentinel.prev[2], "prev[2]")
 print("\n")
 
 # ---------------------- Example for the clear_point function -------------------
@@ -553,7 +553,7 @@ from hv_plus import compare_tree_asc_y, hv3dplus
 
 print('Example for hv3dplus - points are the same as in test.inp')
 points = [
-    0.16, 0.86, 0.47, 
+    0.16, 0.86, 0.47,  
     0.66, 0.37, 0.29,
     0.79, 0.79, 0.04,
     0.28, 0.99, 0.29,
@@ -567,21 +567,71 @@ points = [
 
 d = 3
 
-ref_p = [0.0, 0.0, 0.0]
+ref_p = [1.0, 1.0, 1.0]
 
 # Call setup_cdllist function - this seorts the node in ascending z coordinate
-head_node = setup_cdllist_new(points, 10, 10, 3, ref_p)
-print_cdllist(head_node, d - 1)
+dlnode_cdllist = setup_cdllist_new(points, 10, 10, d, ref_p)
+print_cdllist(dlnode_cdllist, d - 1)
 print("\n")
 
 from hv_plus import cdllist_to_list
+from hv_plus import preprocessing
         
-nodes_list = cdllist_to_list(head_node, d-1) # list of dlnodes which we feed into preprocessing, after that we can call hv3dplus
-print("List of doubly-linked dlnodes:")
+from hv_plus import preprocessing_new
+avl_tree_new = preprocessing_new(dlnode_cdllist)
+print("List of preprocessed nodes")
+print(list(avl_tree_new))
+#hypervolume = hv3dplus(dlnode_cdllist)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#nodes_list = cdllist_to_list(dlnode_cdllist, d-1) # list of dlnodes which we feed into preprocessing, after that we can call hv3dplus
+#print("List of nodes in nodes list:")
 #for node in nodes_list:
 #    print(node.x)
-    
-# missing preprocessing(nodes_list)    
-    
-#hypervolume = hv3dplus(nodes_list)
+#    
+#preprocessed_list = list(preprocessing(nodes_list))
+#print("List of nodes after preprocessing")
+#print(preprocessed_list)
+#print("\n")    
+
+#hypervolume = hv3dplus(dlnode_cdllist)
 #print("Hypervolume:", hypervolume)
+
+#"Auxiliary function that reverses points in the list so that the z coordinate comes first"
+#def reverse_list_z(dlnode_list):
+#    points_list = []
+#    for dlnode in dlnode_list:
+#        point = dlnode.x
+#        point.reverse()
+#        points_list.append(point)
+#    return [DLNode(point) for point in points_list]
+#
+#print("\n")
+#print("List of nodes with reversed order, coordinates  are now (z,y,x)")
+#nodes_list_z = reverse_list_z(nodes_list)
+#for node in nodes_list_z:
+#    print(node.x)
+#
+#preprocessing(nodes_list_z)
+#print("List of nodes after preprocessing")
+#print(list(preprocessing(nodes_list_z)))

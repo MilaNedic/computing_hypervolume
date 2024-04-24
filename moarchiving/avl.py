@@ -134,39 +134,3 @@ class AVLTree(object):
 # 
 #print("PREORDER")
 #Tree.preOrder(root)
-
-from hv_plus import setup_cdllist_new
-from hv_plus_test import print_cdllist, cdllist_to_list
-
-points = [
-    0.16, 0.86, 0.47,
-    0.66, 0.37, 0.29,
-    0.79, 0.79, 0.04,
-    0.28, 0.99, 0.29,
-    0.51, 0.37, 0.38,
-    0.92, 0.62, 0.07,
-    0.16, 0.53, 0.70,
-    0.01, 0.98, 0.94,
-    0.67, 0.17, 0.54,
-    0.79, 0.72, 0.05
-]
-
-d = 3
-
-ref_p = [0.0, 0.0, 0.0]
-
-# Call setup_cdllist function - this seorts the node in ascending z coordinate
-head_node = setup_cdllist_new(points, 10, 10, 3, ref_p)
-        
-nodes_list = cdllist_to_list(head_node, d-1) # list of dlnodes which we feed into preprocessing, after that we can call hv3dplus
-#for node in nodes_list:
-#    print(node.x)
-
-Tree = AVLTree()       
-root = None
-for node in nodes_list[1:-1]:
-    point = node.x
-    point.reverse()
-    root = Tree.insert_node(root,tuple(node.x))
-    
-Tree.preOrder(root)

@@ -1,0 +1,6 @@
+Testing the functionality of Python and C functions/classes
+
+	Function  	|	Python		| 	   C	
+-----------------------------------------------------------------------
+class DLNode: ok
+init_sentinels for d=3 and d=4: ok
