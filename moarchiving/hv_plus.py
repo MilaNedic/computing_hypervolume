@@ -334,21 +334,13 @@ def compute_area_simple(p, di, s, u):
     dj = 1 - di
     area = 0
     q = s
-    
-    if s is None or u is None or s.cnext[di] is None or u.cnext[dj] is None:
-        return 0
-
-    # Since 's' and 'u' are not None here, it's safe to access their 'x' attribute
     area += (q.x[dj] - p[dj]) * (u.x[di] - p[di])
-    
+
     while p[dj] < u.x[dj]:
         q = u
         u = u.cnext[di]
-        if u is None:
-            # If 'u' becomes None, it means we've reached the end of the list or cnext isn't set
-            break
         area += (q.x[dj] - p[dj]) * (u.x[di] - q.x[di])
-    
+
     return area
 
 

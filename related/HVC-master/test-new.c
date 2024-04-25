@@ -1,67 +1,51 @@
 #include <stdio.h>
-#include <stdlib.h>
 
 // Define the dlnode structure
 typedef struct dlnode {
-    double x[4];                  // The data vector
-    struct dlnode *closest[2];    // closest[0] == cx, closest[1] == cy
-    struct dlnode *cnext[2];      // current next
-    struct dlnode *next[4];       // keeps the points sorted according to coordinates 2, 3, and 4
-                                   // (in the case of 2 and 3, only the points swept by 4 are kept)
-    struct dlnode *prev[4];       // keeps the points sorted according to coordinates 2 and 3 (except the sentinel 3)
-    int ndomr;                    // number of dominators
+    double x[3];           // The data vector
+    struct dlnode *cnext[2];  // current next
 } dlnode_t;
 
+// Function to compute area
+double computeAreaSimple(double *p, int di, dlnode_t *s, dlnode_t *u) {
+    int dj = 1 - di;
+    double area = 0;
+    dlnode_t *q = s;
+    area += (q->x[dj] - p[dj]) * (u->x[di] - p[di]);
+
+    while (p[dj] < u->x[dj]) {
+        q = u;
+        u = u->cnext[di];
+        area += (q->x[dj] - p[dj]) * (u->x[di] - q->x[di]);
+    }
+
+    return area;
+}
+
 int main() {
-    // Create an instance of the dlnode structure
-    dlnode_t *node = (dlnode_t *)malloc(sizeof(dlnode_t));
+    // Define the points and p
+    double point0_data[] = {4.0, 1.0, 1.0};
+    double point1_data[] = {3.0, 2.0, 2.0};
+    double point2_data[] = {2.0, 3.0, 3.0};
+    double p_data[] = {5.0, 3.0, 3.0};
 
-    // Assign values to its attributes
-    node->x[0] = 1.0;
-    node->x[1] = 2.0;
-    node->x[2] = 3.0;
-    node->x[3] = 4.0;
+    // Create dlnode structures for the points
+    dlnode_t point0 = {{point0_data[0], point0_data[1], point0_data[2]}, {NULL, NULL}};
+    dlnode_t point1 = {{point1_data[0], point1_data[1], point1_data[2]}, {NULL, NULL}};
+    dlnode_t point2 = {{point2_data[0], point2_data[1], point2_data[2]}, {NULL, NULL}};
 
-    node->closest[0] = NULL;
-    node->closest[1] = NULL;
+    // Create dlnode structure for p
+    dlnode_t p = {{p_data[0], p_data[1], p_data[2]}, {NULL, NULL}};
 
-    node->cnext[0] = NULL;
-    node->cnext[1] = NULL;
+    // Compute area for di = 0
+    int di = 0;
+    double area_di_0 = computeAreaSimple(p_data, di, &point0, &point1);
+    printf("Area for di = 0: %f\n", area_di_0);
 
-    node->next[0] = NULL;
-    node->next[1] = NULL;
-    node->next[2] = NULL;
-    node->next[3] = NULL;
-
-    node->prev[0] = NULL;
-    node->prev[1] = NULL;
-    node->prev[2] = NULL;
-    node->prev[3] = NULL;
-
-    node->ndomr = 0;
-
-    // Print the values of the node's attributes
-    printf("Node values:\n");
-    printf("x[0]: %f\n", node->x[0]);
-    printf("x[1]: %f\n", node->x[1]);
-    printf("x[2]: %f\n", node->x[2]);
-    printf("x[3]: %f\n", node->x[3]);
-    printf("closest[0]: %p\n", (void *)node->closest[0]);
-    printf("closest[1]: %p\n", (void *)node->closest[1]);
-    printf("cnext[0]: %p\n", (void *)node->cnext[0]);
-    printf("cnext[1]: %p\n", (void *)node->cnext[1]);
-    printf("next[0]: %p\n", (void *)node->next[0]);
-    printf("next[1]: %p\n", (void *)node->next[1]);
-    printf("next[2]: %p\n", (void *)node->next[2]);
-    printf("next[3]: %p\n", (void *)node->next[3]);
-    printf("prev[0]: %p\n", (void *)node->prev[0]);
-    printf("prev[1]: %p\n", (void *)node->prev[1]);
-    printf("prev[2]: %p\n", (void *)node->prev[2]);
-    printf("prev[3]: %p\n", (void *)node->prev[3]);
-    printf("ndomr: %d\n", node->ndomr);
-
-    // Free the memory allocated for the node
-    free(node);
+    // Compute area for di = 1
+    di = 1;
+    double area_di_1 = computeAreaSimple(p_data, di, &point0, &point1);
+    printf("Area for di = 1: %f\n", area_di_1);
 
     return 0;
 }

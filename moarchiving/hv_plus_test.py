@@ -351,67 +351,22 @@ print('\n')
 
 # ---------------- Example for compute_area_simple -------------------
 print("Example for compute_area_simple")
-
-# Create the sentinel nodes for the list
-sentinel_start = DLNode()
-sentinel_end = DLNode()
-sentinel_start.x = [-float('inf'), -float('inf'), -float('inf'), -float('inf')]
-sentinel_end.x = [float('inf'), float('inf'), float('inf'), float('inf')]
-
-
-# Link the sentinel nodes
-sentinel_start.next[2] = sentinel_end  # Assume dimension 2 is y-dimension
-sentinel_end.prev[2] = sentinel_start
-
-# Create a few DLNode instances and link them in the list
-node1 = DLNode([4.0, 1.0, 1.0])
-node2 = DLNode([3.0, 2.0, 2.0])
-node3 = DLNode([2.0, 3.0, 3.0])
-
-
-nodes = [node1, node2, node3]
-
-# Link the nodes into the list
-prev_node = sentinel_start
-for node in nodes:
-    node.next[2] = sentinel_end
-    node.prev[2] = prev_node
-    prev_node.next[2] = node
-    prev_node = node
-    
-# Close the circular doubly-linked list
-sentinel_end.prev[2] = nodes[-1]
-
-# Initialize cnext pointers using restart_list_y function
-restart_list_y(sentinel_start)
-
-# Now you can call compute_area_simple with these nodes
-# For example, let's compute the area for the first node in the list
-p = [5.0, 3.0, 3.0]  # Some point p
-q = [0.0, 1.0, 3.0] # Some point q
-di = 0  # Dimension to compute the area over
-#s = nodes[0]
-#u = nodes[1]
-
-area = compute_area_simple(p, di, nodes[0], nodes[1])
-print(f"The computed area for p, node1 and node2 is: {area}")
-
-area = compute_area_simple(p, di, nodes[1], nodes[2])
-print(f"The computed area for p, node2 and node3 is: {area}")
-
-area = compute_area_simple(p, di, nodes[0], nodes[2])
-print(f"The computed area for p, node1 and node3 is: {area}")
-
-print("\n")
-
-area = compute_area_simple(p, di+1, nodes[2], nodes[1])
-print(f"The computed area for p, node1 and node2 is: {area}")
-
-area = compute_area_simple(p, di+1, nodes[1], nodes[0])
-print(f"The computed area for p, node2 and node3 is: {area}")
-
-area = compute_area_simple(p, di+1, nodes[2], nodes[0])
-print(f"The computed area for p, node1 and node3 is: {area}")
+point0_data = [3.0, 2.0, 2.0, 0.0]
+point1_data = [2.0, 3.0, 3.0, 0.0]
+p_data = [5.0, 3.0, 3.0, 0.0]
+# Create DLNode instances for the points
+point0 = DLNode(point0_data)
+point1 = DLNode(point1_data)
+# Create DLNode instance for p
+p = DLNode(p_data)
+# Compute area for di = 0
+di = 0
+area_di_0 = compute_area_simple(p_data, di, point0, point1)
+print("Area for di = 0:", area_di_0)
+# Compute area for di = 1
+di = 1
+area_di_1 = compute_area_simple(p_data, di, point0, point1)
+print("Area for di = 1:", area_di_1)
 
 print("\n")
 
@@ -581,7 +536,7 @@ from hv_plus import preprocessing_new
 avl_tree_new = preprocessing_new(dlnode_cdllist)
 print("List of preprocessed nodes")
 print(list(avl_tree_new))
-#hypervolume = hv3dplus(dlnode_cdllist)
+hypervolume = hv3dplus(dlnode_cdllist)
 
 
 
