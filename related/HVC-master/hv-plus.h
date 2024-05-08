@@ -41,9 +41,6 @@ extern "C" {
 double hvplus(double *data, int d, int n, const double *ref, int recompute);
 
 int lexicographicLessNew(double * a, double * b);
-int compare_point3d(const void *p1, const void* p2);
-int compare_point4d(const void *p1, const void* p2);
-
 
 
 #ifdef __cplusplus

@@ -87,16 +87,17 @@ print("\n")
 
 # ----------------- point2struct test ----------------
 print("Example for point2struct")
-p = DLNode([1.0, 1.0, 1.0, 1.0])
-
-# New values to assign to p
-new_values = [10.0, 20.0, 30.0, 40.0]
-
-# Update/initialize p with new_values
-p_updated = point2struct(sentinels, p, new_values, dimension)
-
-# Print the updated state of p to verify
-print("Updated p.x:", p_updated.x)
+list_node = DLNode()
+list_node.next[2] = list_node  # assuming some self-referencing for simplicity
+# Initialize a point
+point = DLNode()
+values = [1.1, 2.2, 3.3, 4.4]
+# Convert array to struct
+point2struct(list_node, point, values, 4)
+# Print the values to check
+print("Point values:")
+for i in range(4):
+    print(f"x[{i}] = {point.x[i]:.2f}")
 print("\n")
 
 
@@ -147,111 +148,83 @@ print("\n")
 
 # ----------------------------  Example usage for setup z and closest -----------------------------------
 print("Example case for setup_z_and_closest")
-# Create sentinel nodes to simulate the start and end of the list
-sentinel_start = DLNode([-15, -15, -15, -15]) # Minimum possible values
-sentinel_end = DLNode([10, 10, 10, 10]) # Maximum possible values
+def print_node(label, node):
+    if node:
+        print(f"{label}: ({node.x[0]}, {node.x[1]}, {node.x[2]}, {node.x[3]})")
+    else:
+        print(f"{label}: (None)")
 
-# Manually link the sentinel nodes
-sentinel_start.next[2] = sentinel_end
-sentinel_end.prev[2] = sentinel_start
+# Initialize nodes with specified values
+list_node = DLNode([-15, -15, -15, -15])
+next_node = DLNode([10, 10, 10, 10])
+new_node = DLNode([0, 0, 0, 0])
 
+# Link nodes
+list_node.next[2] = next_node
+next_node.prev[2] = list_node
+next_node.next[2] = None  # End of list
 
-new_node = DLNode()
-new_node.x = [0, 0, 0, 0]
-setup_z_and_closest(sentinel_start, new_node)
+# Print initial setup
+print("Before setup:")
+print_node("listNode", list_node)
+print_node("nextNode", next_node)
 
-# Output the results
-print("sentinel_start's next is new_node:", sentinel_start.next[2] is new_node)
-print("new_node's next is sentinel_end:", new_node.next[2] is sentinel_end)  
-print("sentinel_end's prev is new_node:", sentinel_end.prev[2] is new_node)
-print("new_node closest[0]:", new_node.closest[0].x)
-print("new_node closest[1]:", new_node.closest[1].x)
+# Perform setup
+setup_z_and_closest(list_node, new_node)
+
+# Print after setup
+print("After setup:")
+print_node("newNode", new_node)
+print_node("newNode closest[0]", new_node.closest[0])
+print_node("newNode closest[1]", new_node.closest[1])
+print_node("newNode next[2]", new_node.next[2])
+print_node("newNode prev[2]", new_node.prev[2])
+
+print_node("list_node closest[0]", list_node.closest[0])
+print_node("list_node closest[1]", list_node.closest[1])
+print_node("list_node next[2]", list_node.next[2])
+print_node("list_node prev[2]", list_node.prev[2])
+
+print_node("next_node closest[0]", next_node.closest[0])
+print_node("next_node closest[1]", next_node.closest[1])
+print_node("next_node next[2]", next_node.next[2])
+print_node("next_node prev[2]", next_node.prev[2])
+
+print("\n")
+
+print("Example case for update_links")
+head = DLNode([5, 5, 5, 5])
+new_node = DLNode([1, 1, 1, 1])
+node1 = DLNode([2, 2, 2, 2])
+node2 = DLNode([3, 3, 3, 3])
+node3 = DLNode([4, 4, 4, 4])
+
+# Linking nodes
+head.next[2] = node1
+node1.prev[2] = head
+node1.next[2] = node2
+node2.prev[2] = node1
+node2.next[2] = node3
+node3.prev[2] = node2
+node3.next[2] = None  # End of the list
+new_node.prev[2] = node3
+
+# Assume node3 is the last before the stop node
+head.prev[2] = node3
+
+# Execute update_links and print results
+ndom = update_links(head, new_node, head.next[2])
+print("Number of dominators updated:", ndom)
 print("\n")
 
 
-#new_node2 = DLNode([5.0, 5.0, 5.0, 5.0])
-#
-#setup_z_and_closest(new_node, new_node2)
-#print("new_node closest[0]:", new_node.closest[0].x)
-#print("new_node closest[1]:", new_node.closest[1].x)
-#
-#print("new_node2 closest[0]:", new_node2.closest[0].x)
-#print("new_node2 closest[1]:", new_node2.closest[1].x)
 
+print("Example case for compare_points_3d and compare_point_4d")
+point1_3d = [1.0, 2.0, 3.0]
+point2_3d = [4.0, 5.0, 6.0]
+result_3d = compare_points_3d(point1_3d, point2_3d)
+print("Result for compare_point3d:", result_3d)
 print("\n")
-
-## Reference point to define sentinel boundaries
-#ref_point = [1.0, 1.0, 1.0, 1.0]
-#
-## Dimension we're working with (3 in this case)
-#dimension = 4
-#
-## Initialize the sentinels based on the reference point and dimension
-#sentinels = init_sentinels(ref_point, dimension)
-#
-#print_node_details(sentinels, "s1")
-#print_node_details(sentinels.next[2], "s2") 
-#print_node_details(sentinels.prev[2], "s3")
-#
-#
-## Step 1: Initial Setup
-## Assume 'sentinels' is the initial list with the sentinel nodes already set up
-#node1 = DLNode([1, 2, 3, 4])  # Example node
-#node2 = DLNode([5, 6, 7, 8])  # Example node
-#
-## Insert 'node1' into the structure
-#setup_z_and_closest(sentinels, node1)
-#print("node1 closest[0]:", node1.closest[0].x)
-#print("node1 closest[1]:", node1.closest[1].x)
-#
-## Insert 'node2', expecting it to correctly position itself based on its values
-#setup_z_and_closest(sentinels, node2)
-#print("node2 closest[0]:", node2.closest[0].x)
-#print("node2 closest[1]:", node2.closest[1].x)
-#
-## Step 2: Insert another new node
-#new_node = DLNode([3, 4, 5, 6])  # This node should fit between 'node1' and 'node2' based on its values
-#setup_z_and_closest(sentinels, new_node)
-#print("new_node closest[0]:", new_node.closest[0].x)
-#print("new_node closest[1]:", new_node.closest[1].x)
-
-# The structure now contains the nodes in their correct positions.
-
-
-# Assuming the `init_sentinels` function is correctly implemented,
-# you now have three sentinel nodes (s1, s2, s3) properly set up and linked.
-
-## Initialize start and end nodes
-#sentinel_start = DLNode([-float('inf'), -float('inf'), -float('inf')])
-#sentinel_end = DLNode([float('inf'), float('inf'), float('inf')])
-##sentinel_start.next[2] = sentinel_end
-##sentinel_end.prev[2] = sentinel_start
-#
-## Create some nodes to form a list
-#p1 = DLNode([2.0, 2.0, 2.0])
-#p2 = DLNode([3.0, 3.0, 3.0])
-#p3 = DLNode([4.0, 4.0, 4.0])
-#
-## Link the nodes
-#sentinel_start.next[2] = p1
-#p1.prev[2] = sentinel_start
-#p1.next[2] = p2
-#p2.prev[2] = p1
-#p2.next[2] = p3
-#p3.prev[2] = p2
-#p3.next[2] = sentinel_end
-#sentinel_end.prev[2] = p3
-#
-## Create a new node that will be checked against the existing nodes
-#new_node = DLNode()
-#new_node.x = [2.5, 2.5, 2.5]
-#
-## Call update_links
-#number_of_dominators = update_links(sentinel_start, new_node, sentinel_start.next[2])
-#
-## Output the number of dominators found
-#print("Number of dominators:", number_of_dominators)
-##
 
 # Example usage for sorting lists of 3D and 4D points:
 print('Example for sorting points in 3D and 4D in ascending order of the last coordinate')
@@ -375,25 +348,19 @@ print("\n")
 print('Example for restart_base_setup_z_and_closest')
 
 # Example setup
-list_node = DLNode([0.0, 0.0, 0.0, 0.0])
-node1 = DLNode([1.0, 1.0, 1.0, 1.0])
-node2 = DLNode([2.0, 2.0, 2.0, 2.0])
-node3 = DLNode([3.0, 3.0, 3.0, 3.0])
+list_node = DLNode([-1.0, -1.0, -1.0, -1.0])
+node1 = DLNode([0.0, 0.0, 0.0, 0.0])
+node2 = DLNode([5.0, 5.0, 5.0, 5.0])
+
 
 # Link the nodes in the list for z coordinates (third coordinate, index 2)
 list_node.next[2] = node1
-node1.prev[2] = list_node
 node1.next[2] = node2
-node2.prev[2] = node1
-node2.next[2] = node3
-node3.prev[2] = node2
+node2.next[2] = None
 
-# Set closest for node1 and node2 (arbitrarily for this example)
-node1.closest = [list_node, list_node]
-node2.closest = [node1, node1]
 
 # New node to be inserted
-new_node = DLNode([2.8, 1.8, 1.8, 1.8])
+new_node = DLNode([1.0, 1.0, 1.0, 1.0])
 
 #list_nodes = [node1, node2, node3]
 #init_sentinels_new(list_nodes, list_node.x, 4)
@@ -402,108 +369,16 @@ new_node = DLNode([2.8, 1.8, 1.8, 1.8])
 restart_base_setup_z_and_closest(list_node, new_node)
 
 # Check if the new node's closest and prev/next are correctly set
-print(f"New node's closest in x: {new_node.closest[0].x if new_node.closest[0] else None}")
-print(f"New node's closest in y: {new_node.closest[1].x if new_node.closest[1] else None}")
-print(f"New node's previous node in z: {new_node.prev[2].x if new_node.prev[2] else None}")
-print(f"New node's next node in z: {new_node.next[2].x if new_node.next[2] else None}")
+print("New node dominators count:", new_node.ndomr)
+print("New node closest[0]:", new_node.closest[0].x)
+print("New node closest[1]:", new_node.closest[1].x)
+#print(f"New node's closest in x: {new_node.closest[0].x if new_node.closest[0] else None}")
+#print(f"New node's closest in y: {new_node.closest[1].x if new_node.closest[1] else None}")
+#print(f"New node's previous node in z: {new_node.prev[2].x if new_node.prev[2] else None}")
+#print(f"New node's next node in z: {new_node.next[2].x if new_node.next[2] else None}")
 print('\n')
 
 
-
-
-
-
-## -------- example 1 ----------------
-
-# Create a list and populate it with nodes. This is an example for a 3D case.
-# Define a list with sentinel nodes
-#ref_point = [1.0 for i in range(4 )]
-#head = DLNode()
-#head.next[2] = DLNode([-float('inf'), 10.0, -float('inf'), -float('inf')])  # Sentinel
-#head.next[2].next[2] = DLNode([ref_point[0], -float('inf'), -float('inf'), -float('inf')])  # Sentinel
-#head.next[2].next[2].next[2] = head  # Make it circular
-#
-## Define a new node with coordinates
-#new_node = DLNode([1.0, 1.0, 2.0, 3.0])
-#new_node2 = DLNode([5.0, 0.0, 1.0, 1.0])
-##Now call the function with the list and the new node.
-#
-#restart_base_setup_z_and_closest(head, new_node)
-#restart_base_setup_z_and_closest(head, new_node2)
-#
-## Print the results
-#print(f"New node's closest[0]: {new_node.closest[0].x if new_node.closest[0] else None}")
-#print(f"New node's closest[1]: {new_node.closest[1].x if new_node.closest[1] else None}")
-#print(f"New node's ndomr: {new_node.ndomr}")
-#
-#print("\n")
-#
-#print(f"New node2's closest[0]: {new_node2.closest[0].x if new_node2.closest[0] else None}")
-#print(f"New node2's closest[1]: {new_node2.closest[1].x if new_node2.closest[1] else None}")
-#print(f"New node2's ndomr: {new_node2.ndomr}")
-#
-#print("\n")
-#
-## ------------------ example 2 ----------------------
-#
-## Create the sentinel nodes for the list
-#ref_point = [10.0, 10.0, 10.0, 10.0]
-#sentinel_start = DLNode([-float('inf'), ref_point[1], -float('inf'), -float('inf')])
-#sentinel_end = DLNode([ref_point[0], -float('inf'), -float('inf'), -float('inf')])
-#
-## Link sentinel nodes to form a circular list in the z-dimension
-#sentinel_start.next[2] = sentinel_end
-#sentinel_end.prev[2] = sentinel_start
-#
-## Initialize a list with some DLNode objects representing 3D points
-## The points are sorted in increasing z order
-#points = [
-#    [1.0, 1.0, 1.0, 4.0],  
-#    [2.0, 2.0, 2.0, 4.0],  
-#    [3.0, 3.0, 3.0, 4.0],  
-#    [4.0, 4.0, 4.0, 4.0],  
-#    [5.0, 5.0, 5.0, 4.0]   
-#]
-#
-## Create the nodes and link them into the list
-#current = sentinel_start
-#
-#for point in points:
-#    idx = points.index(point)
-#    node = DLNode(point)
-#    node.next[2] = sentinel_end
-#    node.prev[2] = current
-#    current.next[2] = node
-#    current = node
-#
-#
-## Close the circular doubly-linked list in the z-dimension
-#sentinel_end.prev[2] = current
-#
-## Define a new node with coordinates that is supposed to be inserted
-#new_node = DLNode([6.1, 0.1, 2.1, 4.0]) 
-#" the closest node in x coordinate is [2.0, 2.0, 2.0, 4.0] and the closest node in y coordinate is [3.0, 3.0, 3.0, 4.0]"
-#
-## Call the function to insert the new_node into the list
-#restart_base_setup_z_and_closest(sentinel_start, new_node)
-#
-#
-## Function to print the list for debugging purposes
-#def print_list(node):
-#    while node:
-#        print(f"Node: {node.x}, Closest[0]: {node.closest[0].x if node.closest[0] else 'None'}, Closest[1]: {node.closest[1].x if node.closest[1] else 'None'}")
-#        node = node.next[2] if node.next[2] != sentinel_start else None
-#
-#
-## Print the list starting from the first sentinel node
-#print_list(sentinel_start.next[2])
-## Print the details of the new_node
-#print(f"New Node: {new_node.x}, Closest[0]: {new_node.closest[0].x if new_node.closest[0] else 'None'}, Closest[1]: {new_node.closest[1].x if new_node.closest[1] else 'None'}, ndomr: {new_node.ndomr}")
-#
-##print(new_node.closest[0].x == [2.0, 2.0, 2.0, 4.0])
-##print(new_node.closest[1].x == [3.0, 3.0, 3.0, 4.0])
-#print("\n")
-#
 from hv_plus import compare_tree_asc_y, hv3dplus
 
 print('Example for hv3dplus - points are the same as in test.inp')
@@ -536,7 +411,7 @@ from hv_plus import preprocessing_new
 avl_tree_new = preprocessing_new(dlnode_cdllist)
 print("List of preprocessed nodes")
 print(list(avl_tree_new))
-hypervolume = hv3dplus(dlnode_cdllist)
+#hypervolume = hv3dplus(dlnode_cdllist)
 
 
 

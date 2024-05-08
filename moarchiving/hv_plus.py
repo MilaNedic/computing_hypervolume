@@ -16,7 +16,7 @@ def lexicographic_less_4d(a, b):
 
 class DLNode:
     def __init__(self, x=None):
-        self.x = x if x else [0.0, 0.0, 0.0, 0.0]
+        self.x = x if x else [None, None, None, None]
         self.closest = [None, None]  # closest in x coordinate, closest in y coordinate
         self.cnext = [None, None]  # current next
 
@@ -108,23 +108,23 @@ def init_sentinels_new(list_nodes, ref, d):
 
 # ------------
 
-def clear_point(list, p):
-    p.closest[1] = list
-    p.closest[0] = list.next[2]
+def clear_point(list_node, p):
+    p.closest[1] = list_node
+    p.closest[0] = list_node.next[2]
 
-    p.cnext[1] = list
-    p.cnext[0] = list.next[2]
+    p.cnext[1] = list_node
+    p.cnext[0] = list_node.next[2]
     
     p.ndomr = 0
     
 
-def point2struct(list, p, v, d):
+def point2struct(list_node, p, v, d):
     # Update the node p with values from v based on dimension d
     for i in range(d):
         p.x[i] = v[i]
     
     # Reset the node's properties
-    clear_point(list, p)
+    clear_point(list_node, p)
     
     return p
 
@@ -151,41 +151,29 @@ def remove_from_z(old):
 
 
 
-def setup_z_and_closest(head, new):
-    # Find closest nodes in the dimensions 0 and 1
-    closest0 = head.next[2]  
-    closest1 = head  
+def setup_z_and_closest(list_node, new_node):
+    closest1 = list_node
+    closest0 = list_node.next[2]
 
-    q = head.next[2] # Start from the node after sentinel_start in the z dimension
+    q = list_node.next[2].next[2]
+    newx = new_node.x
 
-    # Traverse the list to find the correct position for new_node
-    while q and lexicographic_less(q.x, new.x):
-        # Check dominance in dimensions 0 and 1
-        if q.x[0] <= new.x[0] and q.x[1] <= new.x[1]:
-            new.ndomr += 1  # Increment dominator count
-        elif q.x[1] < new.x[1] and (q.x[0] < closest0[0] or (q.x[0] == closest0[0] and q.x[1] < closest0[1])):
-            # Update closest0 if q is lexicographically less than the current closest0
+    while q and lexicographic_less(q.x, newx):
+        if q.x[0] <= newx[0] and q.x[1] <= newx[1]:
+            new_node.ndomr += 1
+        elif q.x[1] < newx[1] and (q.x[0] < closest0.x[0] or (q.x[0] == closest0.x[0] and q.x[1] < closest0.x[1])):
             closest0 = q
-        elif q.x[0] < new.x[0] and (q.x[1] < closest1[1] or (q.x[1] == closest1[1] and q.x[0] < closest1[0])):
-            # Update closest1 if q is lexicographically less than the current closest1
+        elif q.x[0] < newx[0] and (q.x[1] < closest1.x[1] or (q.x[1] == closest1.x[1] and q.x[0] < closest1.x[0])):
             closest1 = q
         q = q.next[2]
 
-    # Set the closest and cnext pointers
-    new.closest[0] = new.cnext[0] = closest0
-    new.closest[1] = new.cnext[1] = closest1
+    new_node.closest[0] = new_node.cnext[0] = closest0
+    new_node.closest[1] = new_node.cnext[1] = closest1
 
-    # Insert new_node before q in the z dimension
-    new.prev[2] = q.prev[2]
-    new.next[2] = q
-    
-    #q.prev[2].next[2] = new  # Link the previous node's next to new_node
-    #q.prev[2] = new  # Link q's prev to new_node
-#
-    #q.next[2].prev[2] = new  # Link the previous node's next to new_node
-    #q.next[2] = new  # Link q's prev to new_node
-
-    return new  # Return the newly inserted node for verification if needed
+    new_node.prev[2] = q.prev[2] if q else None
+    new_node.next[2] = q
+    if q:
+        q.prev[2] = new_node
 
 
 
@@ -353,46 +341,40 @@ def compute_area_simple(p, di, s, u):
 
 
 
-def restart_base_setup_z_and_closest(head, new_node):
-    p = head.next[2]  # Skipping the first sentinel.
-    closest0 = closest1 = None
-    
-    # Prepare to iterate through the list to find the correct position for the new_node
-    # and update closest0 and closest1 accordingly.
-    while p != head:
-        # Ensure we're operating within valid nodes.
-        if lexicographic_less(p.x, new_node.x):
-            if p.x[0] < new_node.x[0] and (closest0 is None or p.x[0] > closest0.x[0]):
-                closest0 = p
-            if p.x[1] < new_node.x[1] and (closest1 is None or p.x[1] > closest1.x[1]):
-                closest1 = p
-        else:
-            # Found the insertion point or a node not less than new_node lexicographically.
-            break
-        p = p.next[2]
-    
-    # Ensure closest0 and closest1 are not incorrectly pointing to the same node
-    # unless it's the only valid choice.
-    if closest0 == closest1 and closest0 is not None and p != head:
-        # Attempt to adjust closest1 to a better fitting node if possible.
-        if closest1.x[1] < new_node.x[1]:
-            # Look ahead for a better match for closest1.
-            next_p = closest1.next[2]
-            while next_p != head and next_p.x[1] < new_node.x[1]:
-                closest1 = next_p
-                next_p = next_p.next[2]
+def restart_base_setup_z_and_closest(list_node, new_node):
+    p = list_node.next[2].next[2]
+    closest1 = list_node
+    closest0 = list_node.next[2]
 
-    # Link the new_node into the list
-    new_node.prev[2] = p.prev[2]
-    new_node.next[2] = p
-    if p.prev[2]:
-        p.prev[2].next[2] = new_node
-    p.prev[2] = new_node
+    newx = new_node.x
+    
+    restart_list_y(list_node)
+    
+    while p and lexicographic_less(p.x, newx):
+        p.cnext[0] = p.closest[0]
+        p.cnext[1] = p.closest[1]
+        
+        p.cnext[0].cnext[1] = p
+        p.cnext[1].cnext[0] = p
+        
+        if p.x[0] <= newx[0] and p.x[1] <= newx[1]:
+            new_node.ndomr += 1
+        elif p.x[1] < newx[1] and (p.x[0] < closest0.x[0] or (p.x[0] == closest0.x[0] and p.x[1] < closest0.x[1])):
+            closest0 = p
+        elif p.x[0] < newx[0] and (p.x[1] < closest1.x[1] or (p.x[1] == closest1.x[1] and p.x[0] < closest1.x[0])):
+            closest1 = p
+        
+        p = p.next[2]
     
     new_node.closest[0] = closest0
     new_node.closest[1] = closest1
-    new_node.cnext[0] = closest0
-    new_node.cnext[1] = closest1
+    
+    if p:
+        new_node.prev[2] = p.prev[2]
+        new_node.next[2] = p
+        if p.prev[2]:
+            p.prev[2].next[2] = new_node
+        p.prev[2] = new_node
 
 
 # --------------- one contribution 3d ------------------

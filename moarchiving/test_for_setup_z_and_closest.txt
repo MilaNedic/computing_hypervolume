@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <float.h>
+#include <string.h>
+
+typedef struct dlnodeNew {
+    double x[4];
+    struct dlnodeNew *closest[2];
+    struct dlnodeNew *cnext[2];
+    struct dlnodeNew *next[4];
+    struct dlnodeNew *prev[4];
+    int ndomr;
+} dlnodeNew_t;
+
+int lexicographicLessNew(double *a, double *b) {
+    return (a[2] < b[2] || (a[2] == b[2] && (a[1] < b[1] || (a[1] == b[1] && a[0] <= b[0]))));
+}
+
+static void setupZandClosest(dlnodeNew_t *list, dlnodeNew_t *new) {
+    double *closest1 = (double *)(list);
+    double *closest0 = (double *)(list->next[2]);
+
+    dlnodeNew_t *q = (list->next[2]->next[2]);
+    double *newx = new->x;
+
+    while(q != NULL && lexicographicLessNew(q->x, newx)){
+        if(q->x[0] <= newx[0] && q->x[1] <= newx[1]){
+            new->ndomr += 1;
+        }else if(q->x[1] < newx[1] && (q->x[0] < closest0[0] || (q->x[0] == closest0[0] && q->x[1] < closest0[1]))){
+            closest0 = (double *) q;
+        }else if(q->x[0] < newx[0] && (q->x[1] < closest1[1] || (q->x[1] == closest1[1] && q->x[0] < closest1[0]))){
+            closest1 = (double *) q;
+        }
+
+        q = q->next[2];
+    }
+
+    new->closest[0] = new->cnext[0] = (dlnodeNew_t *) closest0;
+    new->closest[1] = new->cnext[1] = (dlnodeNew_t *) closest1;
+    
+    if (q != NULL) {
+        new->prev[2] = q->prev[2];
+        new->next[2] = q;
+        if (q->prev[2]) {
+            q->prev[2]->next[2] = new;
+        }
+        q->prev[2] = new;
+    }
+}
+
+void print_node(const char *label, dlnodeNew_t *node) {
+    if (node) {
+        printf("%s: (%.1f, %.1f, %.1f, %.1f)\n", label, node->x[0], node->x[1], node->x[2], node->x[3]);
+    } else {
+        printf("%s: (NULL)\n", label);
+    }
+}
+
+int main() {
+    dlnodeNew_t *listNode = malloc(sizeof(dlnodeNew_t));
+    dlnodeNew_t *nextNode = malloc(sizeof(dlnodeNew_t));
+    dlnodeNew_t *newNode = malloc(sizeof(dlnodeNew_t));
+
+    // Initialize nodes with specified values
+    listNode->x[0] = -15; listNode->x[1] = -15; listNode->x[2] = -15; listNode->x[3] = -15;
+    nextNode->x[0] = 10; nextNode->x[1] = 10; nextNode->x[2] = 10; nextNode->x[3] = 10;
+    newNode->x[0] = 0; newNode->x[1] = 0; newNode->x[2] = 0; newNode->x[3] = 0;
+
+    // Link nodes
+    listNode->next[2] = nextNode;
+    nextNode->prev[2] = listNode;
+    nextNode->next[2] = NULL; // End of list
+
+    // Print initial setup
+    printf("Before setup:\n");
+    print_node("listNode", listNode);
+    print_node("nextNode", nextNode);
+
+    // Perform setup
+    setupZandClosest(listNode, newNode);
+
+    // Print after setup
+    printf("After setup:\n");
+    print_node("newNode", newNode);
+    print_node("newNode closest[0]", newNode->closest[0]);
+    print_node("newNode closest[1]", newNode->closest[1]);
+    print_node("newNode next[2]", newNode->next[2]);
+    print_node("newNode prev[2]", newNode->prev[2]);
+
+    print_node("listNode prev[2]", listNode->prev[2]);
+    print_node("listNode next[2]", listNode->next[2]);
+    print_node("listNode closest[0]", listNode->closest[0]);
+    print_node("listNode closest[1]", listNode->closest[1]);
+
+    print_node("nextNode prev[2]", nextNode->prev[2]);
+    print_node("nextNode next[2]", nextNode->next[2]);
+    print_node("nextNode closest[0]", nextNode->closest[0]);
+    print_node("nextNode closest[1]", nextNode->closest[1]);
+
+    // Clean up
+    free(listNode);
+    free(nextNode);
+    free(newNode);
+
+    return 0;
+}
+

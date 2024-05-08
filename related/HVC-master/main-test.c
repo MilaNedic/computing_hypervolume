@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
 #include <float.h>
 #include <string.h>
@@ -117,31 +117,86 @@ double computeAreaSimple(double *p, int di, dlnodeNew_t *s, dlnodeNew_t *u) {
 }
 
 
+static int compare_point3d(const void *p1, const void* p2)
+{
+    int i;
+    for(i = 2; i >= 0; i--){
+        double x1 = (*((const double **)p1))[i];
+        double x2 = (*((const double **)p2))[i];
+
+        if(x1 < x2)
+            return -1;
+        if(x1 > x2)
+            return 1;
+    }
+    return 0;
+}
+
+
+static int compare_point4d(const void *p1, const void* p2)
+{
+    int i;
+    for(i = 3; i >= 0; i--){
+        double x1 = (*((const double **)p1))[i];
+        double x2 = (*((const double **)p2))[i];
+
+        if(x1 < x2)
+            return -1;
+        if(x1 > x2)
+            return 1;
+    }
+    return 0;
+}
+
+static void addToZ(dlnode_t * new){
+    
+    new->next[2] = new->prev[2]->next[2]; //in case new->next[2] was removed for being dominated
+    
+    new->next[2]->prev[2] = new;
+    new->prev[2]->next[2] = new;
+}
+
+
+static void removeFromZ(dlnode_t * old){
+    old->prev[2]->next[2] = old->next[2];
+    old->next[2]->prev[2] = old->prev[2];
+}
+
+
+static void setupZandClosest(dlnodeNew_t *list, dlnodeNew_t *new) {
+    double *closest1 = (double *)(list);
+    double *closest0 = (double *)(list->next[2]);
+
+    dlnodeNew_t *q = (list->next[2]->next[2]);
+    double *newx = new->x;
+
+    while(q != NULL && lexicographicLessNew(q->x, newx)){
+        if(q->x[0] <= newx[0] && q->x[1] <= newx[1]){
+            new->ndomr += 1;
+        }else if(q->x[1] < newx[1] && (q->x[0] < closest0[0] || (q->x[0] == closest0[0] && q->x[1] < closest0[1]))){
+            closest0 = (double *) q;
+        }else if(q->x[0] < newx[0] && (q->x[1] < closest1[1] || (q->x[1] == closest1[1] && q->x[0] < closest1[0]))){
+            closest1 = (double *) q;
+        }
+
+        q = q->next[2];
+    }
+
+    new->closest[0] = new->cnext[0] = (dlnodeNew_t *) closest0;
+    new->closest[1] = new->cnext[1] = (dlnodeNew_t *) closest1;
+    
+    if (q != NULL) {
+        new->prev[2] = q->prev[2];
+        new->next[2] = q;
+        if (q->prev[2]) {
+            q->prev[2]->next[2] = new;
+        }
+        q->prev[2] = new;
+    }
+}
+
 int main() {
     printf("Hello world!\n");
-        // Define the points and p
-    double point0_data[] = {3.0, 2.0, 2.0, 0.0};
-    double point1_data[] = {2.0, 3.0, 3.0, 0.0};
-    double p_data[] = {5.0, 3.0, 3.0, 0.0};
-
-    // Create dlnodeNew structures for the points
-    dlnodeNew_t point0 = {{point0_data[0], point0_data[1], point0_data[2], point0_data[3]}, {NULL, NULL}, {NULL, NULL}, {NULL, NULL, NULL, NULL}, {NULL, NULL, NULL, NULL}, 0};
-    dlnodeNew_t point1 = {{point1_data[0], point1_data[1], point1_data[2], point1_data[3]}, {NULL, NULL}, {NULL, NULL}, {NULL, NULL, NULL, NULL}, {NULL, NULL, NULL, NULL}, 0};
-
-    // Create dlnodeNew structure for p
-    dlnodeNew_t p = {{p_data[0], p_data[1], p_data[2], p_data[3]}, {NULL, NULL}, {NULL, NULL}, {NULL, NULL, NULL, NULL}, {NULL, NULL, NULL, NULL}, 5};
-
-    // Compute area for di = 0
-    int di = 0;
-    double area_di_0 = computeAreaSimple(p_data, di, &point0, &point1);
-    printf("Area for di = 0: %f\n", area_di_0);
-
-    // Compute area for di = 1
-    di = 1;
-    double area_di_1 = computeAreaSimple(p_data, di, &point0, &point1);
-    printf("Area for di = 1: %f\n", area_di_1);
-
-    return 0;
 
 
 }
