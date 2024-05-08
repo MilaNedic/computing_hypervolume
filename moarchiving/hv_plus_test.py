@@ -399,69 +399,63 @@ d = 3
 
 ref_p = [1.0, 1.0, 1.0]
 
+
 # Call setup_cdllist function - this seorts the node in ascending z coordinate
 dlnode_cdllist = setup_cdllist_new(points, 10, 10, d, ref_p)
 print_cdllist(dlnode_cdllist, d - 1)
 print("\n")
 
-from hv_plus import cdllist_to_list
-from hv_plus import preprocessing
-        
-from hv_plus import preprocessing_new
-avl_tree_new = preprocessing_new(dlnode_cdllist)
-print("List of preprocessed nodes")
-print(list(avl_tree_new))
-#hypervolume = hv3dplus(dlnode_cdllist)
+from hv_plus import cdllist_preprocessing
+
+cdllist_preprocessing(dlnode_cdllist, d - 1, 12)
+hypervolume = hv3dplus(dlnode_cdllist)
+print("Hypervolume in 3D:", hypervolume)
 
 
+points_4d = [
+    1.0, 2.0, 3.0, 1.0,
+    4.0, 5.0, 6.0, 0.5,
+    7.0, 8.0, 9.0, 0.7,
+    2.0, 1.0, 0.5, 0.6,
+    3.0, 4.0, 5.0, 0.8,
+    6.0, 7.0, 8.0, 0.3,
+    9.0, 1.0, 2.0, 0.9,
+    5.0, 6.0, 7.0, 0.2,
+    8.0, 9.0, 1.0, 0.4,
+    0.0, 1.0, 2.0, 0.1
+]
+
+dim4d = 4
+
+n4d = 10
+
+ref_point_4d = [10.0, 10.0, 10.0, 10.0]
+
+cdllist_4d = setup_cdllist_new(points_4d, n4d, n4d, dim4d, ref_point_4d)
+
+from hv_plus import hv4dplusR
+
+print("\nHypervolume in 4d - hv4dplusR", hv4dplusR(cdllist_4d))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#nodes_list = cdllist_to_list(dlnode_cdllist, d-1) # list of dlnodes which we feed into preprocessing, after that we can call hv3dplus
-#print("List of nodes in nodes list:")
-#for node in nodes_list:
-#    print(node.x)
+#def hv4dplusU(list_):
+#    height = 0
+#    volume = 0
+#    hv = 0
 #    
-#preprocessed_list = list(preprocessing(nodes_list))
-#print("List of nodes after preprocessing")
-#print(preprocessed_list)
-#print("\n")    
-
-#hypervolume = hv3dplus(dlnode_cdllist)
-#print("Hypervolume:", hypervolume)
-
-#"Auxiliary function that reverses points in the list so that the z coordinate comes first"
-#def reverse_list_z(dlnode_list):
-#    points_list = []
-#    for dlnode in dlnode_list:
-#        point = dlnode.x
-#        point.reverse()
-#        points_list.append(point)
-#    return [DLNode(point) for point in points_list]
+#    last = list_.prev[3]
+#    new = list_.next[3].next[3]
+#    
+#    while new != last:
+#        volume += one_contribution_3d(list_, new)
+#        add_to_z(new)
+#        update_links(list_, new, new.next[2])
+#        
+#        height = new.next[3].x[3] - new.x[3]
+#        hv += volume * height
+#        
+#        new = new.next[3]
+#        
+#    return hv
 #
-#print("\n")
-#print("List of nodes with reversed order, coordinates  are now (z,y,x)")
-#nodes_list_z = reverse_list_z(nodes_list)
-#for node in nodes_list_z:
-#    print(node.x)
-#
-#preprocessing(nodes_list_z)
-#print("List of nodes after preprocessing")
-#print(list(preprocessing(nodes_list_z)))
+#print("\nHypervolume in 4d - hv4dplusU", hv4dplusU(cdllist_4d))

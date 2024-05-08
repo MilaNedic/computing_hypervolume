@@ -1,0 +1,104 @@
+
+
+
+def preprocessing(node_list):
+    # Assuming the list_node is the start of a linked list of DLNodes
+
+    # Create an AVL tree with a custom comparator for the y-coordinate
+    avl_tree = AvlTree()
+    
+    def find_le(tree, point):
+        le_node = None
+        for node_point in tree:
+            if node_point <= point:
+                if le_node is None or node_point > le_node:
+                    le_node = node_point
+        return le_node
+
+    for idx, node in enumerate(node_list[1:-1], start=1):  # Skip sentinel nodes
+        point = tuple(node.x)  # No need to reverse since we're using the avl_tree package
+        avl_tree[point] = idx  # Index in node_list as key, point as value
+        
+    p = node_list[1].next[2]  # Skip the head sentinel
+    stop = node_list[-2]  # Stop before the tail sentinel
+
+
+    while p != stop:
+        #print("curent point in preprocessing", p)
+        point = tuple(p.x)
+        le_point = find_le(avl_tree, point)
+        
+        # If a node to the left exists, perform comparisons
+        if le_point is not None:
+            le_idx = avl_tree[le_point]
+            # Find the previous node that is not dominated by p
+            while le_point is not None and le_point[0] >= point[0]:
+                # Find the next node that could potentially dominate p
+                higher_points = [k for k in avl_tree if k > le_point]
+                if higher_points:
+                    le_point = min(higher_points, key=lambda x: (x[1], x[0]))
+                else:
+                    le_point = None
+
+            if le_point is not None:
+                le_idx = avl_tree[le_point]
+                p.closest[0] = le_point
+                p.closest[1] = le_idx
+
+        # The point is not dominated, insert it into the tree
+        if p.ndomr == 0:
+            avl_tree[point] = idx
+        
+        p = p.next[2]
+
+    return avl_tree
+
+
+def preprocessing_new(head_node):
+    # Assuming head_node is the head of a circular doubly linked list of DLNodes
+    # and the first two and the last node are sentinels
+
+    # Create an AVL tree with a custom comparator for the y-coordinate
+    avl_tree = AvlTree()
+    
+    def find_le(tree, point):
+        le_node = None
+        for node_point in tree:
+            if node_point <= point:
+                if le_node is None or node_point > le_node:
+                    le_node = node_point
+        return le_node
+
+    # Start from the node next to the head sentinel
+    p = head_node.next[2]
+
+    # Continue until we reach the head sentinel again (full circle)
+    while p != head_node and p.next[2] != head_node:
+        point = tuple(p.x)
+        le_point = find_le(avl_tree, point)
+        
+        # If a node to the left exists, perform comparisons
+        if le_point is not None:
+            le_idx = avl_tree[le_point]
+            # Find the previous node that is not dominated by p
+            while le_point is not None and le_point[0] >= point[0]:
+                # Find the next node that could potentially dominate p
+                higher_points = [k for k in avl_tree if k > le_point]
+                if higher_points:
+                    le_point = min(higher_points, key=lambda x: (x[1], x[0]))
+                else:
+                    le_point = None
+
+            if le_point is not None:
+                le_idx = avl_tree[le_point]
+                p.closest[0] = le_point
+                p.closest[1] = le_idx
+
+        # The point is not dominated, insert it into the tree
+        if p.ndomr == 0:
+            avl_tree[point] = p  # Here we insert the node itself instead of the index
+
+        # Move to the next node in the list
+        p = p.next[2]
+
+    return avl_tree

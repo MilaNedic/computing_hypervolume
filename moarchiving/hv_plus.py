@@ -269,6 +269,9 @@ def print_cdllist(head, di):
         print(current.x)
         current = current.next[di] if current.next[di] != head else None
 
+
+
+
 " This is now the correct implementation of setup_cdlist "
 def setup_cdllist_new(data, naloc, n, d, ref):
     head = [DLNode() for _ in range(naloc + 3)]
@@ -289,6 +292,8 @@ def setup_cdllist_new(data, naloc, n, d, ref):
         # Create nodes from sorted points
         for i, index in enumerate(sorted_indices):
             head[i + 3].x = points[index].tolist()
+            if d == 3: #
+                head[i + 3].x.append(0.0) # Add 0.0 for 3d points so that it matches the original code, written in C
 
         # Link nodes
         s = head[0].next[di]
@@ -438,7 +443,7 @@ def one_contribution_3d(list_node, new_node):
 " this is very straightfoward and same as the c code "
 " the problem occrus when seeting up examples "
 def hv3dplus(list_node):
-    p = list_node # list of DLNodes or DLNode?
+    p = list_node 
     area = 0
     volume = 0
 
@@ -452,7 +457,13 @@ def hv3dplus(list_node):
             p.cnext[0] = p.closest[0]
             p.cnext[1] = p.closest[1]
 
+            print("Current p", p.x)
+            print("p.closest[0]", p.closest[0].x)
+            print("p.closest[1]", p.closest[1].x)
+            print("p.cnext[0].cnext[1]", p.cnext[0].cnext[1].x, "\n")
+
             area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
+            print("Area:", area)
 
             p.cnext[0].cnext[1] = p
             p.cnext[1].cnext[0] = p
@@ -460,20 +471,67 @@ def hv3dplus(list_node):
             remove_from_z(p)
 
         volume += area * (p.next[2].x[2] - p.x[2])
+        print("Volume:", volume)
 
         p = p.next[2]
 
     return volume
 
 
-#def preprocessing(node_list): # input is a lsit of dlnodes
-#    avl_tree = AvlTree()  # Initialize an empty AVL tree
-#
-#    for idx, node in enumerate(node_list[1:-1]):  # Skip the head and tail sentinels
-#        # The node's coordinates are reversed before being inserted into the AVL tree,
-#        # because the last coordinate is supposed to be the most significant for sorting
-#        point = tuple(reversed(node.x))
-#        avl_tree[point] = str(idx)  # Use the index as the key, and the point as the value
+def cdllist_start_node(head, di):
+    current = head.next[di]
+    print(current.x)
+    return current
+    
+
+def cdllist_end_node(head, di, n):
+    current = head.next[di]
+    counter = 0
+    end_of_list = DLNode()
+    while current is not None and current != head:
+        current = current.next[di] if current.next[di] != head else None
+        counter += 1
+        if counter == n - 1:
+            end_of_list = DLNode(current.x)
+            #print(end_of_list.x)
+    return end_of_list
+
+def cdllist_preprocessing(head, di, n):
+    start_node = cdllist_start_node(head, di)
+    print("head", head.x)
+    current = head.next[di]
+    end_of_list = cdllist_end_node(head, di, n)
+    while current is not None and current != head:
+        current.closest[0] = start_node
+        current.closest[1] = end_of_list
+        current.cnext[0] = start_node
+        current.cnext[0].cnext[1] = current.next[di]
+        current = current.next[di] if current.next[di] != head else None
+
+def hv4dplusR(list_):
+    height = 0
+    volume = 0
+    hv = 0
+    
+    last = list_.prev[3]
+    new = list_.next[3].next[3]
+    
+    while new != last:
+        setup_z_and_closest(list_, new)           # Compute cx and cy of 'new' and determine next and prev in z
+        add_to_z(new)                            # Add 'new' to list sorted by z
+        update_links(list_, new, new.next[2])   # Update cx and cy of the points above 'new' in z
+                                                # and remove dominated points
+        
+        volume = hv3dplus(list_)               # Compute hv indicator in d=3 in linear time
+        
+        height = new.next[3].x[3] - new.x[3]
+        hv += volume * height                  # Update hypervolume in d=4
+        
+        new = new.next[3]
+        
+    return hv
+
+
 
 def preprocessing(node_list):
     # Assuming the list_node is the start of a linked list of DLNodes
@@ -576,7 +634,6 @@ def preprocessing_new(head_node):
         p = p.next[2]
 
     return avl_tree
-
 
 
 

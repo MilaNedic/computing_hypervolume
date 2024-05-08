@@ -1,0 +1,27 @@
+    dlnodeNew_t *list = malloc(sizeof(dlnodeNew_t));
+    dlnodeNew_t *newNode = malloc(sizeof(dlnodeNew_t));
+    dlnodeNew_t *node1 = malloc(sizeof(dlnodeNew_t));
+    dlnodeNew_t *node2 = malloc(sizeof(dlnodeNew_t));
+
+    // Initialize nodes
+    list->x[0] = -1; list->x[1] = -1; list->x[2] = -1; list->x[3] = -1;
+    node1->x[0] = 0; node1->x[1] = 0; node1->x[2] = 0; node1->x[3] = 0;
+    node2->x[0] = 5; node2->x[1] = 5; node2->x[2] = 5; node2->x[3] = 5;
+    newNode->x[0] = 1; newNode->x[1] = 1; newNode->x[2] = 2; newNode->x[3] = 2;
+
+    // Link nodes
+    list->next[2] = node1;
+    node1->next[2] = node2;
+    node2->next[2] = NULL;
+
+    // Setup the list and new node interaction
+    restartBaseSetupZandClosest(list, newNode);
+
+    printf("New node dominators count: %d\n", newNode->ndomr);
+    printf("New node closest[0]: (%.1f, %.1f, %.1f, %.1f)\n", newNode->closest[0]->x[0], newNode->closest[0]->x[1], newNode->closest[0]->x[2], newNode->closest[0]->x[3]);
+    printf("New node closest[1]: (%.1f, %.1f, %.1f, %.1f)\n", newNode->closest[1]->x[0], newNode->closest[1]->x[1], newNode->closest[1]->x[2], newNode->closest[1]->x[3]);
+
+    free(list);
+    free(newNode);
+    free(node1);
+    free(node2);

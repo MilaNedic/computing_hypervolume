@@ -149,7 +149,7 @@ static dlnode_t * initSentinels(dlnode_t * list, const double * ref, int d){
     
 }
 
-
+    
 
 
 
@@ -293,7 +293,7 @@ static int updateLinks(dlnode_t * list, dlnode_t * new, dlnode_t * p){
 
 /* ---------------------------------- Sort ---------------------------------------*/
 
-static int compare_point3d(const void *p1, const void* p2)
+int compare_point3d(const void *p1, const void* p2)
 {
     int i;
     for(i = 2; i >= 0; i--){
@@ -310,7 +310,7 @@ static int compare_point3d(const void *p1, const void* p2)
 
 
 
-static int compare_point4d(const void *p1, const void* p2)
+int compare_point4d(const void *p1, const void* p2)
 {
     int i;
     for(i = 3; i >= 0; i--){
@@ -544,8 +544,8 @@ static void restartBaseSetupZandClosest(dlnode_t * list, dlnode_t * new){
     double * newx = new->x;
     int loop;
 
-    printf("list\n");
-    printf("%f %f %f %f\n", list[0], list[1], list[2], list[3]);    
+    //printf("list\n");
+    //printf("%f %f %f %f\n", list[0], list[1], list[2], list[3]);    
     
     restartListy(list);
     
@@ -575,8 +575,8 @@ static void restartBaseSetupZandClosest(dlnode_t * list, dlnode_t * new){
         p = p->next[2];
 
     }
-    printf("newx\n");
-    printf("%f %f %f %f\n", newx[0], newx[1], newx[2], newx[3]);    
+    //printf("newx\n");
+    //printf("%f %f %f %f\n", newx[0], newx[1], newx[2], newx[3]);    
     
     new->closest[0] = (dlnode_t *) closest0;
     new->closest[1] = (dlnode_t *) closest1;
@@ -584,12 +584,6 @@ static void restartBaseSetupZandClosest(dlnode_t * list, dlnode_t * new){
     new->prev[2] = p->prev[2];
     new->next[2] = p;
     
-    printf("p\n");
-    printf("%f %f %f %f\n", p->x[0], p->x[1], p->x[2], p->x[3]);    
-    printf("closest0\n");
-    printf("%f %f %f %f\n", closest0[0], closest0[1], closest0[2], closest0[3]);     
-    printf("closest1\n");
-    printf("%f %f %f %f\n", closest1[0], closest1[1], closest1[2], closest1[3]);    
 }
 
 static double oneContribution3d(dlnode_t * list, dlnode_t * new){
@@ -668,6 +662,11 @@ static double hv3dplus(dlnode_t * list){
         if(p->ndomr < 1){
             p->cnext[0] = p->closest[0];
             p->cnext[1] = p->closest[1];
+
+            //printf("current p [%lf, %lf, %lf, %lf]\n", p->x[0], p->x[1], p->x[2], p->x[3]);
+            //printf("p->closest[0] [%lf, %lf, %lf, %lf]\n", p->closest[0]->x[0], p->closest[0]->x[1], p->closest[0]->x[2], p->closest[0]->x[3]);
+            //printf("p->closest[1] [%lf, %lf, %lf, %lf]\n", p->closest[1]->x[0], p->closest[1]->x[1], p->closest[1]->x[2], p->closest[1]->x[3]);
+            //printf("p->cnext[0]->cnext[1] [%lf, %lf, %lf, %lf]\n", p->cnext[0]->cnext[1]->x[0], p->cnext[0]->cnext[1]->x[1], p->cnext[0]->cnext[1]->x[2], p->cnext[0]->cnext[1]->x[3]);
             
             area += computeAreaSimple(p->x, 1, p->cnext[0], p->cnext[0]->cnext[1]);
             
