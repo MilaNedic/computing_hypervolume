@@ -31,13 +31,10 @@ nodes_list = cdllist_to_list(head_node, d-1) # list of dlnodes which we feed int
 for node in nodes_list[1:-1]: # first and last dlnode indicate the start and end of the list and are not needed in the sorting process
     idx = nodes_list.index(node)
     point = node.x
-    point.reverse() # reverse the order to that it is sorted based on the last cooridnate
     avl_tree[tuple(point)] = str(idx) # keys must be immutable and have a less-than comparison, to we turn a list into a tuple
 
 del avl_tree[tuple(ref_p)] # delete the reference point
 
-print("List of nodes in the AVL tree - points are (z,y,x)")
-print(list(avl_tree))
 
 print("Minimum element in the AVL tree")
 print(avl_tree.minimum()) # min in the first corodinate
@@ -47,18 +44,10 @@ print(avl_tree.maximum()) # max in the first coordinate
 print("\n")
 from hv_plus import preprocessing
 preprocessing(nodes_list)
+for node in nodes_list:
+    print("closest[0]", node.closest[0])
+    print("closest[1]:", node.closest[1])
 print("List of nodes in the AVL tree after preprocessing")
 print(list(preprocessing(nodes_list)))
 print("\n")
-
-
-from avl import AVLTree
-print("AVL tree gotten with the avl.py file")
-Tree = AVLTree()       
-root = None
-for node in nodes_list[1:-1]:
-    point = node.x
-    root = Tree.insert_node(root,tuple(point))
-    
-Tree.preOrder(root)
 

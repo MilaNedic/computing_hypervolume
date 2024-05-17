@@ -132,6 +132,41 @@ static int lexicographicLess(double *a, double *b) {
     return (a[2] < b[2] || (a[2] == b[2] && (a[1] < b[1] || (a[1] == b[1] && a[0] <= b[0]))));
 }
 
+static void setupZandClosest(dlnodeNew_t * list, dlnodeNew_t * new){
+    
+            
+    double * closest1 = (double *) (list);
+    double * closest0 = (double *) (list->next[2]);
+
+    dlnodeNew_t * q = (list->next[2]->next[2]);
+    
+    double * newx = new->x;
+    
+    
+    while(lexicographicLess(q->x, newx)){
+        if(q->x[0] <= newx[0] && q->x[1] <= newx[1]){
+                
+            new->ndomr += 1;
+            //new->domr = q;
+            //return new;
+                
+        }else if(q->x[1] < newx[1] && (q->x[0] < closest0[0] || (q->x[0] == closest0[0] && q->x[1] < closest0[1]))){
+            closest0 = (double *) q;
+        }else if(q->x[0] < newx[0] && (q->x[1] < closest1[1] || (q->x[1] == closest1[1] && q->x[0] < closest1[0]))){
+            closest1 = (double *) q;
+        }
+        
+        q = q->next[2];
+    }
+    
+    new->closest[0] = new->cnext[0] = (dlnodeNew_t *) closest0;
+    new->closest[1] = new->cnext[1] = (dlnodeNew_t *) closest1;
+    
+    new->prev[2] = q->prev[2];
+    new->next[2] = q;
+    
+}
+
 static void restartBaseSetupZandClosest(dlnodeNew_t *list, dlnodeNew_t *new) {
     dlnodeNew_t *p = list->next[2]->next[2];
     double *closest1 = (double *)(list);
@@ -182,7 +217,9 @@ static double computeAreaSimple(double * p, int di, dlnodeNew_t * s, dlnodeNew_t
     return area;
 }
 
-static double oneContribution3d(dlnodeNew_t * list, dlnodeNew_t * new){
+double oneContribution3d(dlnodeNew_t * list, dlnodeNew_t * new){
+    printf("Entering oneContribution3d\n");  // Debugging statement
+    fflush(stdout);
     
 //     int considerDominated = 1;
     
@@ -193,6 +230,8 @@ static double oneContribution3d(dlnodeNew_t * list, dlnodeNew_t * new){
     
     restartBaseSetupZandClosest(list, new);
     if (new->ndomr > 0)
+        printf("Dominators are present, exiting early.\n");
+        fflush(stdout);
         return 0;
     
     new->cnext[0] = new->closest[0];
@@ -236,7 +275,11 @@ static double oneContribution3d(dlnodeNew_t * list, dlnodeNew_t * new){
         
     }
     
-    volume += area * (p->x[2]- lastz);
+    if(p) {
+        volume += area * (p->x[2] - lastz);
+    }
+    printf("Volume computed: %f\n", volume); // Debugging statement
+    fflush(stdout);
     return volume;
     
 }
@@ -255,7 +298,6 @@ int compare_point3d(const void *p1, const void* p2)
     }
     return 0;
 }
-
 
 
 int compare_point4d(const void *p1, const void* p2)
@@ -387,31 +429,12 @@ static void free_cdllist(dlnodeNew_t * list)
     free(list);
 }
 
-static int compare_tree_asc_y( const void *p1, const void *p2)
-{
-    const double x1= *((const double *)p1+1);
-    const double x2= *((const double *)p2+1);
-
-    if (x1 < x2)
-        return -1;
-    else if (x1 > x2)
-        return 1;
-    else return 0;
-}
-
-
-static inline double *node_point(const avl_node_t *node)
-{
-    return (double*) node->item;
-}
-
 
 
 int main() {
-    printf("Test\n");
-    // Provided data
-    // Provided data
-    double points[] = {
+    printf("Test for one contributon 3d\n");
+    // Given dataset
+    double data[] = {
         0.16, 0.86, 0.47,
         0.66, 0.37, 0.29,
         0.79, 0.79, 0.04,
@@ -423,33 +446,28 @@ int main() {
         0.67, 0.17, 0.54,
         0.79, 0.72, 0.05
     };
-    double ref_p[] = {1.0, 1.0, 1.0};
-    int naloc = 10; // You need to specify the value of naloc
-    int n = 10;     // Number of points
-    int d = 3;     // Dimensionality
 
-    // Setup the cdllist
-    dlnodeNew_t *head = setup_cdllist(points, naloc, n, d, ref_p);
+    // Reference point is (1, 1, 1)
+    const double ref[] = {1, 1, 1};
 
-    // Print out the nodes in the cdllist
-    printf("Nodes in the cdllist:\n");
-    dlnodeNew_t *current = head->next[d - 1]; // Start from the first node
-    int count = 0;
-    while (current != head) {
-        printf("[%lf, %lf, %lf, %lf]\n", current->x[0], current->x[1], current->x[2], current->x[3]);
-        current = current->next[d - 1];
-        count++;
+    // Number of points, dimensions, and allocation size for nodes
+    int naloc = 12; // Including extra space for sentinels
+    int n = 10;     // Number of data points
+    int d = 3;      // Number of dimensions
+
+    // Setup the circular doubly-linked list of nodes
+    dlnodeNew_t *head = setup_cdllist(data, naloc, n, d, ref);
+
+    // Iterate over the data nodes to calculate their contributions
+    dlnodeNew_t *current = head->next[d-1]; // Assuming the first data node starts just after the sentinel
+    int index = 0; // Data node index
+    while (current != head && current != head->prev[d-1]) { // Assumes the last node connects back to a sentinel
+        printf("Current node [%f %f %f %f]\n", current->x[0], current->x[1], current->x[2], current->x[3]);
+        double contribution = oneContribution3d(head, current);
+        printf("Volume contribution of node %d is: %f\n", index, contribution);
+        current = current->next[d-1];
+        index++;
     }
 
-    // Compute the hypervolume in 3D
-    double hypervolume = hv3dplus(head);
-
-    // Print out the hypervolume
-    printf("Hypervolume in 3D: %lf\n", hypervolume);
-
-    // Free dynamically allocated memory
-    // You should free all dynamically allocated memory here
-    // Freeing the cdllist is not included in this example
-    free_cdllist(head);
     return 0;
 }

@@ -1,5 +1,5 @@
 # -------------------- AVL Tree ---------------
-from avltree import AvlTree, _avl_tree_node
+from avltree import AvlTree, _avl_tree_node, _avl_tree_key
 from functools import cmp_to_key
 import numpy as np
 
@@ -133,47 +133,50 @@ def point2struct(list_node, p, v, d):
 # --------------------- Updating Data Structures --------------------------
 
 def add_to_z(new):
-    if new.prev[2] is not None:
-        new.next[2] = new.prev[2].next[2] if new.prev[2].next[2] is not None else None  # in case new->next[2] was removed for being dominated
-    else:
-        new.next[2] = None
-        
-    if new.next[2] is not None:
-        new.next[2].prev[2] = new
-    if new.prev[2] is not None:
-        new.prev[2].next[2] = new
+    new.next[2] = new.prev[2].next[2]
+    new.next[2].prev[2] = new
+    new.prev[2].next[2] = new
+    #if new.prev[2] is not None:
+    #    new.next[2] = new.prev[2].next[2] if new.prev[2].next[2] is not None else None  # in case new->next[2] was removed for being dominated
+    #else:
+    #    new.next[2] = None
+    #    
+    #if new.next[2] is not None:
+    #    new.next[2].prev[2] = new
+    #if new.prev[2] is not None:
+    #    new.prev[2].next[2] = new
 
 def remove_from_z(old):
-    if old.prev[2] is not None and old.prev[2].next[2] is not None:
-        old.prev[2].next[2] = old.next[2] if old.next[2] is not None else None
-    if old.next[2] is not None and old.next[2].prev[2] is not None:
-        old.next[2].prev[2] = old.prev[2] if old.prev[2] is not None else None
+    old.prev[2].next[2] = old.next[2]
+    old.next[2].prev[2] = old.prev[2]
+    #if old.prev[2] is not None and old.prev[2].next[2] is not None:
+    #    old.prev[2].next[2] = old.next[2] if old.next[2] is not None else None
+    #if old.next[2] is not None and old.next[2].prev[2] is not None:
+    #    old.next[2].prev[2] = old.prev[2] if old.prev[2] is not None else None
 
 
 
-def setup_z_and_closest(list_node, new_node):
-    closest1 = list_node
-    closest0 = list_node.next[2]
+def setup_z_and_closest(list_, new):
+    closest1 = list_
+    closest0 = list_.next[2]
 
-    q = list_node.next[2].next[2]
-    newx = new_node.x
+    q = list_.next[2].next[2]
+    newx = new.x
 
     while q and lexicographic_less(q.x, newx):
         if q.x[0] <= newx[0] and q.x[1] <= newx[1]:
-            new_node.ndomr += 1
+            new.ndomr += 1
         elif q.x[1] < newx[1] and (q.x[0] < closest0.x[0] or (q.x[0] == closest0.x[0] and q.x[1] < closest0.x[1])):
             closest0 = q
         elif q.x[0] < newx[0] and (q.x[1] < closest1.x[1] or (q.x[1] == closest1.x[1] and q.x[0] < closest1.x[0])):
             closest1 = q
+
         q = q.next[2]
 
-    new_node.closest[0] = new_node.cnext[0] = closest0
-    new_node.closest[1] = new_node.cnext[1] = closest1
-
-    new_node.prev[2] = q.prev[2] if q else None
-    new_node.next[2] = q
-    if q:
-        q.prev[2] = new_node
+    new.closest[0] = new.cnext[0] = closest0
+    new.closest[1] = new.cnext[1] = closest1
+    new.prev[2] = q.prev[2] if q else None
+    new.next[2] = q
 
 
 
@@ -338,112 +341,95 @@ def compute_area_simple(p, di, s, u):
 
 
 
-"The function compute_area_simple seems to return weird answers for d = 2 (if points are 3-dimensional)"
-"Maybe i should try setting up a 4d case"
-
 # ----------------------------------------------------------------
 
 
+def restart_base_setup_z_and_closest(list, new):
+    p = list.next[2].next[2]
+    closest1 = list
+    closest0 = list.next[2]
 
+    newx = new.x
 
-def restart_base_setup_z_and_closest(list_node, new_node):
-    p = list_node.next[2].next[2]
-    closest1 = list_node
-    closest0 = list_node.next[2]
+    restart_list_y(list)
 
-    newx = new_node.x
-    
-    restart_list_y(list_node)
-    
     while p and lexicographic_less(p.x, newx):
         p.cnext[0] = p.closest[0]
         p.cnext[1] = p.closest[1]
-        
+
         p.cnext[0].cnext[1] = p
         p.cnext[1].cnext[0] = p
-        
+
         if p.x[0] <= newx[0] and p.x[1] <= newx[1]:
-            new_node.ndomr += 1
+            new.ndomr += 1
         elif p.x[1] < newx[1] and (p.x[0] < closest0.x[0] or (p.x[0] == closest0.x[0] and p.x[1] < closest0.x[1])):
             closest0 = p
         elif p.x[0] < newx[0] and (p.x[1] < closest1.x[1] or (p.x[1] == closest1.x[1] and p.x[0] < closest1.x[0])):
             closest1 = p
-        
+
         p = p.next[2]
-    
-    new_node.closest[0] = closest0
-    new_node.closest[1] = closest1
-    
-    if p:
-        new_node.prev[2] = p.prev[2]
-        new_node.next[2] = p
-        if p.prev[2]:
-            p.prev[2].next[2] = new_node
-        p.prev[2] = new_node
+
+    new.closest[0] = closest0
+    new.closest[1] = closest1
+    new.prev[2] = p.prev[2] if p else None
+    new.next[2] = p
 
 
 # --------------- one contribution 3d ------------------
 
-def one_contribution_3d(list_node, new_node):
-    restart_base_setup_z_and_closest(list_node, new_node)
-    print(f"New Node: {new_node.x}, Closest[0]: {new_node.closest[0].x if new_node.closest[0] else 'None'}, Closest[1]: {new_node.closest[1].x if new_node.closest[1] else 'None'}, ndomr: {new_node.ndomr}")
-
-    if new_node.ndomr > 0:
+def one_contribution_3d(cdllist, new):
+    print("Entering one_contribution_3d")
+    # Assume restart_base_setup_z_and_closest and compute_area_simple are already defined
+    restart_base_setup_z_and_closest(cdllist, new)
+    if new.ndomr > 0:
+        print("Selected new node id dominated, exiting early")
         return 0
+    
+    new.cnext[0] = new.closest[0]
+    new.cnext[1] = new.closest[1]
+    area = compute_area_simple(new.x, 1, new.cnext[0], new.cnext[0].cnext[1])
+    
+    p = new.next[2]
+    lastz = new.x[2]
+    volume = 0
 
-    # These checks may not be necessary if restart_base_setup_z_and_closest always sets closest.
-    if not new_node.closest[0] or not new_node.closest[1]:
-        return 0
-
-    new_node.cnext[0] = new_node.closest[0]
-    new_node.cnext[1] = new_node.closest[1]
-
-    # This needs to check that new_node.cnext[0] and new_node.cnext[0].cnext[1] are not None
-    area = compute_area_simple(new_node.x, 1, new_node.cnext[0], new_node.cnext[0].cnext[1])
-
-    p = new_node.next[2]
-    lastz = new_node.x[2]
-    volume = 0.0
-
-    # The loop and conditions inside it should mirror the logic in the C code exactly.
-    while p and (p.x[0] > new_node.x[0] or p.x[1] > new_node.x[1]):
+    while p and (p.x[0] > new.x[0] or p.x[1] > new.x[1]):
         volume += area * (p.x[2] - lastz)
         p.cnext[0] = p.closest[0]
         p.cnext[1] = p.closest[1]
-
-        # This early break may be too simplistic; the C code logic is more nuanced.
-        if p.x[0] >= new_node.x[0] and p.x[1] >= new_node.x[1]:
-            #x = [p.x[0], new_node.x[1], p.x[2]]
-            area -= compute_area_simple(p.x, 1, new_node.cnext[0], new_node.cnext[0].cnext[1])
-            p.cnext[0] = p.closest[0]
-            p.cnext[1] = p.closest[1]
-
-        # Updates to area should be performed with proper checks as in the C code.
-        # These checks should match the conditions in the C code.
-        elif p.x[0] >= new_node.x[0]:
-            if p.x[0] <= new_node.cnext[0].x[0]:
-                #x = [p.x[0], new_node.x[1], p.x[2]]
-                area -= compute_area_simple(p.x, 1, new_node.cnext[0], new_node.cnext[0].cnext[1])
+        
+        if p.x[0] >= new.x[0] and p.x[1] >= new.x[1]:
+            area -= compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
+            p.cnext[1].cnext[0] = p
+            p.cnext[0].cnext[1] = p
+        elif p.x[0] >= new.x[0]:
+            if p.x[0] <= new.cnext[0].x[0]:
+                x = [p.x[0], new.x[1], p.x[2]]
+                area -= compute_area_simple(x, 1, new.cnext[0], new.cnext[0].cnext[1])
+                p.cnext[0] = new.cnext[0]
+                p.cnext[1].cnext[0] = p
+                new.cnext[0] = p
         else:
-            if p.x[1] >= new_node.x[1]:
-                #x = [new_node.x[0], p.x[1], p.x[2]]
-                area -= compute_area_simple(p.x, 0, new_node.cnext[1], new_node.cnext[1].cnext[0])
-
+            if p.x[1] <= new.cnext[1].x[1]:
+                x = [new.x[0], p.x[1], p.x[2]]
+                area -= compute_area_simple(x, 0, new.cnext[1], new.cnext[1].cnext[0])
+                p.cnext[1] = new.cnext[1]
+                p.cnext[0].cnext[1] = p
+                new.cnext[1] = p
+        
         lastz = p.x[2]
         p = p.next[2]
-
-    # Ensure that the last node's z-value is being used correctly.
-    # The C code uses p->x[2], which at this point would be list_tail.x[2] in Python.
-    if p is not None:
-        volume += area * (p.x[2] - lastz)
     
+    if p:
+        volume += area * (p.x[2] - lastz)
+    print("Volume computed:", volume)
     return volume
 
 
 " this is very straightfoward and same as the c code "
 " the problem occrus when seeting up examples "
 def hv3dplus(list_node):
-    p = list_node 
+    p = list_node
     area = 0
     volume = 0
 
@@ -457,13 +443,14 @@ def hv3dplus(list_node):
             p.cnext[0] = p.closest[0]
             p.cnext[1] = p.closest[1]
 
-            print("Current p", p.x)
-            print("p.closest[0]", p.closest[0].x)
-            print("p.closest[1]", p.closest[1].x)
-            print("p.cnext[0].cnext[1]", p.cnext[0].cnext[1].x, "\n")
+            print("Current p", (p.x if p!= None else None))
+            #print("p ndomr", p.ndomr)
+            #print("p.closest[0]", p.closest[0].x)
+            #print("p.closest[1]", p.closest[1].x)
+            #print("p.cnext[0].cnext[1]", p.cnext[0].cnext[1].x, "\n")
 
             area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
-            print("Area:", area)
+            #print("Area:", area)
 
             p.cnext[0].cnext[1] = p
             p.cnext[1].cnext[0] = p
@@ -471,7 +458,7 @@ def hv3dplus(list_node):
             remove_from_z(p)
 
         volume += area * (p.next[2].x[2] - p.x[2])
-        print("Volume:", volume)
+        #print("Volume:", volume)
 
         p = p.next[2]
 
@@ -480,7 +467,7 @@ def hv3dplus(list_node):
 
 def cdllist_start_node(head, di):
     current = head.next[di]
-    print(current.x)
+    #print(current.x)
     return current
     
 
@@ -498,7 +485,7 @@ def cdllist_end_node(head, di, n):
 
 def cdllist_preprocessing(head, di, n):
     start_node = cdllist_start_node(head, di)
-    print("head", head.x)
+    #print("head", head.x)
     current = head.next[di]
     end_of_list = cdllist_end_node(head, di, n)
     while current is not None and current != head:
@@ -507,6 +494,9 @@ def cdllist_preprocessing(head, di, n):
         current.cnext[0] = start_node
         current.cnext[0].cnext[1] = current.next[di]
         current = current.next[di] if current.next[di] != head else None
+        
+"""Compute the hypervolume indicator in d=4 by iteratively
+   computing the hypervolume indicator in d=3 (using hv3d+) """
 
 def hv4dplusR(list_):
     height = 0
@@ -531,13 +521,44 @@ def hv4dplusR(list_):
         
     return hv
 
+"""Compute the hypervolume indicator in d=4 by iteratively
+   computing the one contribution problem in d=3"""
 
+def hv4dplusU(list_):
+    height = 0
+    volume = 0
+    hv = 0
+    
+    last = list_.prev[3]
+    new = list_.next[3].next[3]
+    
+    while new != last:
+        volume += one_contribution_3d(list_, new)
+        add_to_z(new)
+        update_links(list_, new, new.next[2])
+        
+        height = new.next[3].x[3] - new.x[3]
+        hv += volume * height
+        
+        new = new.next[3]
+        
+    return hv
+
+from functools import total_ordering
+
+@total_ordering
+class ReverseComparisonTuple(tuple):
+    def __lt__(self, other):
+        return lexicographic_less(self, other)
+    
 
 def preprocessing(node_list):
+    #_K = TypeVar("_K", bound=AvlTreeLast)
+    #_V = TypeVar("_V", bound=object)
     # Assuming the list_node is the start of a linked list of DLNodes
 
     # Create an AVL tree with a custom comparator for the y-coordinate
-    avl_tree = AvlTree()
+    avl_tree = AvlTree[ReverseComparisonTuple]()
     
     def find_le(tree, point):
         le_node = None
@@ -548,7 +569,7 @@ def preprocessing(node_list):
         return le_node
 
     for idx, node in enumerate(node_list[1:-1], start=1):  # Skip sentinel nodes
-        point = tuple(node.x)  # No need to reverse since we're using the avl_tree package
+        point = ReverseComparisonTuple(node.x)  # No need to reverse since we're using the avl_tree package
         avl_tree[point] = idx  # Index in node_list as key, point as value
         
     p = node_list[1].next[2]  # Skip the head sentinel
@@ -557,7 +578,7 @@ def preprocessing(node_list):
 
     while p != stop:
         #print("curent point in preprocessing", p)
-        point = tuple(p.x)
+        point = ReverseComparisonTuple(p.x)
         le_point = find_le(avl_tree, point)
         
         # If a node to the left exists, perform comparisons
@@ -575,7 +596,9 @@ def preprocessing(node_list):
             if le_point is not None:
                 le_idx = avl_tree[le_point]
                 p.closest[0] = le_point
+                print("p.closest[0]",p.closest[0])
                 p.closest[1] = le_idx
+                print("p.closest[1]",p.closest[1])
 
         # The point is not dominated, insert it into the tree
         if p.ndomr == 0:
@@ -586,54 +609,7 @@ def preprocessing(node_list):
     return avl_tree
 
 
-def preprocessing_new(head_node):
-    # Assuming head_node is the head of a circular doubly linked list of DLNodes
-    # and the first two and the last node are sentinels
 
-    # Create an AVL tree with a custom comparator for the y-coordinate
-    avl_tree = AvlTree()
-    
-    def find_le(tree, point):
-        le_node = None
-        for node_point in tree:
-            if node_point <= point:
-                if le_node is None or node_point > le_node:
-                    le_node = node_point
-        return le_node
-
-    # Start from the node next to the head sentinel
-    p = head_node.next[2]
-
-    # Continue until we reach the head sentinel again (full circle)
-    while p != head_node and p.next[2] != head_node:
-        point = tuple(p.x)
-        le_point = find_le(avl_tree, point)
-        
-        # If a node to the left exists, perform comparisons
-        if le_point is not None:
-            le_idx = avl_tree[le_point]
-            # Find the previous node that is not dominated by p
-            while le_point is not None and le_point[0] >= point[0]:
-                # Find the next node that could potentially dominate p
-                higher_points = [k for k in avl_tree if k > le_point]
-                if higher_points:
-                    le_point = min(higher_points, key=lambda x: (x[1], x[0]))
-                else:
-                    le_point = None
-
-            if le_point is not None:
-                le_idx = avl_tree[le_point]
-                p.closest[0] = le_point
-                p.closest[1] = le_idx
-
-        # The point is not dominated, insert it into the tree
-        if p.ndomr == 0:
-            avl_tree[point] = p  # Here we insert the node itself instead of the index
-
-        # Move to the next node in the list
-        p = p.next[2]
-
-    return avl_tree
 
 
 

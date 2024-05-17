@@ -381,35 +381,6 @@ print('\n')
 
 from hv_plus import compare_tree_asc_y, hv3dplus
 
-print('Example for hv3dplus - points are the same as in test.inp')
-points = [
-    0.16, 0.86, 0.47,  
-    0.66, 0.37, 0.29,
-    0.79, 0.79, 0.04,
-    0.28, 0.99, 0.29,
-    0.51, 0.37, 0.38,
-    0.92, 0.62, 0.07,
-    0.16, 0.53, 0.70,
-    0.01, 0.98, 0.94,
-    0.67, 0.17, 0.54,
-    0.79, 0.72, 0.05
-]
-
-d = 3
-
-ref_p = [1.0, 1.0, 1.0]
-
-
-# Call setup_cdllist function - this seorts the node in ascending z coordinate
-dlnode_cdllist = setup_cdllist_new(points, 10, 10, d, ref_p)
-print_cdllist(dlnode_cdllist, d - 1)
-print("\n")
-
-from hv_plus import cdllist_preprocessing
-
-cdllist_preprocessing(dlnode_cdllist, d - 1, 12)
-hypervolume = hv3dplus(dlnode_cdllist)
-print("Hypervolume in 3D:", hypervolume)
 
 
 points_4d = [
@@ -431,31 +402,42 @@ n4d = 10
 
 ref_point_4d = [10.0, 10.0, 10.0, 10.0]
 
-cdllist_4d = setup_cdllist_new(points_4d, n4d, n4d, dim4d, ref_point_4d)
+#points_4d = [
+#1.0, 1.0, 1.0, 4.0,  
+#2.0, 2.0, 2.0, 4.0,
+#5.0, 5.0, 5.0, 4.0,
+#3.0, 3.0, 3.0, 4.0,
+#4.0, 4.0, 4.0, 4.0
+#]
+#
+#dim4d = 4
+#
+#n4d = 5
+#
+#ref_point_4d = [7.0, 7.0, 7.0, 7.0]
+
+cdllist_4d = setup_cdllist_new(points_4d, n4d+2, n4d, dim4d, ref_point_4d)
 
 from hv_plus import hv4dplusR
 
+print("-----------------------------------------")
 print("\nHypervolume in 4d - hv4dplusR", hv4dplusR(cdllist_4d))
+print("-----------------------------------------")
 
 
-#def hv4dplusU(list_):
-#    height = 0
-#    volume = 0
-#    hv = 0
-#    
-#    last = list_.prev[3]
-#    new = list_.next[3].next[3]
-#    
-#    while new != last:
-#        volume += one_contribution_3d(list_, new)
-#        add_to_z(new)
-#        update_links(list_, new, new.next[2])
-#        
-#        height = new.next[3].x[3] - new.x[3]
-#        hv += volume * height
-#        
-#        new = new.next[3]
-#        
-#    return hv
 #
 #print("\nHypervolume in 4d - hv4dplusU", hv4dplusU(cdllist_4d))
+
+
+#from hv_plus import cdllist_to_list, preprocessing
+#
+#nodes_list = cdllist_to_list(dlnode_cdllist, d-1) # list of dlnodes which we feed into preprocessing, after that we can call hv3dplus
+#print("List of nodes in nodes list:")
+#for node in nodes_list:
+#    print(node.x)
+##    
+#preprocessed_list = list(preprocessing(nodes_list))
+#print("List of nodes after preprocessing")
+#print(preprocessed_list)
+#print("\n")    
+
