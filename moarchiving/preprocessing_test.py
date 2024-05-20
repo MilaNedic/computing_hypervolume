@@ -84,8 +84,8 @@ points = [
 d = 3
 ref = [1.0, 1.0, 1.0]
 
-from hv_plus import setup_cdllist_new, print_cdllist
-head = setup_cdllist_new(points, 10, 10, d, ref)
+from hv_plus import setup_cdllist, print_cdllist
+head = setup_cdllist(points, 10, d, ref)
 avl_tree = preprocessing(head, ref)
 print_cdllist(head, d-1)
 

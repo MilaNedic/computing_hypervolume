@@ -1,6 +1,7 @@
 from hv_plus import restart_base_setup_z_and_closest, DLNode, one_contribution_3d
-from hv_plus import setup_cdllist_new, print_cdllist, cdllist_preprocessing
+from hv_plus import setup_cdllist, print_cdllist, cdllist_preprocessing
 from hv_plus import hv3dplus, free_cdllist
+from hv_plus import hv4dplusR
 
 def main():
     # Provided dataset, converted into a Python list of tuples
@@ -17,12 +18,11 @@ def main():
         0.79, 0.72, 0.05
     ]
     ref = [1, 1, 1]
-    naloc = 12  # Including space for sentinel nodes
     n = 10
     d = 3
 
     # Initialize nodes and setup circular doubly linked list
-    head = setup_cdllist_new(data, naloc, n, d, ref)
+    head = setup_cdllist(data, n, d, ref)
     cdllist_preprocessing(head, d-1, n+2)
 
     # Assume head[3] is the first real data node
@@ -33,7 +33,8 @@ def main():
         print(f"Volume contribution of node {index} is: {contribution}")
         current = current.next[d-1]
         index += 1
-        
 
+  
+    
 if __name__ == "__main__":
     main()

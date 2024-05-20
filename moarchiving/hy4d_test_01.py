@@ -1,5 +1,5 @@
 from hv_plus import restart_base_setup_z_and_closest, DLNode, one_contribution_3d
-from hv_plus import setup_cdllist_new, print_cdllist, cdllist_preprocessing
+from hv_plus import setup_cdllist, print_cdllist, cdllist_preprocessing
 from hv_plus import hv3dplus, free_cdllist, hv4dplusR
 
 def main():
@@ -21,14 +21,14 @@ def main():
 
     new_ref = [11, 11, 41, 46]
 
-    head = setup_cdllist_new(new_points, n+2, n, d, new_ref)
+    head = setup_cdllist(new_points, n, d, new_ref)
 
     # Assume head[3] is the first real data node
     current = head.next[d-1]
     index = 0
     while current and index < n:  # Avoid infinite loops, ensure only data nodes are processed
-        contribution = one_contribution_3d(head, current)
-        print(f"Volume contribution of node {index} is: {contribution}")
+        #contribution = one_contribution_3d(head, current)
+        #print(f"Volume contribution of node {index} is: {contribution}")
         current = current.next[d-1]
         index += 1
     

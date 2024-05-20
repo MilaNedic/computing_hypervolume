@@ -1,6 +1,7 @@
 import random
 import numpy as np
-from hv_plus import hv4dplusR, setup_cdllist_new, free_cdllist
+from hv_plus import hv4dplusR, setup_cdllist, free_cdllist
+import time
 
 def generate_4d_points(num_points, dimension_ranges):
     """
@@ -20,19 +21,22 @@ def generate_4d_points(num_points, dimension_ranges):
     return points
 
 # define the ranges for each dimension
-dimension_ranges = [(0, 5), (0, 5), (0, 5), (0, 5)]  # Example ranges for each dimension
+dimension_ranges = [(0, 1), (0, 1), (0, 1), (0, 1)]  # Example ranges for each dimension
 
 # generate 4D points
-num = 10
+num = 1000
 points = generate_4d_points(num, dimension_ranges)
 points_np =  np.array([np.array(x) for x in points])
 points_list = points_np.flatten()
-print(points_list)
+#print(points_list)
 
-reference_point = [5.0, 5.0, 5.0, 5.0]
+reference_point = [1.0, 1.0, 1.0, 1.0]
 
-list4d = setup_cdllist_new(points_list, num+2, num, 4, reference_point)
-print("Hypervolume in 4D:", hv4dplusR(list4d), "\n")
+tic = time.perf_counter()
+list4d = setup_cdllist(points_list, num, 4, reference_point)
+print("Hypervolume in 4D:", hv4dplusR(list4d))
+toc = time.perf_counter()
+print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds \n")
 
 #from hv_plus import hv4dplusU
 #print("Hypervolume in 4D using contributions:", hv4dplusU(list4d))
@@ -53,8 +57,11 @@ points03 = [
 ]
 
 ref03 = [110, 110, 410, 460]
-head03 = setup_cdllist_new(points03, 12, 10, 4, ref03)
-print("Hypervolume in 4D:", hv4dplusR(head03), "\n")
+tic = time.perf_counter()
+head03 = setup_cdllist(points03, 10, 4, ref03)
+print("Hypervolume in 4D:", hv4dplusR(head03))
+toc = time.perf_counter()
+print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds \n")
 
 new_points = [
 1, 10, 20, 30,
@@ -73,9 +80,11 @@ new_n = 10
 
 new_ref = [11, 11, 41, 46]
 
-new_head = setup_cdllist_new(new_points, new_n+2, new_n, new_d, new_ref)
-print("Hypervolume in 4D:", hv4dplusR(new_head), "\n")
-
+tic = time.perf_counter()
+new_head = setup_cdllist(new_points, new_n, new_d, new_ref)
+print("Hypervolume in 4D:", hv4dplusR(new_head))
+toc = time.perf_counter()
+print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds \n")
 
 points02 = [
 0.10, 1.00, 2.00, 3.00,
@@ -91,9 +100,44 @@ points02 = [
 ]
 d02 = 4
 n02 = 10
-
 ref02 = [1.1, 1.1, 4.1, 4.6]
+tic = time.perf_counter()
+head02 = setup_cdllist(points02, n02, 4, ref02)
+print("Hypervolume in 4D:", hv4dplusR(head02))
+toc = time.perf_counter()
+print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds \n")
 
-head02 = setup_cdllist_new(points02, n02+2, n02, 4, ref02)
-print("Hypervolume in 4D:", hv4dplusR(head02), "\n")
+#from fractions import Fraction
+#points02_frac = [Fraction(i) for i in points02]
+#ref02_frac = [Fraction(i) for i in ref02]
+#head02_frac = setup_cdllist(points02_frac, 10, 4, ref02_frac)
+#print("Hypervolume in 4D using Fractions:", hv4dplusR(head02_frac).limit_denominator(), "\n")
+#toc = time.perf_counter()
+#print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds")
+
+
+points04 = [
+0.010, 0.100, 0.200, 0.300,
+0.020, 0.090, 0.250, 0.290,
+0.030, 0.080, 0.300, 0.280,
+0.040, 0.070, 0.350, 0.270,
+0.050, 0.060, 0.400, 0.260,
+0.060, 0.050, 0.180, 0.350,
+0.070, 0.040, 0.220, 0.340,
+0.080, 0.050, 0.280, 0.350,
+0.090, 0.020, 0.160, 0.400,
+0.100, 0.010, 0.150, 0.450
+]
+
+
+ref04 = [0.11, 0.11, 0.41, 0.46]
+head04 = setup_cdllist(points04, 10, 4, ref04)
+print("Hypervolume in 4D:", hv4dplusR(head04))
+toc = time.perf_counter()
+print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds \n")
+
+
+
+
+
 

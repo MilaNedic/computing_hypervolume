@@ -254,7 +254,7 @@ def sort_4d(list):
 
 
 "Auxiliary function which return a list of dlnodes, setup in the order which setup_cdllist returns"
-def cdllist_to_list(head, di): # head = setup_cdllist_new(points, nalloc, n, d, ref_p) the output of setup_cdlllist
+def cdllist_to_list(head, di): # head = setup_cdllist(points, nalloc, n, d, ref_p) the output of setup_cdlllist
     nodes_list = []
     current = head.next[di]
     while current != head:
@@ -276,8 +276,8 @@ def print_cdllist(head, di):
 
 
 " This is now the correct implementation of setup_cdlist "
-def setup_cdllist_new(data, naloc, n, d, ref):
-    head = [DLNode() for _ in range(naloc + 3)]
+def setup_cdllist(data, n, d, ref):
+    head = [DLNode() for _ in range(n + 3)]
     init_sentinels_new(head[0:3], ref, d) # init_sentinels_new accepts a list at the beginning, therefore we use head[0:3]
     di = d - 1
 
@@ -515,11 +515,13 @@ def hv4dplusR(list_):
         volume = hv3dplus(list_)               # Compute hv indicator in d=3 in linear time
         
         height = new.next[3].x[3] - new.x[3]
+        #print("Hypervolume contribution of node", new.x, "is", volume * height)
         hv += volume * height                  # Update hypervolume in d=4
         
         new = new.next[3]
         
     return hv
+
 
 """Compute the hypervolume indicator in d=4 by iteratively
    computing the one contribution problem in d=3"""

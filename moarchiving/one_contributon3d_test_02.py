@@ -1,5 +1,5 @@
 from hv_plus import restart_base_setup_z_and_closest, DLNode, one_contribution_3d
-from hv_plus import setup_cdllist_new, print_cdllist, cdllist_preprocessing
+from hv_plus import setup_cdllist, print_cdllist, cdllist_preprocessing
 from hv_plus import hv3dplus, free_cdllist
 
 def main():
@@ -23,7 +23,7 @@ def main():
     d = 3
 
     # Initialize nodes and setup circular doubly linked list
-    head = setup_cdllist_new(data, naloc, n, d, ref)
+    head = setup_cdllist(data, n, d, ref)
     #cdllist_preprocessing(head, d-1, n+2)
 
     # Assume head[3] is the first real data node

@@ -1,5 +1,5 @@
 from avltree import AvlTree
-from hv_plus import setup_cdllist_new, cdllist_to_list, print_cdllist
+from hv_plus import setup_cdllist, cdllist_to_list, print_cdllist
 
 
 # points from the example case
@@ -22,7 +22,7 @@ ref_p = [0.0, 0.0, 0.0]
 avl_tree: AvlTree[tuple, str] = AvlTree[tuple, str]({tuple(ref_p): "reference_point"})
 
 # Call setup_cdllist function - this seorts the node in ascending z coordinate
-head_node = setup_cdllist_new(points, 10, 10, 3, ref_p)
+head_node = setup_cdllist(points, 10, 3, ref_p)
 print_cdllist(head_node, d-1)
 print("\n")
         

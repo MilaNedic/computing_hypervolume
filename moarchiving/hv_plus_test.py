@@ -281,7 +281,7 @@ print(sentinels.x)
 
 print("\n")
 
-from hv_plus import setup_cdllist_new, print_cdllist
+from hv_plus import setup_cdllist, print_cdllist
 from random import uniform
 print('Example for setup_cdlist and setup_cdlist_new')
 
@@ -311,7 +311,7 @@ data_4d = [
 ref_4d = [0.0, 0.0, 0.0, 0.0]
 
 # Call setup_cdllist function for 4D data
-head_node_4d = setup_cdllist_new(data_4d, 4, 4, 4, ref_4d)
+head_node_4d = setup_cdllist(data_4d, 4, 4, ref_4d)
 
 # Let's print out the list to check
 current = head_node_4d.next[3]
@@ -416,7 +416,7 @@ ref_point_4d = [10.0, 10.0, 10.0, 10.0]
 #
 #ref_point_4d = [7.0, 7.0, 7.0, 7.0]
 
-cdllist_4d = setup_cdllist_new(points_4d, n4d+2, n4d, dim4d, ref_point_4d)
+cdllist_4d = setup_cdllist(points_4d, n4d, dim4d, ref_point_4d)
 
 from hv_plus import hv4dplusR
 
