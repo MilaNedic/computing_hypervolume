@@ -3,46 +3,6 @@ import numpy as np
 from hv_plus import hv4dplusR, setup_cdllist, free_cdllist
 import time
 
-def generate_4d_points(num_points, dimension_ranges):
-    """
-    Generate a list of 4-dimensional points.
-
-    Parameters:
-    - num_points: int, number of points to generate
-    - dimension_ranges: list of tuples, where each tuple represents the min and max range of each dimension
-
-    Returns:
-    - list of points, where each point is a list of 4 coordinates
-    """
-    points = []
-    for _ in range(num_points):
-        point = [random.uniform(min_dim, max_dim) for min_dim, max_dim in dimension_ranges]
-        points.append(point)
-    return points
-
-# define the ranges for each dimension
-dimension_ranges = [(0, 1), (0, 1), (0, 1), (0, 1)]  # Example ranges for each dimension
-
-# generate 4D points
-num = 1000
-points = generate_4d_points(num, dimension_ranges)
-points_np =  np.array([np.array(x) for x in points])
-points_list = points_np.flatten()
-#print(points_list)
-
-reference_point = [1.0, 1.0, 1.0, 1.0]
-
-tic = time.perf_counter()
-list4d = setup_cdllist(points_list, num, 4, reference_point)
-print("Hypervolume in 4D:", hv4dplusR(list4d))
-toc = time.perf_counter()
-print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds \n")
-
-#from hv_plus import hv4dplusU
-#print("Hypervolume in 4D using contributions:", hv4dplusU(list4d))
-
-free_cdllist(list4d)
-
 points03 = [
 10, 100, 200, 300,
 20, 90, 250, 290,

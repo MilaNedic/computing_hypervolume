@@ -402,19 +402,6 @@ n4d = 10
 
 ref_point_4d = [10.0, 10.0, 10.0, 10.0]
 
-#points_4d = [
-#1.0, 1.0, 1.0, 4.0,  
-#2.0, 2.0, 2.0, 4.0,
-#5.0, 5.0, 5.0, 4.0,
-#3.0, 3.0, 3.0, 4.0,
-#4.0, 4.0, 4.0, 4.0
-#]
-#
-#dim4d = 4
-#
-#n4d = 5
-#
-#ref_point_4d = [7.0, 7.0, 7.0, 7.0]
 
 cdllist_4d = setup_cdllist(points_4d, n4d, dim4d, ref_point_4d)
 
@@ -423,21 +410,5 @@ from hv_plus import hv4dplusR
 print("-----------------------------------------")
 print("\nHypervolume in 4d - hv4dplusR", hv4dplusR(cdllist_4d))
 print("-----------------------------------------")
-
-
-#
-#print("\nHypervolume in 4d - hv4dplusU", hv4dplusU(cdllist_4d))
-
-
-#from hv_plus import cdllist_to_list, preprocessing
-#
-#nodes_list = cdllist_to_list(dlnode_cdllist, d-1) # list of dlnodes which we feed into preprocessing, after that we can call hv3dplus
-#print("List of nodes in nodes list:")
-#for node in nodes_list:
-#    print(node.x)
-##    
-#preprocessed_list = list(preprocessing(nodes_list))
-#print("List of nodes after preprocessing")
-#print(preprocessed_list)
-#print("\n")    
+    
 
