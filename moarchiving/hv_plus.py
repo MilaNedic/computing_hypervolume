@@ -443,7 +443,7 @@ def hv3dplus(list_node):
             p.cnext[0] = p.closest[0]
             p.cnext[1] = p.closest[1]
 
-            print("Current p", (p.x if p!= None else None))
+            #print("Current p", (p.x if p!= None else None))
             #print("p ndomr", p.ndomr)
             #print("p.closest[0]", p.closest[0].x)
             #print("p.closest[1]", p.closest[1].x)
