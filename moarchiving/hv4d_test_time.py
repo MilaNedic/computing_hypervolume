@@ -53,7 +53,7 @@ for n in n_list:
 import matplotlib.pyplot as plt
 
 plt.plot(n_list, times, 'o-')
-plt.title("Average time for computing the hypervolume in 4D")
+plt.title("Average time for computing the hypervolume in 4-D")
 plt.xlabel("Number of points")
 plt.ylabel("Average time [s]")
 plt.xscale('log')

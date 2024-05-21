@@ -503,10 +503,10 @@ def hv4dplusR(list_):
     volume = 0
     hv = 0
     
-    last = list_.prev[3]
+    stop = list_.prev[3]
     new = list_.next[3].next[3]
     
-    while new != last:
+    while new != stop:
         restart_base_setup_z_and_closest(list_, new)           # Compute cx and cy of 'new' and determine next and prev in z
         add_to_z(new)                            # Add 'new' to list sorted by z
         update_links(list_, new, new.next[2])   # Update cx and cy of the points above 'new' in z
