@@ -11,7 +11,7 @@ points03 = [
 50, 60, 400, 260,
 60, 50, 180, 350,
 70, 40, 220, 340,
-80, 50, 280, 350, 
+80, 30, 280, 350, 
 90, 20, 160, 400,
 100, 10, 150, 450
 ]
@@ -31,7 +31,7 @@ new_points = [
 5, 6, 40, 26,
 6, 5, 18, 35,
 7, 4, 22, 34,
-8, 5, 28, 35,
+8, 3, 28, 35,
 9, 2, 16, 40,
 10, 1, 15, 45
 ]
@@ -54,7 +54,7 @@ points02 = [
 0.50, 0.60, 4.00, 2.60,
 0.60, 0.50, 1.80, 3.50,
 0.70, 0.40, 2.20, 3.40,
-0.80, 0.50, 2.80, 3.50,
+0.80, 0.30, 2.80, 3.50,
 0.90, 0.20, 1.60, 4.00,
 1.00, 0.10, 1.50, 4.50
 ]
@@ -84,7 +84,7 @@ points04 = [
 0.050, 0.060, 0.400, 0.260,
 0.060, 0.050, 0.180, 0.350,
 0.070, 0.040, 0.220, 0.340,
-0.080, 0.050, 0.280, 0.350,
+0.080, 0.030, 0.280, 0.350,
 0.090, 0.020, 0.160, 0.400,
 0.100, 0.010, 0.150, 0.450
 ]
@@ -97,7 +97,90 @@ toc = time.perf_counter()
 print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds \n")
 
 
+"""
+Test for hypervolume when we iteratively add dominated points to the list.
+We want to ensure that the hypervolume remains unchanged when adding dominated points to the list.
+"""
+
+print("-----------------------------------------")
+print("---------- Hv4d dominance test -----------")
+print("-----------------------------------------")
 
 
+points_dom = [
+4, 1, 3, 35,
+4, 2, 39, 26,
+2, 2, 24, 38,
+6, 9, 21, 36,
+4, 5, 15, 26,
+5, 7, 12, 46,
+8, 3, 22, 46,
+3, 6, 13, 35,
+3, 5, 26, 45,
+1, 9, 5, 29
+#10, 10, 40, 50     
+]
+
+ref_dom = [11, 11, 41, 51]
+
+head_dom = setup_cdllist(points_dom, 10, 4, ref_dom)
+print("Hypervolume in 4d (non-dominated points):", hv4dplusR(head_dom))
+free_cdllist(head_dom)
+
+points_dom_02 = [
+4, 1, 3, 35,
+4, 2, 39, 26,
+2, 2, 24, 38,
+6, 9, 21, 36,
+4, 5, 15, 26,
+5, 7, 12, 46,
+8, 3, 22, 46,
+10, 10, 40, 50,     
+3, 6, 13, 35,
+3, 5, 26, 45,
+1, 9, 5, 29
+]
+
+head_dom_02 = setup_cdllist(points_dom_02, 11, 4, ref_dom)
+print("Hypervolume in 4d after adding a dominated point to the list:", hv4dplusR(head_dom_02))
+free_cdllist(head_dom_02)
 
 
+points_dom_03 = [
+4, 1, 3, 35,
+4, 2, 39, 26,
+2, 2, 24, 38,
+6, 9, 21, 36,
+9, 4, 23, 47,
+4, 5, 15, 26,
+5, 7, 12, 46,
+8, 3, 22, 46,
+10, 10, 40, 50,     
+3, 6, 13, 35,
+3, 5, 26, 45,
+1, 9, 5, 29
+]
+
+head_dom_03 = setup_cdllist(points_dom_03, 12, 4, ref_dom)
+print("Hypervolume in 4d after adding another dominated point to the list:", hv4dplusR(head_dom_03))
+free_cdllist(head_dom_03)
+
+points_dom_04 = [
+4, 1, 3, 35,
+4, 2, 39, 26,
+2, 2, 24, 38,
+6, 9, 21, 36,
+9, 4, 23, 47,
+4, 5, 15, 26,
+5, 7, 12, 46,
+8, 3, 22, 46,
+10, 10, 40, 50,     
+3, 6, 13, 35,
+4, 7, 14, 36,
+3, 5, 26, 45,
+1, 9, 5, 29
+]
+
+head_dom_04 = setup_cdllist(points_dom_04, 13, 4, ref_dom)
+print("Hypervolume in 4d after adding another dominated point to the list:", hv4dplusR(head_dom_04))
+free_cdllist(head_dom_04)

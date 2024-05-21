@@ -49,7 +49,7 @@ for i in range(1, 9):  # Skip the first and last for meaningful output
 
 # Print results for each node
 for i in range(1, 9):
-    print(f"Node {i}:")
+    print(f"Node {i}:", nodes[i].x)
     if nodes[i].closest[0]:
         print(f"  Closest X: [{nodes[i].closest[0].x[0]}, {nodes[i].closest[0].x[1]}, {nodes[i].closest[0].x[2]}]")
     else:

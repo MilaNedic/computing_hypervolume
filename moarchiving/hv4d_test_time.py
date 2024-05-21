@@ -19,8 +19,8 @@ def hv4d_time(n):
     ref_point = [1, 1, 1, 1]
     points_np =  np.array([np.array(x) for x in points])
     points_list = points_np.flatten()
-    tic = time.perf_counter()
     head =  setup_cdllist(points_list, n, 4, ref_point)
+    tic = time.perf_counter()
     hv4d = hv4dplusR(head)
     toc = time.perf_counter()
     t = toc - tic
@@ -43,7 +43,8 @@ def average_time(n, m):
 
 m = 10
 times = []
-n_list = np.linspace(10, 10000, 20).astype(int)
+n_list = np.linspace(100, 10000, 20).astype(int)
+print(n_list)
 
 for n in n_list:
     avg_time = average_time(n, m)
@@ -51,8 +52,10 @@ for n in n_list:
 
 import matplotlib.pyplot as plt
 
-plt.plot(np.array(n_list), np.array(times))
+plt.plot(n_list, times, 'o-')
 plt.title("Average time for computing the hypervolume in 4D")
 plt.xlabel("Number of points")
 plt.ylabel("Average time [s]")
+plt.xscale('log')
+plt.yscale('log')
 plt.show()

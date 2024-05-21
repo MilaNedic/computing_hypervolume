@@ -507,7 +507,7 @@ def hv4dplusR(list_):
     new = list_.next[3].next[3]
     
     while new != last:
-        setup_z_and_closest(list_, new)           # Compute cx and cy of 'new' and determine next and prev in z
+        restart_base_setup_z_and_closest(list_, new)           # Compute cx and cy of 'new' and determine next and prev in z
         add_to_z(new)                            # Add 'new' to list sorted by z
         update_links(list_, new, new.next[2])   # Update cx and cy of the points above 'new' in z
                                                 # and remove dominated points
