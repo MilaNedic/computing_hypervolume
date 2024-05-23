@@ -5,6 +5,11 @@ import numpy as np
 
 # --------------- Auxiliary Functions ---------------------
 
+# Compares tuples based on the y-coordinate
+def lexicographic_less_2d(a, b):
+    return (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0]))
+
+
 def lexicographic_less(a, b):
     return a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))
 
@@ -136,23 +141,11 @@ def add_to_z(new):
     new.next[2] = new.prev[2].next[2]
     new.next[2].prev[2] = new
     new.prev[2].next[2] = new
-    #if new.prev[2] is not None:
-    #    new.next[2] = new.prev[2].next[2] if new.prev[2].next[2] is not None else None  # in case new->next[2] was removed for being dominated
-    #else:
-    #    new.next[2] = None
-    #    
-    #if new.next[2] is not None:
-    #    new.next[2].prev[2] = new
-    #if new.prev[2] is not None:
-    #    new.prev[2].next[2] = new
 
 def remove_from_z(old):
     old.prev[2].next[2] = old.next[2]
     old.next[2].prev[2] = old.prev[2]
-    #if old.prev[2] is not None and old.prev[2].next[2] is not None:
-    #    old.prev[2].next[2] = old.next[2] if old.next[2] is not None else None
-    #if old.next[2] is not None and old.next[2].prev[2] is not None:
-    #    old.next[2].prev[2] = old.prev[2] if old.prev[2] is not None else None
+
 
 
 
@@ -443,14 +436,14 @@ def hv3dplus(list_node):
             p.cnext[0] = p.closest[0]
             p.cnext[1] = p.closest[1]
 
-            #print("Current p", (p.x if p!= None else None))
-            #print("p ndomr", p.ndomr)
-            #print("p.closest[0]", p.closest[0].x)
-            #print("p.closest[1]", p.closest[1].x)
-            #print("p.cnext[0].cnext[1]", p.cnext[0].cnext[1].x, "\n")
+            print("Current p", (p.x if p!= None else None))
+            print("p ndomr", p.ndomr)
+            print("p.closest[0]", p.closest[0].x)
+            print("p.closest[1]", p.closest[1].x)
+            print("p.cnext[0].cnext[1]", p.cnext[0].cnext[1].x, "\n")
 
             area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
-            #print("Area:", area)
+            print("Area:", area)
 
             p.cnext[0].cnext[1] = p
             p.cnext[1].cnext[0] = p
@@ -458,7 +451,7 @@ def hv3dplus(list_node):
             remove_from_z(p)
 
         volume += area * (p.next[2].x[2] - p.x[2])
-        #print("Volume:", volume)
+        print("Volume:", volume)
 
         p = p.next[2]
 
@@ -551,8 +544,8 @@ from functools import total_ordering
 @total_ordering
 class ReverseComparisonTuple(tuple):
     def __lt__(self, other):
-        return lexicographic_less(self, other)
-    
+        return lexicographic_less_2d(self, other)
+        
 
 def preprocessing(node_list):
     #_K = TypeVar("_K", bound=AvlTreeLast)
@@ -570,12 +563,13 @@ def preprocessing(node_list):
                     le_node = node_point
         return le_node
 
-    for idx, node in enumerate(node_list[1:-1], start=1):  # Skip sentinel nodes
+    py_list = cdllist_to_list(node_list, 2)
+    for idx, node in enumerate(py_list[1:-1], start=1):  # Skip sentinel nodes
         point = ReverseComparisonTuple(node.x)  # No need to reverse since we're using the avl_tree package
         avl_tree[point] = idx  # Index in node_list as key, point as value
         
-    p = node_list[1].next[2]  # Skip the head sentinel
-    stop = node_list[-2]  # Stop before the tail sentinel
+    p = node_list.next[2].next[2]  # Skip the head sentinel
+    stop = node_list.prev[2]  # Stop before the tail sentinel
 
 
     while p != stop:

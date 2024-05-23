@@ -379,36 +379,6 @@ print("New node closest[1]:", new_node.closest[1].x)
 print('\n')
 
 
-from hv_plus import compare_tree_asc_y, hv3dplus
 
-
-
-points_4d = [
-    1.0, 2.0, 3.0, 1.0,
-    4.0, 5.0, 6.0, 0.5,
-    7.0, 8.0, 9.0, 0.7,
-    2.0, 1.0, 0.5, 0.6,
-    3.0, 4.0, 5.0, 0.8,
-    6.0, 7.0, 8.0, 0.3,
-    9.0, 1.0, 2.0, 0.9,
-    5.0, 6.0, 7.0, 0.2,
-    8.0, 9.0, 1.0, 0.4,
-    0.0, 1.0, 2.0, 0.1
-]
-
-dim4d = 4
-
-n4d = 10
-
-ref_point_4d = [10.0, 10.0, 10.0, 10.0]
-
-
-cdllist_4d = setup_cdllist(points_4d, n4d, dim4d, ref_point_4d)
-
-from hv_plus import hv4dplusR
-
-print("-----------------------------------------")
-print("\nHypervolume in 4d - hv4dplusR", hv4dplusR(cdllist_4d))
-print("-----------------------------------------")
     
 

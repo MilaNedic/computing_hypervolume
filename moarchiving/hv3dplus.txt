@@ -1,0 +1,17 @@
+After preprocessing
+
+node: 20 -inf - inf -inf, closest[0]: 20 -inf - inf -inf, closest[1]: 20 -inf - inf -inf
+node: 12 9 1 0, closest[0]: 20 -inf - inf -inf, closest[1]: 20 -inf - inf -inf
+node: 7 15 2 0, closest[0]: 12 9 1 0, closest[1]: 12 9 1 0
+node: 13 3 15 0, closest[0]: 20 -inf - inf -inf, closest[1]: 20 -inf - inf -inf
+node: 4 5 15 0, closest[0]: 13 3 15 0, closest[1]: 13 3 15 0
+node: 1 17 16 0, closest[0]: 4 5 15 0, closest[1]: 4 5 15 0
+
+Hv3dplus
+
+node: 12 9 1 0, closest[0]: 20 -inf - inf -inf, closest[1]: -inf 20 - inf -inf, cnext[0].cnext[1]: -inf 20 - inf -inf
+node: 7 15 2 0, closest[0]: 12 9 1 0, closest[1]: -inf 20 - inf -inf, cnext[0].cnext[1]: -inf 20 - inf -inf
+node: 13 3 15 0, closest[0]: 20 -inf - inf -inf, closest[1]: 12 9 1 0, cnext[0].cnext[1]: 12 9 1 0
+node: 4 5 15 0, closest[0]: 13 3 15 0, closest[1]: -inf 20 - inf -inf, cnext[0].cnext[1]: 12 9 1 0
+node: 1 17 16 0, closest[0]: 4 5 15 0, closest[1]: -inf 20 - inf -inf, cnext[0].cnext[1]: -inf 20 - inf -inf
+

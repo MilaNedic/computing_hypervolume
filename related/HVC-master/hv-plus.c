@@ -44,6 +44,7 @@
 #include <limits.h>
 #include <float.h>
 #include <string.h>
+#include <math.h>
 
 
 #if __GNUC__ >= 3
@@ -53,6 +54,18 @@
 #endif
 
 #define AVL_DEPTH
+
+
+void print_node(double x[4]) {
+    for (int i = 0; i < 4; i++) {
+        if (x[i] < -100000) {
+            printf("-inf ");
+        } else {
+            printf("%.2f ", x[i]);
+        }
+    }
+    printf("\n");
+}
 
 
 /* ---------------------------------- Auxiliar Functions ----------------------------------*/
@@ -464,7 +477,10 @@ static void preprocessing(dlnode_t * list){
     double * point;
     
     while(p != stop){
-        
+        //printf("Current step: Start of loop\n");
+        printf("Current node p: ");
+        print_node(p->x);
+
         node = malloc(sizeof(avl_node_t));
         
         node = avl_init_node(node, p->x);
@@ -473,16 +489,21 @@ static void preprocessing(dlnode_t * list){
         if(avl_search_closest(avltree, p->x, &nodeaux) == 1)
             nodeaux = nodeaux->next;
         point = node_point(nodeaux);
+        //printf("point: ");
+        //print_node(point);
 
         if(point[1] == p->x[1] && point[0] <= p->x[0]){
             nodeaux = nodeaux->next;
         }
         
         prev = node_point(nodeaux->prev);
+        //printf("prev: ");
+        //print_node(prev);
         
         if(prev[0] <= p->x[0] && prev[1] <= p->x[1] && prev[2] <= p->x[2]){
             p->ndomr = 1;
             free(node);
+            printf("Node is dominated.\n");
         }else{
             while(node_point(nodeaux)[0] >= p->x[0]){
                 
@@ -493,6 +514,11 @@ static void preprocessing(dlnode_t * list){
             avl_insert_before(avltree, nodeaux, node);
             p->closest[0] = node->prev->item;
             p->closest[1] = node->next->item;
+            printf("Closest[0]: ");
+            print_node(p->closest[0]->x);
+            printf("Closest[1]: ");
+            print_node(p->closest[1]->x);
+            printf("\n");
         }
         p = p->next[2];
     }
@@ -663,11 +689,11 @@ static double hv3dplus(dlnode_t * list){
             p->cnext[0] = p->closest[0];
             p->cnext[1] = p->closest[1];
 
-            printf("current p in hv3dplus [%lf, %lf, %lf, %lf]\n", p->x[0], p->x[1], p->x[2], p->x[3]);
-            printf("p->ndomr %d\n", p->ndomr);
+            //printf("current p in hv3dplus [%lf, %lf, %lf, %lf]\n", p->x[0], p->x[1], p->x[2], p->x[3]);
+            //printf("p->ndomr %d\n", p->ndomr);
             //printf("p->closest[0] [%lf, %lf, %lf, %lf]\n", p->closest[0]->x[0], p->closest[0]->x[1], p->closest[0]->x[2], p->closest[0]->x[3]);
             //printf("p->closest[1] [%lf, %lf, %lf, %lf]\n", p->closest[1]->x[0], p->closest[1]->x[1], p->closest[1]->x[2], p->closest[1]->x[3]);
-            printf("p->cnext[0]->cnext[1] [%lf, %lf, %lf, %lf]\n", p->cnext[0]->cnext[1]->x[0], p->cnext[0]->cnext[1]->x[1], p->cnext[0]->cnext[1]->x[2], p->cnext[0]->cnext[1]->x[3]);
+            //printf("p->cnext[0]->cnext[1] [%lf, %lf, %lf, %lf]\n", p->cnext[0]->cnext[1]->x[0], p->cnext[0]->cnext[1]->x[1], p->cnext[0]->cnext[1]->x[2], p->cnext[0]->cnext[1]->x[3]);
             
             area += computeAreaSimple(p->x, 1, p->cnext[0], p->cnext[0]->cnext[1]);
             
@@ -772,9 +798,9 @@ double hvplus(double *data, int d, int n, double *ref, int recompute)
         dlnode_t *current = list->next[d-1]; // Assuming the first data node starts just after the sentinel
         int index = 0; // Data node index
         while (current != list && current != list->prev[d-1]) { // Assumes the last node connects back to a sentinel
-        printf("Current node after preprocessing [%f %f %f %f]\n", current->x[0], current->x[1], current->x[2], current->x[3]);
-        printf("current.closest[0] [%f %f %f %f]\n", current->closest[0]->x[0], current->closest[0]->x[1], current->closest[0]->x[2], current->closest[0]->x[3]);
-        printf("current.closest[1] [%f %f %f %f]\n", current->closest[0]->x[0], current->closest[0]->x[1], current->closest[0]->x[2], current->closest[0]->x[3]);
+        //printf("Current node after preprocessing [%f %f %f %f]\n", current->x[0], current->x[1], current->x[2], current->x[3]);
+        //printf("current.closest[0] [%f %f %f %f]\n", current->closest[0]->x[0], current->closest[0]->x[1], current->closest[0]->x[2], current->closest[0]->x[3]);
+        //printf("current.closest[1] [%f %f %f %f]\n", current->closest[0]->x[0], current->closest[0]->x[1], current->closest[0]->x[2], current->closest[0]->x[3]);
         
         current = current->next[d-1];
         index++;

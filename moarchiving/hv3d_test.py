@@ -1,4 +1,4 @@
-from hv_plus import setup_cdllist_new, hv3dplus, cdllist_preprocessing, print_cdllist
+from hv_plus import setup_cdllist, hv3dplus, cdllist_preprocessing, print_cdllist
 
 print('Example for hv3dplus - points are the same as in test.inp')
 points = [
@@ -20,13 +20,14 @@ ref_p = [1.0, 1.0, 1.0]
 
 
 # Call setup_cdllist function - this seorts the node in ascending z coordinate
-dlnode_cdllist = setup_cdllist_new(points, 10, 10, d, ref_p)
-print_cdllist(dlnode_cdllist, d - 1)
+head = setup_cdllist(points, 10, d, ref_p)
+print_cdllist(head, d - 1)
 print("\n")
 
-from hv_plus import cdllist_preprocessing
+from preprocessing02 import preprocessing
 
-cdllist_preprocessing(dlnode_cdllist, d - 1, 12)
+preprocessing(head, d)
 
-hypervolume = hv3dplus(dlnode_cdllist)
+hypervolume = hv3dplus(head)
 print("Hypervolume in 3D:", hypervolume)
+
