@@ -29,33 +29,37 @@ def preprocessing(head, d):
     current = head.next[di]
     stop = head.prev[di]
 
-    # SortedList to maintain nodes in an order based on y-coordinate
+    # Initialize AVL-like sorted list to maintain order based on y-coordinate
     avl_tree = SortedList(key=lambda node: (node.x[1], node.x[0]))
-    
-    # Add sentinel nodes to the AVL tree at the start and end
-    avl_tree.add(head)
-    avl_tree.add(head.prev[di])
+
+    # Add sentinel nodes at the start and end
+    avl_tree.add(head)  # head is the starting sentinel
+    avl_tree.add(head.prev[di])  # head.prev[di] is the ending sentinel
 
     while current != stop:
         avl_tree.add(current)
         index = avl_tree.index(current)
-        current.closest[0] = avl_tree[max(0, index - 1)]  # previous node or first sentinel
-        current.closest[1] = avl_tree[min(len(avl_tree) - 1, index + 1)]  # next node or last sentinel
 
-        # Adjust the closest if it points to itself
-        if current.closest[0] == current:
-            current.closest[0] = avl_tree[max(0, index - 2)]
-        if current.closest[1] == current:
-            current.closest[1] = avl_tree[min(len(avl_tree) - 1, index + 2)]
+        # Set closest[0] and closest[1] ensuring that current does not point to itself
+        if index > 0 and avl_tree[index - 1] != current:
+            current.closest[0] = avl_tree[index - 1]
+        else:
+            current.closest[0] = head
 
-        # Domination check and removal
+        if index + 1 < len(avl_tree) and avl_tree[index + 1] != current:
+            current.closest[1] = avl_tree[index + 1]
+        else:
+            current.closest[1] = head.prev[di]
+
+        # Remove dominated nodes
         dominated = [node for node in avl_tree if node != current and all(node.x[i] <= current.x[i] for i in range(3))]
         for node in dominated:
             avl_tree.remove(node)
             node.ndomr = 1
-        
+
         current = current.next[di]
 
+    # Clear AVL tree after processing
     avl_tree.clear()
 
 
