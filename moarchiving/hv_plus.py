@@ -437,6 +437,7 @@ def hv3dplus(list_node):
             p.cnext[1] = p.closest[1]
 
             print("Current p", (p.x if p!= None else None))
+            
             print("p ndomr", p.ndomr)
             print("p.closest[0]", p.closest[0].x)
             print("p.closest[1]", p.closest[1].x)
@@ -539,70 +540,48 @@ def hv4dplusU(list_):
         
     return hv
 
-from functools import total_ordering
+from sortedcontainers import SortedList
 
-@total_ordering
-class ReverseComparisonTuple(tuple):
-    def __lt__(self, other):
-        return lexicographic_less_2d(self, other)
-        
-
-def preprocessing(node_list):
-    #_K = TypeVar("_K", bound=AvlTreeLast)
-    #_V = TypeVar("_V", bound=object)
-    # Assuming the list_node is the start of a linked list of DLNodes
-
-    # Create an AVL tree with a custom comparator for the y-coordinate
-    avl_tree = AvlTree[ReverseComparisonTuple]()
+def preprocessing(head, d):
+    di = d - 1
+    current = head.next[di]
+    stop = head.prev[di]
     
-    def find_le(tree, point):
-        le_node = None
-        for node_point in tree:
-            if node_point <= point:
-                if le_node is None or node_point > le_node:
-                    le_node = node_point
-        return le_node
+    # SortedList to maintain nodes in order based on y-coordinate, supports custom sorting needs
+    avl_tree = SortedList(key=lambda node: (node.x[1], node.x[0]))
+    
+    # Adding sentinel nodes to handle edge conditions
+    avl_tree.add(head)  # head is a left sentinel
+    avl_tree.add(head.prev[di])  # right sentinel
 
-    py_list = cdllist_to_list(node_list, 2)
-    for idx, node in enumerate(py_list[1:-1], start=1):  # Skip sentinel nodes
-        point = ReverseComparisonTuple(node.x)  # No need to reverse since we're using the avl_tree package
-        avl_tree[point] = idx  # Index in node_list as key, point as value
+    while current != stop:
+        avl_tree.add(current)
+        index = avl_tree.index(current)
         
-    p = node_list.next[2].next[2]  # Skip the head sentinel
-    stop = node_list.prev[2]  # Stop before the tail sentinel
+        # Determine closest[0]
+        x_candidates = [node for node in avl_tree if node.x[0] > current.x[0] and node.x[1] < current.x[1]]
+        if x_candidates:
+            current.closest[0] = min(x_candidates, key=lambda node: node.x[0])
+        else:
+            current.closest[0] = head  # Fallback to sentinel if no valid candidate
 
+        # Determine closest[1]
+        y_candidates = [node for node in avl_tree if node.x[0] < current.x[0] and node.x[1] > current.x[1]]
+        if y_candidates:
+            current.closest[1] = min(y_candidates, key=lambda node: node.x[1])
+        else:
+            current.closest[1] = head.prev[di]  # Fallback to sentinel if no valid candidate
 
-    while p != stop:
-        #print("curent point in preprocessing", p)
-        point = ReverseComparisonTuple(p.x)
-        le_point = find_le(avl_tree, point)
-        
-        # If a node to the left exists, perform comparisons
-        if le_point is not None:
-            le_idx = avl_tree[le_point]
-            # Find the previous node that is not dominated by p
-            while le_point is not None and le_point[0] >= point[0]:
-                # Find the next node that could potentially dominate p
-                higher_points = [k for k in avl_tree if k > le_point]
-                if higher_points:
-                    le_point = min(higher_points, key=lambda x: (x[1], x[0]))
-                else:
-                    le_point = None
+        # Remove dominated nodes
+        dominated = [node for node in avl_tree if node != current and all(node.x[i] <= current.x[i] for i in range(3))]
+        for node in dominated:
+            avl_tree.remove(node)
+            node.ndomr = 1
 
-            if le_point is not None:
-                le_idx = avl_tree[le_point]
-                p.closest[0] = le_point
-                print("p.closest[0]",p.closest[0])
-                p.closest[1] = le_idx
-                print("p.closest[1]",p.closest[1])
+        current = current.next[di]
 
-        # The point is not dominated, insert it into the tree
-        if p.ndomr == 0:
-            avl_tree[point] = idx
-        
-        p = p.next[2]
+    avl_tree.clear()  # Clear the AVL tree after processing
 
-    return avl_tree
 
 
 

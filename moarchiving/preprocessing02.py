@@ -28,28 +28,31 @@ def preprocessing(head, d):
     di = d - 1
     current = head.next[di]
     stop = head.prev[di]
-
-    # Initialize AVL-like sorted list to maintain order based on y-coordinate
+    
+    # SortedList to maintain nodes in order based on y-coordinate, supports custom sorting needs
     avl_tree = SortedList(key=lambda node: (node.x[1], node.x[0]))
-
-    # Add sentinel nodes at the start and end
-    avl_tree.add(head)  # head is the starting sentinel
-    avl_tree.add(head.prev[di])  # head.prev[di] is the ending sentinel
+    
+    # Adding sentinel nodes to handle edge conditions
+    avl_tree.add(head)  # head is a left sentinel
+    avl_tree.add(head.prev[di])  # right sentinel
 
     while current != stop:
         avl_tree.add(current)
         index = avl_tree.index(current)
-
-        # Set closest[0] and closest[1] ensuring that current does not point to itself
-        if index > 0 and avl_tree[index - 1] != current:
-            current.closest[0] = avl_tree[index - 1]
+        
+        # Determine closest[0]
+        x_candidates = [node for node in avl_tree if node.x[0] > current.x[0] and node.x[1] < current.x[1]]
+        if x_candidates:
+            current.closest[0] = min(x_candidates, key=lambda node: node.x[0])
         else:
-            current.closest[0] = head
+            current.closest[0] = head  # Fallback to sentinel if no valid candidate
 
-        if index + 1 < len(avl_tree) and avl_tree[index + 1] != current:
-            current.closest[1] = avl_tree[index + 1]
+        # Determine closest[1]
+        y_candidates = [node for node in avl_tree if node.x[0] < current.x[0] and node.x[1] > current.x[1]]
+        if y_candidates:
+            current.closest[1] = min(y_candidates, key=lambda node: node.x[1])
         else:
-            current.closest[1] = head.prev[di]
+            current.closest[1] = head.prev[di]  # Fallback to sentinel if no valid candidate
 
         # Remove dominated nodes
         dominated = [node for node in avl_tree if node != current and all(node.x[i] <= current.x[i] for i in range(3))]
@@ -59,8 +62,7 @@ def preprocessing(head, d):
 
         current = current.next[di]
 
-    # Clear AVL tree after processing
-    avl_tree.clear()
+    avl_tree.clear()  # Clear the AVL tree after processing
 
 
 data_points = [
