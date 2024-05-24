@@ -1,28 +1,6 @@
 import numpy as np
-from hv_plus import clear_point, DLNode, setup_cdllist, hv3dplus
+from hv_plus import DLNode, setup_cdllist, hv3dplus
 from sortedcontainers import SortedList
-
-def outerDelimiterx(p, head, di):
-    """Find the point with the smallest y > py such that qx < px"""
-    current = head.next[di]
-    candidate = None
-    while current != head:
-        if current.x[1] > p.x[1] and current.x[0] < p.x[0]:
-            if candidate is None or current.x[1] < candidate.x[1]:
-                candidate = current
-        current = current.next[di]
-    return candidate
-
-def outerDelimitery(p, head, di):
-    """Find the point with the largest x < px such that qy < py"""
-    current = head.next[di]
-    candidate = None
-    while current != head:
-        if current.x[0] < p.x[0] and current.x[1] < p.x[1]:
-            if candidate is None or current.x[0] > candidate.x[0]:
-                candidate = current
-        current = current.next[di]
-    return candidate
 
 def preprocessing(head, d):
     di = d - 1

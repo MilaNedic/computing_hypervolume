@@ -1,15 +1,7 @@
-# -------------------- AVL Tree ---------------
-from avltree import AvlTree, _avl_tree_node, _avl_tree_key
 from functools import cmp_to_key
 import numpy as np
 
 # --------------- Auxiliary Functions ---------------------
-
-# Compares tuples based on the y-coordinate
-def lexicographic_less_2d(a, b):
-    return (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0]))
-
-
 def lexicographic_less(a, b):
     return a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))
 
@@ -24,14 +16,11 @@ class DLNode:
         self.x = x if x else [None, None, None, None]
         self.closest = [None, None]  # closest in x coordinate, closest in y coordinate
         self.cnext = [None, None]  # current next
-
         # keeps the points sorted according to coordinates 2,3, and 4
         # (in the case of 2 and 3, only the points swept by 4 are kept)
         self.next = [None, None, None, None]
-
         # keeps the points sorted according to coordinates 2 and 3 (except the sentinel 3)
         self.prev = [None, None, None, None]
-
         self.ndomr = 0  # number of dominators
 
 
@@ -111,7 +100,7 @@ def init_sentinels_new(list_nodes, ref, d):
     return s1
 
 
-# ------------
+# --------------------------------------------------------------
 
 def clear_point(list_node, p):
     p.closest[1] = list_node
@@ -133,8 +122,6 @@ def point2struct(list_node, p, v, d):
     
     return p
 
-
-
 # --------------------- Updating Data Structures --------------------------
 
 def add_to_z(new):
@@ -145,8 +132,6 @@ def add_to_z(new):
 def remove_from_z(old):
     old.prev[2].next[2] = old.next[2]
     old.next[2].prev[2] = old.prev[2]
-
-
 
 
 def setup_z_and_closest(list_, new):
@@ -171,10 +156,7 @@ def setup_z_and_closest(list_, new):
     new.prev[2] = q.prev[2] if q else None
     new.next[2] = q
 
-
-
 # ------------------- Update Links --------------------
-
 
 def update_links(head, new, p):
     stop = head.prev[2]
@@ -238,24 +220,10 @@ def compare_tree_asc_y(p1, p2):
 # --------- Auxiliary function that compares points in 3d or in 4d and sorts them in ascending order of the last coorinate ---------------
 
 def sort_3d(list):
-    #return sorted(list, key=key_point3d)
     return sorted(list, key=cmp_to_key(compare_points_3d))
 
 def sort_4d(list):
-    #return sorted(list, key=key_point4d)
     return sorted(list, key=cmp_to_key(compare_points_4d))
-
-
-"Auxiliary function which return a list of dlnodes, setup in the order which setup_cdllist returns"
-def cdllist_to_list(head, di): # head = setup_cdllist(points, nalloc, n, d, ref_p) the output of setup_cdlllist
-    nodes_list = []
-    current = head.next[di]
-    while current != head:
-        nodes_list.append(current)
-        # print(current.x)
-        current = current.next[di]
-    return nodes_list # return a list of DLNodes
-
 
 "Auxiliary function for printing element of cdllist"
 def print_cdllist(head, di):
@@ -267,8 +235,7 @@ def print_cdllist(head, di):
 
 
 
-
-" This is now the correct implementation of setup_cdlist "
+"""Sets up a circular doubly-linked list"""
 def setup_cdllist(data, n, d, ref):
     head = [DLNode() for _ in range(n + 3)]
     init_sentinels_new(head[0:3], ref, d) # init_sentinels_new accepts a list at the beginning, therefore we use head[0:3]
@@ -332,10 +299,7 @@ def compute_area_simple(p, di, s, u):
 
     return area
 
-
-
 # ----------------------------------------------------------------
-
 
 def restart_base_setup_z_and_closest(list, new):
     p = list.next[2].next[2]
@@ -370,6 +334,7 @@ def restart_base_setup_z_and_closest(list, new):
 
 # --------------- one contribution 3d ------------------
 
+"""Currently unused"""
 def one_contribution_3d(cdllist, new):
     print("Entering one_contribution_3d")
     # Assume restart_base_setup_z_and_closest and compute_area_simple are already defined
@@ -418,9 +383,7 @@ def one_contribution_3d(cdllist, new):
     print("Volume computed:", volume)
     return volume
 
-
-" this is very straightfoward and same as the c code "
-" the problem occrus when seeting up examples "
+"""Main function for computing the hypervolume in 3-D"""
 def hv3dplus(list_node):
     p = list_node
     area = 0
@@ -436,15 +399,14 @@ def hv3dplus(list_node):
             p.cnext[0] = p.closest[0]
             p.cnext[1] = p.closest[1]
 
-            print("Current p", (p.x if p!= None else None))
-            
-            print("p ndomr", p.ndomr)
-            print("p.closest[0]", p.closest[0].x)
-            print("p.closest[1]", p.closest[1].x)
-            print("p.cnext[0].cnext[1]", p.cnext[0].cnext[1].x, "\n")
+            #print("Current p", (p.x if p!= None else None))
+            #print("p ndomr", p.ndomr)
+            #print("p.closest[0]", p.closest[0].x)
+            #print("p.closest[1]", p.closest[1].x)
+            #print("p.cnext[0].cnext[1]", p.cnext[0].cnext[1].x, "\n")
 
             area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
-            print("Area:", area)
+            #print("Area:", area)
 
             p.cnext[0].cnext[1] = p
             p.cnext[1].cnext[0] = p
@@ -452,42 +414,12 @@ def hv3dplus(list_node):
             remove_from_z(p)
 
         volume += area * (p.next[2].x[2] - p.x[2])
-        print("Volume:", volume)
+        #print("Volume:", volume)
 
         p = p.next[2]
 
     return volume
 
-
-def cdllist_start_node(head, di):
-    current = head.next[di]
-    #print(current.x)
-    return current
-    
-
-def cdllist_end_node(head, di, n):
-    current = head.next[di]
-    counter = 0
-    end_of_list = DLNode()
-    while current is not None and current != head:
-        current = current.next[di] if current.next[di] != head else None
-        counter += 1
-        if counter == n - 1:
-            end_of_list = DLNode(current.x)
-            #print(end_of_list.x)
-    return end_of_list
-
-def cdllist_preprocessing(head, di, n):
-    start_node = cdllist_start_node(head, di)
-    #print("head", head.x)
-    current = head.next[di]
-    end_of_list = cdllist_end_node(head, di, n)
-    while current is not None and current != head:
-        current.closest[0] = start_node
-        current.closest[1] = end_of_list
-        current.cnext[0] = start_node
-        current.cnext[0].cnext[1] = current.next[di]
-        current = current.next[di] if current.next[di] != head else None
         
 """Compute the hypervolume indicator in d=4 by iteratively
    computing the hypervolume indicator in d=3 (using hv3d+) """
@@ -517,31 +449,39 @@ def hv4dplusR(list_):
     return hv
 
 
-"""Compute the hypervolume indicator in d=4 by iteratively
-   computing the one contribution problem in d=3"""
+"""
+Compute the hypervolume indicator in d=4 by iteratively
+computing the one contribution problem in d=3.
+Currently unused.
+"""
 
-def hv4dplusU(list_):
-    height = 0
-    volume = 0
-    hv = 0
-    
-    last = list_.prev[3]
-    new = list_.next[3].next[3]
-    
-    while new != last:
-        volume += one_contribution_3d(list_, new)
-        add_to_z(new)
-        update_links(list_, new, new.next[2])
-        
-        height = new.next[3].x[3] - new.x[3]
-        hv += volume * height
-        
-        new = new.next[3]
-        
-    return hv
+#def hv4dplusU(list_):
+#    height = 0
+#    volume = 0
+#    hv = 0
+#    
+#    last = list_.prev[3]
+#    new = list_.next[3].next[3]
+#    
+#    while new != last:
+#        volume += one_contribution_3d(list_, new)
+#        add_to_z(new)
+#        update_links(list_, new, new.next[2])
+#        
+#        height = new.next[3].x[3] - new.x[3]
+#        hv += volume * height
+#        
+#        new = new.next[3]
+#        
+#    return hv
 
 from sortedcontainers import SortedList
 
+"""
+Function for preprocessing nodes in 3-D.
+Sets up closest[0] and closest[1] for each node.
+Input for preprocessing is the output from setup_cdllist (head node).
+"""
 def preprocessing(head, d):
     di = d - 1
     current = head.next[di]
@@ -558,14 +498,14 @@ def preprocessing(head, d):
         avl_tree.add(current)
         index = avl_tree.index(current)
         
-        # Determine closest[0]
+        # Determine closest[0]: smallest q such that q_x > p_x and q_y < p_y
         x_candidates = [node for node in avl_tree if node.x[0] > current.x[0] and node.x[1] < current.x[1]]
         if x_candidates:
             current.closest[0] = min(x_candidates, key=lambda node: node.x[0])
         else:
             current.closest[0] = head  # Fallback to sentinel if no valid candidate
 
-        # Determine closest[1]
+        # Determine closest[1]: smallest q such that q_x < p_x and q_y > p_y
         y_candidates = [node for node in avl_tree if node.x[0] < current.x[0] and node.x[1] > current.x[1]]
         if y_candidates:
             current.closest[1] = min(y_candidates, key=lambda node: node.x[1])
