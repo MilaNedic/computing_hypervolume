@@ -127,7 +127,7 @@ for i = 1:size(points, 1)
 
     % Draw the bar using vertices for each face
     % Front and back faces
-    c1 = [0.2 0.4 0.4]
+    c1 = [0.2 0.4 0.4];
     fill3([x0, x0+dx, x0+dx, x0], [y0, y0, y0, y0], [z0, z0, z0+dz, z0+dz], c1);
     fill3([x0, x0+dx, x0+dx, x0], [y0+dy, y0+dy, y0+dy, y0+dy], [z0, z0, z0+dz, z0+dz], c1);
     % Left and right faces

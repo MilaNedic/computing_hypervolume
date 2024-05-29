@@ -67,15 +67,6 @@ print("Hypervolume in 4D:", hv4dplusR(head02))
 toc = time.perf_counter()
 print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds \n")
 
-#from fractions import Fraction
-#points02_frac = [Fraction(i) for i in points02]
-#ref02_frac = [Fraction(i) for i in ref02]
-#head02_frac = setup_cdllist(points02_frac, 10, 4, ref02_frac)
-#print("Hypervolume in 4D using Fractions:", hv4dplusR(head02_frac).limit_denominator(), "\n")
-#toc = time.perf_counter()
-#print(f"Setting up cdllist and computing the hypervolume was executed in {toc - tic:0.9f} seconds")
-
-
 points04 = [
 0.010, 0.100, 0.200, 0.300,
 0.020, 0.090, 0.250, 0.290,
@@ -102,9 +93,9 @@ Test for hypervolume when we iteratively add dominated points to the list.
 We want to ensure that the hypervolume remains unchanged when adding dominated points to the list.
 """
 
-print("----------------------------------------------------------------")
-print("-------------------- Hv4d dominance test -----------------------")
-print("----------------------------------------------------------------")
+print("------------------------------------------------------------------------------------------")
+print("------------------------------- Hv4d dominance test --------------------------------------")
+print("------------------------------------------------------------------------------------------")
 
 
 points_dom = [
@@ -212,6 +203,6 @@ cdllist_4d = setup_cdllist(points_4d, n4d, dim4d, ref_point_4d)
 
 from hv_plus import hv4dplusR
 
-print("--------------------------------------------------------")
+print("----------------------------------------------------------------------------------")
 print("Hypervolume in 4d - hv4dplusR", hv4dplusR(cdllist_4d))
-print("--------------------------------------------------------")
+print("----------------------------------------------------------------------------------")

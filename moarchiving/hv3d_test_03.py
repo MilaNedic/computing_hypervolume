@@ -1,5 +1,4 @@
-import numpy as np
-from hv_plus import DLNode, setup_cdllist, hv3dplus
+from hv_plus import setup_cdllist, hv3dplus
 from hv_plus import preprocessing
 
 # some points are dominated

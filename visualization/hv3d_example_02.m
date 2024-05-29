@@ -1,10 +1,10 @@
 % Define the points and the reference point
 points = [
-    12, 9, 1;
-    7, 15, 2;
-    13, 3, 15;
-    4, 5, 15;
-    1, 17, 16
+3 4 18; 
+1 10 16; 
+5 2 20; 
+8 1 19;
+4 5 19
 ];
 reference = [20, 20, 20];
 
@@ -35,25 +35,23 @@ for i = 1:size(points, 1)
 
     % Draw the bar using vertices for each face
     % Front and back faces
-    c1 = [0.4940 0.1840 0.5560];
-    fill3([x0, x0+dx, x0+dx, x0], [y0, y0, y0, y0], [z0, z0, z0+dz, z0+dz], 'm');
-    fill3([x0, x0+dx, x0+dx, x0], [y0+dy, y0+dy, y0+dy, y0+dy], [z0, z0, z0+dz, z0+dz], 'm');
+    c1 = [0.1 0.1 0.8];
+    fill3([x0, x0+dx, x0+dx, x0], [y0, y0, y0, y0], [z0, z0, z0+dz, z0+dz], c1);
+    fill3([x0, x0+dx, x0+dx, x0], [y0+dy, y0+dy, y0+dy, y0+dy], [z0, z0, z0+dz, z0+dz], c1);
     % Left and right faces
-    c2 = [0.6350 0.2780 0.1840];
-    fill3([x0, x0, x0, x0], [y0, y0+dy, y0+dy, y0], [z0, z0, z0+dz, z0+dz], 'm');
-    fill3([x0+dx, x0+dx, x0+dx, x0+dx], [y0, y0+dy, y0+dy, y0], [z0, z0, z0+dz, z0+dz], 'm');
+    fill3([x0, x0, x0, x0], [y0, y0+dy, y0+dy, y0], [z0, z0, z0+dz, z0+dz], c1);
+    fill3([x0+dx, x0+dx, x0+dx, x0+dx], [y0, y0+dy, y0+dy, y0], [z0, z0, z0+dz, z0+dz], c1);
     % Top and bottom faces
-    c3 = [0 0.5 0.5];
-    fill3([x0, x0+dx, x0+dx, x0], [y0, y0, y0+dy, y0+dy], [z0+dz, z0+dz, z0+dz, z0+dz], 'm');
-    fill3([x0, x0+dx, x0+dx, x0], [y0, y0, y0+dy, y0+dy], [z0, z0, z0, z0], 'm');
+    fill3([x0, x0+dx, x0+dx, x0], [y0, y0, y0+dy, y0+dy], [z0+dz, z0+dz, z0+dz, z0+dz], c1);
+    fill3([x0, x0+dx, x0+dx, x0], [y0, y0, y0+dy, y0+dy], [z0, z0, z0, z0], c1);
     alpha(0.5)
 end
 
 % Set the aspect ratio and limits for better visualization
 axis equal;
-xlim([0, 22]);
-ylim([0, 22]);
-zlim([0, 22]);
+xlim([0, 21]);
+ylim([0, 21]);
+zlim([0, 21]);
 view(3);  % Set to 3D view
 
 hold off;

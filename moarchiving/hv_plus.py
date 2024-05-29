@@ -102,23 +102,23 @@ def init_sentinels_new(list_nodes, ref, d):
 
 # --------------------------------------------------------------
 
-def clear_point(list_node, p):
-    p.closest[1] = list_node
-    p.closest[0] = list_node.next[2]
+def clear_point(head, p):
+    p.closest[1] = head
+    p.closest[0] = head.next[2]
 
-    p.cnext[1] = list_node
-    p.cnext[0] = list_node.next[2]
+    p.cnext[1] = head
+    p.cnext[0] = head.next[2]
     
     p.ndomr = 0
     
 
-def point2struct(list_node, p, v, d):
+def point2struct(head, p, v, d):
     # Update the node p with values from v based on dimension d
     for i in range(d):
         p.x[i] = v[i]
     
     # Reset the node's properties
-    clear_point(list_node, p)
+    clear_point(head, p)
     
     return p
 
@@ -134,11 +134,11 @@ def remove_from_z(old):
     old.next[2].prev[2] = old.prev[2]
 
 
-def setup_z_and_closest(list_, new):
-    closest1 = list_
-    closest0 = list_.next[2]
+def setup_z_and_closest(head, new):
+    closest1 = head
+    closest0 = head.next[2]
 
-    q = list_.next[2].next[2]
+    q = head.next[2].next[2]
     newx = new.x
 
     while q and lexicographic_less(q.x, newx):
@@ -278,13 +278,11 @@ def free_cdllist(list):
     # In Python, garbage collection handles memory deallocation
     del list
 
-
-
 # ------------------------- Hyperovlume Indicator Algorithms ---------------------------------------
-def restart_list_y(list_node): # head == list
+def restart_list_y(head): # head == list
     # This function resets the cnext pointers for the y-dimension.
-    list_node.next[2].cnext[1] = list_node
-    list_node.cnext[0] = list_node.next[2]
+    head.next[2].cnext[1] = head
+    head.cnext[0] = head.next[2]
     
 def compute_area_simple(p, di, s, u):
     dj = 1 - di
@@ -301,14 +299,14 @@ def compute_area_simple(p, di, s, u):
 
 # ----------------------------------------------------------------
 
-def restart_base_setup_z_and_closest(list, new):
-    p = list.next[2].next[2]
-    closest1 = list
-    closest0 = list.next[2]
+def restart_base_setup_z_and_closest(head, new):
+    p = head.next[2].next[2]
+    closest1 = head
+    closest0 = head.next[2]
 
     newx = new.x
 
-    restart_list_y(list)
+    restart_list_y(head)
 
     while p and lexicographic_less(p.x, newx):
         p.cnext[0] = p.closest[0]
@@ -384,15 +382,15 @@ def one_contribution_3d(cdllist, new):
     return volume
 
 """Main function for computing the hypervolume in 3-D"""
-def hv3dplus(list_node):
-    p = list_node
+def hv3dplus(head):
+    p = head
     area = 0
     volume = 0
 
-    restart_list_y(list_node)
+    restart_list_y(head)
     p = p.next[2].next[2]
 
-    stop = list_node.prev[2]
+    stop = head.prev[2]
 
     while p != stop:
         if p.ndomr < 1:
@@ -424,21 +422,21 @@ def hv3dplus(list_node):
 """Compute the hypervolume indicator in d=4 by iteratively
    computing the hypervolume indicator in d=3 (using hv3d+) """
 
-def hv4dplusR(list_):
+def hv4dplusR(head):
     height = 0
     volume = 0
     hv = 0
     
-    stop = list_.prev[3]
-    new = list_.next[3].next[3]
+    stop = head.prev[3]
+    new = head.next[3].next[3]
     
     while new != stop:
-        setup_z_and_closest(list_, new)           # Compute cx and cy of 'new' and determine next and prev in z
+        setup_z_and_closest(head, new)           # Compute cx and cy of 'new' and determine next and prev in z
         add_to_z(new)                            # Add 'new' to list sorted by z
-        update_links(list_, new, new.next[2])   # Update cx and cy of the points above 'new' in z
+        update_links(head, new, new.next[2])   # Update cx and cy of the points above 'new' in z
                                                 # and remove dominated points
         
-        volume = hv3dplus(list_)               # Compute hv indicator in d=3 in linear time
+        volume = hv3dplus(head)               # Compute hv indicator in d=3 in linear time
         
         height = new.next[3].x[3] - new.x[3]
         #print("Hypervolume contribution of node", new.x, "is", volume * height)
