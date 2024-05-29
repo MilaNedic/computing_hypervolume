@@ -6,7 +6,7 @@ points = [
 8 1 19;
 4 5 19
 ];
-reference = [20, 20, 20];
+reference = [21, 21, 21];
 
 % Sort points by z-coordinate
 [~, idx] = sort(points(:,3));
@@ -49,9 +49,9 @@ end
 
 % Set the aspect ratio and limits for better visualization
 axis equal;
-xlim([0, 21]);
-ylim([0, 21]);
-zlim([0, 21]);
+xlim([0, 22]);
+ylim([0, 22]);
+zlim([0, 22]);
 view(3);  % Set to 3D view
 
 hold off;

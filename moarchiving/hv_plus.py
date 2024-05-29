@@ -411,6 +411,7 @@ def hv3dplus(head):
         else:
             remove_from_z(p)
 
+        #print(f"Contribution of {p.x} is {area * (p.next[2].x[2] - p.x[2])}")
         volume += area * (p.next[2].x[2] - p.x[2])
         #print("Volume:", volume)
 
@@ -437,7 +438,7 @@ def hv4dplusR(head):
                                                 # and remove dominated points
         
         volume = hv3dplus(head)               # Compute hv indicator in d=3 in linear time
-        
+
         height = new.next[3].x[3] - new.x[3]
         #print("Hypervolume contribution of node", new.x, "is", volume * height)
         hv += volume * height                  # Update hypervolume in d=4

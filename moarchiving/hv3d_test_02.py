@@ -11,7 +11,7 @@ data_points = [
     8, 1, 19,
     4, 5, 19
 ]
-ref_point = [20, 20, 20]
+ref_point = [21, 21, 21]
 n_points = int(len(data_points)/3)
 dimension = 3
 
