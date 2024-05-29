@@ -1,4 +1,5 @@
 from hv_plus import setup_cdllist, hv3dplus, print_cdllist
+from hv_plus import preprocessing
 
 print('Example for hv3dplus - points are the same as in test.inp')
 points = [
@@ -23,7 +24,6 @@ head = setup_cdllist(points, 10, d, ref_p)
 print_cdllist(head, d - 1)
 print("\n")
 
-from hv_plus import preprocessing
 preprocessing(head, d)
 
 hypervolume = hv3dplus(head)
