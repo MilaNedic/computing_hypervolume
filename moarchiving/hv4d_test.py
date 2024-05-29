@@ -102,9 +102,9 @@ Test for hypervolume when we iteratively add dominated points to the list.
 We want to ensure that the hypervolume remains unchanged when adding dominated points to the list.
 """
 
-print("-----------------------------------------")
-print("---------- Hv4d dominance test -----------")
-print("-----------------------------------------")
+print("----------------------------------------------------------------")
+print("-------------------- Hv4d dominance test -----------------------")
+print("----------------------------------------------------------------")
 
 
 points_dom = [
@@ -212,6 +212,6 @@ cdllist_4d = setup_cdllist(points_4d, n4d, dim4d, ref_point_4d)
 
 from hv_plus import hv4dplusR
 
-print("-----------------------------------------")
+print("--------------------------------------------------------")
 print("Hypervolume in 4d - hv4dplusR", hv4dplusR(cdllist_4d))
-print("-----------------------------------------")
+print("--------------------------------------------------------")

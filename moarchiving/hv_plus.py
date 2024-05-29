@@ -433,7 +433,7 @@ def hv4dplusR(list_):
     new = list_.next[3].next[3]
     
     while new != stop:
-        restart_base_setup_z_and_closest(list_, new)           # Compute cx and cy of 'new' and determine next and prev in z
+        setup_z_and_closest(list_, new)           # Compute cx and cy of 'new' and determine next and prev in z
         add_to_z(new)                            # Add 'new' to list sorted by z
         update_links(list_, new, new.next[2])   # Update cx and cy of the points above 'new' in z
                                                 # and remove dominated points
@@ -482,23 +482,40 @@ Function for preprocessing nodes in 3-D.
 Sets up closest[0] and closest[1] for each node.
 Input for preprocessing is the output from setup_cdllist (head node).
 """
+
 def preprocessing(head, d):
-    di = d - 1
+    di = d - 1  # Dimension index for sorting (z-axis in 3D)
     current = head.next[di]
     stop = head.prev[di]
-    
-    # SortedList to maintain nodes in order based on y-coordinate, supports custom sorting needs
+
+    # Using SortedList to manage nodes by their y-coordinate, supporting custom sorting needs
     avl_tree = SortedList(key=lambda node: (node.x[1], node.x[0]))
-    
-    # Adding sentinel nodes to handle edge conditions
+
+    # Include sentinel nodes to manage edge conditions
     avl_tree.add(head)  # head is a left sentinel
     avl_tree.add(head.prev[di])  # right sentinel
 
     while current != stop:
         avl_tree.add(current)
         index = avl_tree.index(current)
-        
-        # Determine closest[0]: smallest q such that q_x > p_x and q_y < p_y
+
+        # Check if current node is dominated by any previous node in avl_tree
+        dominated = False
+        for node in avl_tree:
+            if node != current and all(node.x[i] <= current.x[i] for i in range(3)) and any(node.x[i] < current.x[i] for i in range(3)):
+                dominated = True
+                break
+
+        if dominated:
+            current.ndomr = 1
+            avl_tree.remove(current)
+        else:
+            # Remove nodes dominated by the current node
+            nodes_to_remove = [node for node in avl_tree if node != current and all(current.x[i] <= node.x[i] for i in range(3)) and any(current.x[i] < node.x[i] for i in range(3))]
+            for node in nodes_to_remove:
+                avl_tree.remove(node)
+                node.ndomr = 1
+
         x_candidates = [node for node in avl_tree if node.x[0] > current.x[0] and node.x[1] < current.x[1]]
         if x_candidates:
             current.closest[0] = min(x_candidates, key=lambda node: node.x[0])
@@ -512,19 +529,15 @@ def preprocessing(head, d):
         else:
             current.closest[1] = head.prev[di]  # Fallback to sentinel if no valid candidate
 
-        # Remove dominated nodes
-        dominated = [node for node in avl_tree if node != current and all(node.x[i] <= current.x[i] for i in range(3))]
-        for node in dominated:
-            avl_tree.remove(node)
-            node.ndomr = 1
+        # Adjust closest if it points to itself
+        if current.closest[0] == current:
+            current.closest[0] = head
+        if current.closest[1] == current:
+            current.closest[1] = head.prev[di]
 
         current = current.next[di]
 
-    avl_tree.clear()  # Clear the AVL tree after processing
-
-
-
-
+    avl_tree.clear()  # Clean up AVL tree after processing
 
 
 

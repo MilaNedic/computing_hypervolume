@@ -16,7 +16,7 @@ points = [
 
 d = 3
 
-ref_p = [1.0, 1.0, 1.0]
+ref_p = [1, 1, 1]
 
 # Call setup_cdllist function - this seorts the node in ascending z coordinate
 head = setup_cdllist(points, 10, d, ref_p)
