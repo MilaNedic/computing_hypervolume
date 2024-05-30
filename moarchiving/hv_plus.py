@@ -171,13 +171,12 @@ def update_links(head, new, p):
                 if new.x[1] <= p.x[1]:
                     p.ndomr += 1
                     ndom += 1
-                    remove_from_z(p)  # Assuming this is the equivalent to removeFromz in C
+                    remove_from_z(p) 
                 elif new.x[0] < p.x[0] and (new.x[1] < p.closest[1].x[1] or (new.x[1] == p.closest[1].x[1] and (new.x[0] < p.closest[1].x[0] or (new.x[0] == p.closest[1].x[0] and new.x[2] < p.closest[1].x[2])))):
                     p.closest[1] = new
             elif new.x[1] < p.x[1] and (new.x[0] < p.closest[0].x[0] or (new.x[0] == p.closest[0].x[0] and (new.x[1] < p.closest[0].x[1] or (new.x[1] == p.closest[0].x[1] and new.x[2] < p.closest[0].x[2])))):
                 p.closest[0] = new
         p = p.next[2]
-
     return ndom
 
 # ----------------------------------------- Sort -----------------------------------
@@ -332,13 +331,10 @@ def restart_base_setup_z_and_closest(head, new):
 
 # --------------- one contribution 3d ------------------
 
-"""Currently unused"""
 def one_contribution_3d(cdllist, new):
-    print("Entering one_contribution_3d")
     # Assume restart_base_setup_z_and_closest and compute_area_simple are already defined
     restart_base_setup_z_and_closest(cdllist, new)
     if new.ndomr > 0:
-        print("Selected new node id dominated, exiting early")
         return 0
     
     new.cnext[0] = new.closest[0]
@@ -378,7 +374,6 @@ def one_contribution_3d(cdllist, new):
     
     if p:
         volume += area * (p.x[2] - lastz)
-    print("Volume computed:", volume)
     return volume
 
 """Main function for computing the hypervolume in 3-D"""
@@ -454,25 +449,25 @@ computing the one contribution problem in d=3.
 Currently unused.
 """
 
-#def hv4dplusU(list_):
-#    height = 0
-#    volume = 0
-#    hv = 0
-#    
-#    last = list_.prev[3]
-#    new = list_.next[3].next[3]
-#    
-#    while new != last:
-#        volume += one_contribution_3d(list_, new)
-#        add_to_z(new)
-#        update_links(list_, new, new.next[2])
-#        
-#        height = new.next[3].x[3] - new.x[3]
-#        hv += volume * height
-#        
-#        new = new.next[3]
-#        
-#    return hv
+def hv4dplusU(list_):
+    height = 0
+    volume = 0
+    hv = 0
+    
+    last = list_.prev[3]
+    new = list_.next[3].next[3]
+    
+    while new != last:
+        volume += one_contribution_3d(list_, new)
+        add_to_z(new)
+        update_links(list_, new, new.next[2])
+        
+        height = new.next[3].x[3] - new.x[3]
+        hv += volume * height
+        
+        new = new.next[3]
+        
+    return hv
 
 from sortedcontainers import SortedList
 

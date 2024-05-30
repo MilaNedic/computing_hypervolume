@@ -1,4 +1,4 @@
-from hv_plus import setup_cdllist, preprocessing, hv4dplusR
+from hv_plus import setup_cdllist, preprocessing, hv4dplusR, hv4dplusU, free_cdllist, print_cdllist
 
 points = [
 0.0055, 0.0740, 0.0254, 0.0636,
@@ -27,5 +27,7 @@ d = 4
 ref = [1, 1, 1, 1]
 n = int(len(points)/d)
 head = setup_cdllist(points, n, d, ref)
-preprocessing(head, d)
+print_cdllist(head, 3)
 print("Hypervolume in 4-D:", hv4dplusR(head))
+#print("Hypervolume in 4-D:", hv4dplusU(head))
+free_cdllist(head)
