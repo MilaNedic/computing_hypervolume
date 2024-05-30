@@ -45,6 +45,7 @@
 #include <float.h>
 #include <string.h>
 #include <math.h>
+#include <time.h> 
 
 
 #if __GNUC__ >= 3
@@ -478,8 +479,8 @@ static void preprocessing(dlnode_t * list){
     
     while(p != stop){
         //printf("Current step: Start of loop\n");
-        printf("Current node p: ");
-        print_node(p->x);
+        //printf("Current node p: ");
+        //print_node(p->x);
 
         node = malloc(sizeof(avl_node_t));
         
@@ -503,7 +504,7 @@ static void preprocessing(dlnode_t * list){
         if(prev[0] <= p->x[0] && prev[1] <= p->x[1] && prev[2] <= p->x[2]){
             p->ndomr = 1;
             free(node);
-            printf("Node is dominated.\n");
+            //printf("Node is dominated.\n");
         }else{
             while(node_point(nodeaux)[0] >= p->x[0]){
                 
@@ -514,11 +515,11 @@ static void preprocessing(dlnode_t * list){
             avl_insert_before(avltree, nodeaux, node);
             p->closest[0] = node->prev->item;
             p->closest[1] = node->next->item;
-            printf("Closest[0]: ");
-            print_node(p->closest[0]->x);
-            printf("Closest[1]: ");
-            print_node(p->closest[1]->x);
-            printf("\n");
+            //printf("Closest[0]: ");
+            //print_node(p->closest[0]->x);
+            //printf("Closest[1]: ");
+            //print_node(p->closest[1]->x);
+            //printf("\n");
         }
         p = p->next[2];
     }
@@ -787,36 +788,60 @@ double hv4dplusU(dlnode_t * list)
  *                  if 0: recompute the hypervolume in d-1 (hv4d+-R)
  *                  otherwise: compute one contribution in d-1 (hv4d+-U)
  */
-double hvplus(double *data, int d, int n, double *ref, int recompute)
-{
-    double hv = 0;
-    dlnode_t * list = setup_cdllist(data, n, n, d, ref);
-    if(d == 3){
-        
-        preprocessing(list);
-        
-        dlnode_t *current = list->next[d-1]; // Assuming the first data node starts just after the sentinel
-        int index = 0; // Data node index
-        while (current != list && current != list->prev[d-1]) { // Assumes the last node connects back to a sentinel
-        //printf("Current node after preprocessing [%f %f %f %f]\n", current->x[0], current->x[1], current->x[2], current->x[3]);
-        //printf("current.closest[0] [%f %f %f %f]\n", current->closest[0]->x[0], current->closest[0]->x[1], current->closest[0]->x[2], current->closest[0]->x[3]);
-        //printf("current.closest[1] [%f %f %f %f]\n", current->closest[0]->x[0], current->closest[0]->x[1], current->closest[0]->x[2], current->closest[0]->x[3]);
-        
-        current = current->next[d-1];
-        index++;
-        }
+double hvplus(double *data, int d, int n, double *ref, int recompute) {
+    clock_t start, end;
+    double cpu_time_used;
+    char filename[100];
 
+    start = clock();
+    dlnode_t *list = setup_cdllist(data, n, n, d, ref);
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    sprintf(filename, "time_%dd_%d_cdllist.txt", d, n);
+    FILE *file = fopen(filename, "a");
+    fprintf(file, "%f\n", cpu_time_used);
+    fclose(file);
+
+    double hv = 0;
+    if (d == 3) {
+        start = clock();
+        preprocessing(list);
+        end = clock();
+        cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+        sprintf(filename, "time_3d_%d_preprocessing.txt", n);
+        file = fopen(filename, "a");
+        fprintf(file, "%f\n", cpu_time_used);
+        fclose(file);
+
+        start = clock();
         hv = hv3dplus(list);
-        
-    }else{
-        if(recompute)
+        end = clock();
+        cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+        sprintf(filename, "time_3d_%d_hv3d.txt", n);
+        file = fopen(filename, "a");
+        fprintf(file, "%f\n", cpu_time_used);
+        fclose(file);
+
+    } else {
+        start = clock();
+        if (recompute)
             hv = hv4dplusR(list);
         else
             hv = hv4dplusU(list);
+        end = clock();
+        cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+        sprintf(filename, "time_4d_%d_hv4d.txt", n);
+        file = fopen(filename, "a");
+        fprintf(file, "%f\n", cpu_time_used);
+        fclose(file);
     }
-    
+
     free_cdllist(list);
-    
+
     return hv;
 }
 
