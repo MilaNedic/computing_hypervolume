@@ -808,7 +808,7 @@ double hvplus(double *data, int d, int n, double *ref, int recompute) {
         start = clock();
         preprocessing(list);
         end = clock();
-        cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+        cpu_time_used = ((double) (end - start));
 
         sprintf(filename, "time_3d_%d_preprocessing.txt", n);
         file = fopen(filename, "a");
