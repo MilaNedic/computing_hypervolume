@@ -46,7 +46,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h> 
-
+#include <Windows.h>
 
 #if __GNUC__ >= 3
 # define __hv_unused    __attribute__ ((unused))
@@ -815,15 +815,21 @@ double hvplus(double *data, int d, int n, double *ref, int recompute) {
         fprintf(file, "%f\n", cpu_time_used);
         fclose(file);
 
+        Sleep(10);
+
         start = clock();
         hv = hv3dplus(list);
         end = clock();
         cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
 
+        Sleep(10);
+
         sprintf(filename, "time_3d_%d_hv3d.txt", n);
         file = fopen(filename, "a");
         fprintf(file, "%f\n", cpu_time_used);
         fclose(file);
+
+        Sleep(10);
 
     } else {
         start = clock();
@@ -838,6 +844,7 @@ double hvplus(double *data, int d, int n, double *ref, int recompute) {
         file = fopen(filename, "a");
         fprintf(file, "%f\n", cpu_time_used);
         fclose(file);
+        Sleep(10);
     }
 
     free_cdllist(list);
