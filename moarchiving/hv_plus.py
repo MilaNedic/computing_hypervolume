@@ -16,13 +16,9 @@ class DLNode:
         self.x = x if x else [None, None, None, None]
         self.closest = [None, None]  # closest in x coordinate, closest in y coordinate
         self.cnext = [None, None]  # current next
-        # keeps the points sorted according to coordinates 2,3, and 4
-        # (in the case of 2 and 3, only the points swept by 4 are kept)
         self.next = [None, None, None, None]
-        # keeps the points sorted according to coordinates 2 and 3 (except the sentinel 3)
         self.prev = [None, None, None, None]
         self.ndomr = 0  # number of dominators
-
 
 # ----------------------------- Data Structure Functions -----------------------------------------
 
