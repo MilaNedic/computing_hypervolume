@@ -449,18 +449,18 @@ computing the one contribution problem in d=3.
 Currently unused.
 """
 
-def hv4dplusU(list_):
+def hv4dplusU(head):
     height = 0
     volume = 0
     hv = 0
     
-    last = list_.prev[3]
-    new = list_.next[3].next[3]
+    last = head.prev[3]
+    new = head.next[3].next[3]
     
     while new != last:
-        volume += one_contribution_3d(list_, new)
+        volume += one_contribution_3d(head, new)
         add_to_z(new)
-        update_links(list_, new, new.next[2])
+        update_links(head, new, new.next[2])
         
         height = new.next[3].x[3] - new.x[3]
         hv += volume * height

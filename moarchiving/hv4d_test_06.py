@@ -27,7 +27,7 @@ d = 4
 ref = [1, 1, 1, 1]
 n = int(len(points)/d)
 head = setup_cdllist(points, n, d, ref)
-print_cdllist(head, 3)
+#print_cdllist(head, 3)
 print("Hypervolume in 4-D:", hv4dplusR(head))
 #print("Hypervolume in 4-D:", hv4dplusU(head))
 free_cdllist(head)
