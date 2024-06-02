@@ -1,4 +1,4 @@
-from hv_plus import setup_cdllist, hv3dplus
+from hv_plus import setup_cdllist, hv3dplus, free_cdllist
 from hv_plus import preprocessing
 
 
@@ -32,4 +32,4 @@ print("--------------------------------------------------------------\n")
 hv3d = hv3dplus(head)
 print("Hypervolume in 3d:", hv3d)
 
-
+free_cdllist(head)

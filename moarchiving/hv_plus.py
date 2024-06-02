@@ -101,21 +101,17 @@ def init_sentinels_new(list_nodes, ref, d):
 def clear_point(head, p):
     p.closest[1] = head
     p.closest[0] = head.next[2]
-
     p.cnext[1] = head
-    p.cnext[0] = head.next[2]
-    
+    p.cnext[0] = head.next[2]    
     p.ndomr = 0
     
 
 def point2struct(head, p, v, d):
     # Update the node p with values from v based on dimension d
     for i in range(d):
-        p.x[i] = v[i]
-    
+        p.x[i] = v[i]    
     # Reset the node's properties
-    clear_point(head, p)
-    
+    clear_point(head, p)    
     return p
 
 # --------------------- Updating Data Structures --------------------------
@@ -203,14 +199,12 @@ def compare_points_4d(p1, p2):
 def compare_tree_asc_y(p1, p2):
     x1 = p1[1]
     x2 = p2[1]
-
     if x1 < x2:
         return -1
     elif x1 > x2:
         return 1
     else:
         return 0
-
 
 # --------- Auxiliary function that compares points in 3d or in 4d and sorts them in ascending order of the last coorinate ---------------
 
@@ -220,14 +214,13 @@ def sort_3d(list):
 def sort_4d(list):
     return sorted(list, key=cmp_to_key(compare_points_4d))
 
-"Auxiliary function for printing element of cdllist"
+"Auxiliary function for printing elements of cdllist"
 def print_cdllist(head, di):
     print("Circular Doubly-Linked List:")
     current = head.next[di]
     while current is not None and current != head:
         print(current.x)
         current = current.next[di] if current.next[di] != head else None
-
 
 
 """Sets up a circular doubly-linked list"""
@@ -268,14 +261,12 @@ def setup_cdllist(data, n, d, ref):
 
     return head[0]
 
-
-def free_cdllist(list):
-    # In Python, garbage collection handles memory deallocation
-    del list
+def free_cdllist(head):
+    del head
 
 # ------------------------- Hyperovlume Indicator Algorithms ---------------------------------------
-def restart_list_y(head): # head == list
-    # This function resets the cnext pointers for the y-dimension.
+def restart_list_y(head): 
+    # resets the cnext pointers for the y-dimension.
     head.next[2].cnext[1] = head
     head.cnext[0] = head.next[2]
     
@@ -295,6 +286,7 @@ def compute_area_simple(p, di, s, u):
 # ----------------------------------------------------------------
 
 def restart_base_setup_z_and_closest(head, new):
+    # Sets up closest[0] and closest[1] for the new node
     p = head.next[2].next[2]
     closest1 = head
     closest0 = head.next[2]
@@ -328,7 +320,6 @@ def restart_base_setup_z_and_closest(head, new):
 # --------------- one contribution 3d ------------------
 
 def one_contribution_3d(head, new):
-    # Assume restart_base_setup_z_and_closest and compute_area_simple are already defined
     restart_base_setup_z_and_closest(head, new)
     if new.ndomr > 0:
         return 0
