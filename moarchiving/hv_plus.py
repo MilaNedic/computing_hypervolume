@@ -506,7 +506,7 @@ def preprocessing(head, d):
                 avl_tree.remove(node)
                 node.ndomr = 1
 
-        # Determine closest[1]: smallest q such that q_x > p_x and q_y < p_y
+        # Determine closest[0]: smallest q such that q_x > p_x and q_y < p_y
         x_candidates = [node for node in avl_tree if node.x[0] > current.x[0] and node.x[1] < current.x[1]]
         if x_candidates:
             current.closest[0] = min(x_candidates, key=lambda node: node.x[0])
