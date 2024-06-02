@@ -327,9 +327,9 @@ def restart_base_setup_z_and_closest(head, new):
 
 # --------------- one contribution 3d ------------------
 
-def one_contribution_3d(cdllist, new):
+def one_contribution_3d(head, new):
     # Assume restart_base_setup_z_and_closest and compute_area_simple are already defined
-    restart_base_setup_z_and_closest(cdllist, new)
+    restart_base_setup_z_and_closest(head, new)
     if new.ndomr > 0:
         return 0
     
