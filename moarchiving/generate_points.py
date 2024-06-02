@@ -1,12 +1,16 @@
 import random
 import numpy as np
 
+"""
+A script that generates points in 3- and 4-D with a fixed seed for reproducibility.
+These test files are used to analyze the time-complexity of algorithms in C and Python.
+"""
 def generate_3d_points(n, seed=42):
     random.seed(seed)  # Setting the seed for reproducibility
     dimension_ranges = [(0, 1), (0, 1), (0, 1)]  # Example ranges for each dimension
     
     points = []
-    filename = f"points_3d_{n}.txt"  # Dynamic filename that includes the number of points and dimensionality
+    filename = f"tests/points_3d_{n}.txt"  # Dynamic filename that includes the number of points and dimensionality
 
     for _ in range(n):
         point = [random.uniform(min_dim, max_dim) for min_dim, max_dim in dimension_ranges]
@@ -24,7 +28,7 @@ def generate_4d_points(n, seed=42):
     dimension_ranges = [(0, 1), (0, 1), (0, 1), (0, 1)]  # Example ranges for each dimension
     
     points = []
-    filename = f"points_4d_{n}.txt"  # Dynamic filename that includes the number of points
+    filename = f"tests/points_4d_{n}.txt"  # Dynamic filename that includes the number of points
     
     for _ in range(n):
         point = [random.uniform(min_dim, max_dim) for min_dim, max_dim in dimension_ranges]

@@ -1,6 +1,10 @@
 from functools import cmp_to_key
 import numpy as np
 
+"""
+Main Python file which includes algorithms for computing the hyperovlume in 3- and 4-D.
+"""
+
 # --------------- Auxiliary Functions ---------------------
 def lexicographic_less(a, b):
     return a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))

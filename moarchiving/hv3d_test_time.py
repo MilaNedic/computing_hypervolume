@@ -11,7 +11,7 @@ def read_3d_points(n):
     if n in points_cache:
         return points_cache[n]
     else:
-        filename = f"points_3d_{n}.txt"
+        filename = f"tests/points_3d_{n}.txt"
         data_points = []
         with open(filename, 'r') as file:
             for line in file:
