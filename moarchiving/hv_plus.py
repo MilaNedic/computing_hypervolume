@@ -442,7 +442,6 @@ def hv4dplusR(head):
 """
 Compute the hypervolume indicator in d=4 by iteratively
 computing the one contribution problem in d=3.
-Currently unused.
 """
 
 def hv4dplusU(head):
