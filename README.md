@@ -18,7 +18,7 @@ The repository is structured as follows:
   - Additional three dimensional examples are available in `hv3d_test_01.py`, `hv3d_test_02.py`, ..., `hv3d_test_10.py`. A visual representation of `hv3d_test_01.py` is available in the *visualization* folder (by opening either `hv3d_example_01.m` or `hv3d_example_01.fig`).
   - Tests for time-efficiency for the three and four dimensional case are available in `hv3d_test_time.py` (for *hv3dplus*) and `hv4d_test_time_R.py` (for *hv4dplus-R*)/`hv4d_test_time_U.py`(for *hv4dplus-U*), respectively. Plots are saved in the *plots* subfolder. Test files are generated using `generate_points.py` and are saved in the *tests* subfolder.
 - The *related* folder is a copy of the `HVC` repository, available at [https://github.com/apguerreiro/HVC]. Here, the original implementation is available as well as example cases (additional examples have been aded to the examples folder). The code has been slightly modified for testing purposes and comparing my Python implementation to the original one.
-- The final report for the project can be found in the *final_report* folder (the project has not been yet completed at the time of wiritng the final report).
+- The final report for the project can be found in the *final_report* folder (the project has not been yet completed at the time of writing the final report).
 
 ## Requirements
 - Python (version 3.12.0 has been used) with the following libraries: numpy, sortedcontainers and functools.
