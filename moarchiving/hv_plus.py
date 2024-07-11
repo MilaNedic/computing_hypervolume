@@ -525,4 +525,11 @@ def preprocessing(head, d):
     avl_tree.clear()  # Clean up AVL tree after processing
 
 
-
+def calc_hypervolume_3D(data_points, ref_point):
+    n_points = len(data_points)
+    dimension = 3
+    data_points = data_points.flatten()
+    head = setup_cdllist(data_points, n_points, dimension, ref_point)
+    preprocessing(head, 3)
+    hv3d = hv3dplus(head)
+    return hv3d
