@@ -63,8 +63,34 @@ class MyTestCase(unittest.TestCase):
         infos = ["A", "B", "C", "D"]
 
         moa = MOArchive(points, [6, 6, 6], infos)
-        # assert that all the points in the archive are non dominated and thus have the same info
+        # assert that only points A and D are stored in the archive
         self.assertSetEqual({"A", "D"}, set(moa.infos))
+
+    def test_in_domain_3D(self):
+        """ test if the in_domain function works correctly for 3D points"""
+        ref_point = [6, 6, 6]
+        moa = MOArchive([[1, 1, 1]], ref_point)
+
+        # test if the points are in the domain
+        self.assertTrue(moa.in_domain([1, 2, 3]))
+        self.assertTrue(moa.in_domain([5.9, 5.9, 5.9]))
+        # test if the point is not in the domain
+        self.assertFalse(moa.in_domain([7, 8, 9]))
+        self.assertFalse(moa.in_domain([6, 6, 6]))
+        self.assertFalse(moa.in_domain([0, 0, 6]))
+
+    def test_in_domain_4D(self):
+        """ test if the in_domain function works correctly for 4D points"""
+        ref_point = [6, 6, 6, 6]
+        moa = MOArchive([[1, 1, 1, 1]], ref_point)
+
+        # test if the points are in the domain
+        self.assertTrue(moa.in_domain([1, 2, 3, 4]))
+        self.assertTrue(moa.in_domain([5.9, 5.9, 5.9, 5.9]))
+        # test if the point is not in the domain
+        self.assertFalse(moa.in_domain([7, 8, 9, 10]))
+        self.assertFalse(moa.in_domain([6, 6, 6, 6]))
+        self.assertFalse(moa.in_domain([0, 0, 0, 6]))
 
 
 if __name__ == '__main__':

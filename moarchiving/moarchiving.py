@@ -35,18 +35,6 @@ class DLNode:
 
 class MOArchive:
     def __init__(self, list_of_f_vals=None, reference_point=None, infos=None):
-        """`list_of_f_vals` does not need to be sorted.
-
-        f-pairs beyond the `reference_point` are pruned away. The
-        `reference_point` is also used to compute the hypervolume.
-
-        `sort` is a sorting function and ``sort=None`` will prevent a sort,
-        which can be useful if the `list_of_f_pairs` is already sorted.
-
-        CAVEAT: the interface, in particular the positional interface
-        may change in future versions.
-        """
-
         if list_of_f_vals is not None and len(list_of_f_vals):
             try:
                 list_of_f_vals = list_of_f_vals.tolist()
@@ -99,7 +87,22 @@ class MOArchive:
         raise NotImplementedError()
 
     def in_domain(self, f_pair, reference_point=None):
-        raise NotImplementedError()
+        """return `True` if `f_pair` is dominating the reference point,
+        `False` otherwise. `True` means that `f_pair` contributes to
+        the hypervolume if not dominated by other elements.
+
+        TODO: in Nikos' code, f_pair can also be an index, not just a list of values,
+        TODO: this is not implemented here (due to not having a state in form of a list of points)
+        """
+
+        if reference_point is None:
+            reference_point = self.reference_point
+        if reference_point is None:
+            return True
+
+        if any(f_pair[i] >= reference_point[i] for i in range(self.n_dim)):
+            return False
+        return True
 
     def cdllist_to_list(self):
         """ returns the points in the archive in a form of a python list
