@@ -35,7 +35,7 @@ class MyTestCase(unittest.TestCase):
             # assert infos are stored correctly
             self.assertEqual([str(p[:3]) for p in moa.points], moa.infos)
 
-    def test_infos_non_dominated(self):
+    def test_infos_non_dominated_3D(self):
         """ test if the infos are stored correctly - if the points are non dominated,
         the infos should be the same"""
         points = [
@@ -52,7 +52,7 @@ class MyTestCase(unittest.TestCase):
         # assert that all the points in the archive are non dominated and thus have the same info
         self.assertSetEqual(set([str(p) for p in points]), set(moa.infos))
 
-    def test_infos_dominated(self):
+    def test_infos_dominated_3D(self):
         """ test if the infos about dominated points are removed """
         points = [
             [1, 2, 3],
