@@ -11,7 +11,8 @@ __license__ = "BSD 3-clause"
 __version__ = "0.6.0"
 
 import copy
-from hv_plus import compute_area_simple, init_sentinels_new, remove_from_z, restart_list_y
+from hv_plus import (compute_area_simple, init_sentinels_new, remove_from_z, restart_list_y,
+                     lexicographic_less)
 from sortedcontainers import SortedList
 import numpy as np
 
@@ -59,17 +60,143 @@ class MOArchive:
         self.preprocessing()
         self._set_HV()
 
-    def add(self, f_pair, info=None):
-        raise NotImplementedError()
+    def print_cdllist(self):
+        """ For debugging purposes: print the circular doubly linked list"""
+        di = self.n_dim - 1
+        print("Circular Doubly-Linked List:")
+        current = self.head.next[di]
+        print(f"(head) {self.head.x[:self.n_dim]} <-> ", end="")
+        while current is not None and current != self.head:
+            print(f"{current.x[:self.n_dim]} <-> ", end="")
+            current = current.next[di] if current.next[di] != self.head else None
+        print("(head)")
 
-    def _add_at(self, idx, f_pair, info=None):
-        raise NotImplementedError()
+    def print_cxcy(self):
+        """ For debugging purposes: print the cx and cy values of the points in the archive"""
+        di = self.n_dim - 1
+        print("cx and cy values:")
+        current = self.head.next[di]
+        print(f"({self.head.info + ')':4} {str(self.head.x[:self.n_dim]):22} "
+              f"cx={'(' + self.head.closest[0].info + ')':4}, "
+              f"cy={'(' + self.head.closest[1].info + ')':4}",
+              f"ndomr={self.head.ndomr}")
+        while current is not None and current != self.head:
+            print(f"({current.info + ')':4} {str(current.x[:self.n_dim]):22} "
+                  f"cx={'(' + current.closest[0].info + ')':4}, "
+                  f"cy={'(' + current.closest[1].info + ')':4}",
+                  f"ndomr={current.ndomr}")
+            current = current.next[di] if current.next[di] != self.head else None
+
+    def add(self, new, info=None, update_hypervolume=True):
+        """
+        4) Data Structure Updates: Adding a new point u to the
+        data structure maintained by HV3D+ requires setting attributes
+        u.cx and u.cy, updating the corresponding attributes of the
+        remaining points in the lexicographically sorted list Q, and
+        inserting u into Q. These operations are performed in linear
+        time in a single sweep of Q, as follows (cy attributes are
+        updated in a similar way, but with the roles of the x- and
+        y-coordinate switched).
+        """
+
+        # q is the current point (so that we are consistent with the paper),
+        # stop is the head of the list, and first_iter is a flag to check if we are at the
+        # first iteration (since the first and last points are the same)
+        q = self.head
+        stop = self.head
+        first_iter = True
+
+        # Add 0.0 for 3d points so that it matches the original C code and create a new node object
+        if self.n_dim == 3:
+            new = new + [0.0]
+        u = DLNode(x=new, info=info)
+        di = self.n_dim - 1
+
+        # loop over all the points in the archive and save the best candidates for cx and cy,
+        # and check if the new point is dominated by any of the points in the archive
+        dominated = False
+        best_cx_candidates = None
+        best_cy_candidates = None
+        inserted = False
+
+        while q != stop or first_iter:
+            first_iter = False
+
+            # check if the new point is dominated by the current point
+            if all(q.x[i] <= u.x[i] for i in range(self.n_dim)):
+                dominated = True
+                break
+            # check if the new point dominates the current point
+            if all(u.x[i] <= q.x[i] for i in range(self.n_dim)):
+                q_next = q.next[self.n_dim - 1]
+                remove_from_z(q)
+                q = q_next
+                continue
+                # q.ndomr += 1
+
+            """
+            1) Set u.cx to the point q ∈ Q with the smallest q_x > u_x
+            such that q_y < u_y and q <L u. If such a point is not
+            unique, the alternative with the smallest q_y is preferred
+            """
+            if lexicographic_less(q.x, u.x) and q.x[0] > u.x[0] and q.x[1] < u.x[1]:
+                if best_cx_candidates is None or q.x[0] < best_cx_candidates.x[0]:
+                    best_cx_candidates = q
+                elif q.x[0] == best_cx_candidates.x[0] and q.x[1] < best_cx_candidates.x[1]:
+                    best_cx_candidates = q
+            if lexicographic_less(q.x, u.x) and q.x[0] < u.x[0] and q.x[1] > u.x[1]:
+                if best_cy_candidates is None or q.x[1] < best_cy_candidates.x[1]:
+                    best_cy_candidates = q
+                elif q.x[1] == best_cy_candidates.x[1] and q.x[0] < best_cy_candidates.x[0]:
+                    best_cy_candidates = q
+
+            """
+            2) For q ∈ Q, set q.cx to u iff u_y < q_y and u <L q, and
+            either q_x < u_x < (q.cx)_x or u_x = (q.cx)_x and u_y ≤
+            (q.cx)_y.
+            """
+            if u.x[1] < q.x[1] and lexicographic_less(u.x, q.x):
+                if (q.x[0] < u.x[0] < q.closest[0].x[0] or
+                        (u.x[0] == q.closest[0].x[0] and u.x[1] <= q.closest[0].x[1])):
+                    q.closest[0] = u
+            if u.x[0] < q.x[0] and lexicographic_less(u.x, q.x):
+                if (q.x[1] < u.x[1] < q.closest[1].x[1] or
+                        (u.x[1] == q.closest[1].x[1] and u.x[0] <= q.closest[1].x[0])):
+                    q.closest[1] = u
+            """
+            3) Insert u into Q immediately before the point q ∈ Q with
+            the lexicographically smallest q such that u <L q.
+            """
+            # If the point is not dominated by any other point in the archive so far,
+            # then it also won't be dominated by the points that come after it in the archive,
+            # as the points are sorted in lexicographic order
+            if lexicographic_less(u.x, q.x) and not inserted and not dominated:
+                u.next[di] = q
+                u.prev[di] = q.prev[di]
+                q.prev[di].next[di] = u
+                q.prev[di] = u
+                inserted = True
+
+            q = q.next[self.n_dim - 1]
+
+        if not dominated:
+            u.closest[0] = best_cx_candidates
+            u.closest[1] = best_cy_candidates
+
+        if update_hypervolume:
+            # TODO: maybe this can be done more efficiently, by only adding hypervolume
+            #  contribution of the new point
+            self._set_HV()
 
     def remove(self, f_pair):
         raise NotImplementedError()
 
-    def add_list(self, list_of_f_pairs):
-        raise NotImplementedError()
+    def add_list(self, list_of_f_vals, infos=None):
+        if infos is None:
+            infos = [None] * len(list_of_f_vals)
+        for f_val, info in zip(list_of_f_vals, infos):
+            self.add(f_val, info=info, update_hypervolume=False)
+        self._set_HV()
 
     def copy(self):
         raise NotImplementedError()
@@ -117,8 +244,8 @@ class MOArchive:
 
     @property
     def points(self):
-        """`list` of coordinates of the nondominated points in the archive"""
-        return [point.x for point in self.cdllist_to_list()]
+        """`list` of coordinates of the non-dominated points in the archive"""
+        return [point.x[:self.n_dim] for point in self.cdllist_to_list()]
 
     @property
     def infos(self):
@@ -132,6 +259,13 @@ class MOArchive:
             raise ValueError("to compute the hypervolume a reference"
                              " point is needed (must be given initially)")
         return self._hypervolume
+
+    @property
+    def contributing_hypervolumes(self):
+        return [self.contributing_hypervolume(point) for point in self.cdllist_to_list()]
+
+    def contributing_hypervolume(self, f_pair):
+        raise NotImplementedError()
 
     def distance_to_pareto_front(self, f_pair, ref_factor=1):
         raise NotImplementedError()

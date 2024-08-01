@@ -6,6 +6,10 @@ import numpy as np
 import os
 
 
+def list_to_set(lst):
+    return set([tuple(p) for p in lst])
+
+
 class MyTestCase(unittest.TestCase):
     def test_hypervolume_3D(self):
         # loop over all files in the tests folder that contain "_3d_" in their name
@@ -91,6 +95,43 @@ class MyTestCase(unittest.TestCase):
         self.assertFalse(moa.in_domain([7, 8, 9, 10]))
         self.assertFalse(moa.in_domain([6, 6, 6, 6]))
         self.assertFalse(moa.in_domain([0, 0, 0, 6]))
+
+    def test_add_3D(self):
+        """ test if the add_points function works correctly for 3D points"""
+        ref_point = [6, 6, 6]
+        start_points = [[1, 2, 5], [3, 5, 1], [5, 1, 4]]
+        moa = MOArchive(start_points, ref_point)
+
+        # add point that is not dominated and does not dominate any other point
+        u1 = [2, 3, 3]
+        moa.add(u1)
+        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
+
+        # add point that is dominated by another point in the archive
+        u2 = [4, 5, 2]
+        moa.add(u2)
+        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
+
+        # add point that dominates another point in the archive
+        u3 = [3, 1, 2]
+        moa.add(u3)
+        self.assertSetEqual(list_to_set(start_points[:2] + [u1, u3]), list_to_set(moa.points))
+
+    def test_hypervolume_after_add_3D(self, n_points=1000, n_tests=10):
+        ref_point = [1, 1, 1]
+
+        for t in range(n_tests):
+            np.random.seed(t)
+            points = np.round(np.random.rand(n_points, 3), 3).tolist()
+            infos = [str(p) for p in range(n_points)]
+            moa = MOArchive(points, ref_point, infos=infos)
+            true_hv = moa.hypervolume
+
+            moa_add = MOArchive(points[:1], ref_point, infos=infos[:1])
+            for i in range(1, n_points):
+                moa_add.add(points[i], infos[i])
+
+            self.assertAlmostEqual(moa_add.hypervolume, true_hv, places=6)
 
 
 if __name__ == '__main__':
