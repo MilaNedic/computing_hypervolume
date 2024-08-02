@@ -128,11 +128,10 @@ class MOArchive:
                 break
             # check if the new point dominates the current point
             if all(u.x[i] <= q.x[i] for i in range(self.n_dim)):
-                q_next = q.next[self.n_dim - 1]
+                q_next = q.next[di]
                 remove_from_z(q)
                 q = q_next
                 continue
-                # q.ndomr += 1
 
             """
             1) Set u.cx to the point q ∈ Q with the smallest q_x > u_x
@@ -177,7 +176,7 @@ class MOArchive:
                 q.prev[di] = u
                 inserted = True
 
-            q = q.next[self.n_dim - 1]
+            q = q.next[di]
 
         if not dominated:
             u.closest[0] = best_cx_candidates
@@ -188,7 +187,16 @@ class MOArchive:
             #  contribution of the new point
             self._set_HV()
 
-    def remove(self, f_pair):
+    def remove(self, u_vals):
+        """
+        Removing a point u ∈ Q also requires updating the cx and
+        cy attributes of the remaining points, as follows.
+        1) For every p ∈ Q \ {u} such that p.cx = u, set p.cx to the
+        point q ∈ Q \ {u} with the smallest qx > p_x such that
+        q_y < py and q <L p (and analogously for p.cy). If such
+        a point is not unique, the alternative with the smallest
+        q_y (respectively, q_x) is preferred.
+        """
         raise NotImplementedError()
 
     def add_list(self, list_of_f_vals, infos=None):
@@ -201,17 +209,37 @@ class MOArchive:
     def copy(self):
         raise NotImplementedError()
 
-    def bisect_left(self, f_pair, lowest_index=0):
-        raise NotImplementedError()
+    def dominates(self, f_val):
+        """ return `True` if any element of `points` dominates or is equal to `f_val`.
+        Otherwise return `False`.
+        """
+        for point in self._points_generator():
+            if all(point.x[i] <= f_val[i] for i in range(self.n_dim)):
+                return True
+            # points are sorted in lexicographic order, so we can return False
+            # once we find a point that is lexicographically greater than f_val
+            elif f_val[self.n_dim - 1] < point.x[self.n_dim - 1]:
+                return False
+        return False
 
-    def dominates(self, f_pair):
-        raise NotImplementedError()
-
-    def dominates_with(self, idx, f_pair):
-        raise NotImplementedError()
-
-    def dominators(self, f_pair, number_only=False):
-        raise NotImplementedError()
+    def dominators(self, f_val, number_only=False):
+        """return the list of all `f_val`-dominating elements in `self`,
+        including an equal element. ``len(....dominators(...))`` is
+        hence the number of dominating elements which can also be obtained
+        without creating the list with ``number_only=True``.
+        """
+        dominators = [] if not number_only else 0
+        for point in self._points_generator():
+            if all(point.x[i] <= f_val[i] for i in range(self.n_dim)):
+                if number_only:
+                    dominators += 1
+                else:
+                    dominators.append(point.x[:self.n_dim])
+            # points are sorted in lexicographic order, so we can break the loop
+            # once we find a point that is lexicographically greater than f_val
+            elif f_val[self.n_dim - 1] < point.x[self.n_dim - 1]:
+                break
+        return dominators
 
     def in_domain(self, f_pair, reference_point=None):
         """return `True` if `f_pair` is dominating the reference point,
@@ -231,27 +259,32 @@ class MOArchive:
             return False
         return True
 
-    def cdllist_to_list(self):
-        """ returns the points in the archive in a form of a python list
+    def _points_generator(self, include_head=False):
+        """ returns the points in the archive in a form of a python generator
         instead of a circular doubly linked list """
-        points = []
-        curr = self.head.next[self.n_dim - 1].next[self.n_dim - 1]
-        stop = self.head.prev[self.n_dim - 1]
-        while curr != stop:
-            points.append(curr)
-            curr = curr.next[self.n_dim - 1]
-        return points
+        first_iter = True
+        di = self.n_dim - 1
+        if include_head:
+            curr = self.head
+            stop = self.head
+        else:
+            curr = self.head.next[di].next[di]
+            stop = self.head.prev[di]
+        while curr != stop or first_iter:
+            yield curr
+            first_iter = False
+            curr = curr.next[di]
 
     @property
-    def points(self):
+    def points_list(self):
         """`list` of coordinates of the non-dominated points in the archive"""
-        return [point.x[:self.n_dim] for point in self.cdllist_to_list()]
+        return [point.x[:self.n_dim] for point in self._points_generator()]
 
     @property
-    def infos(self):
+    def infos_list(self):
         """`list` of complementary information corresponding to each archive entry,
         corresponding to each of the points in the archive"""
-        return [point.info for point in self.cdllist_to_list()]
+        return [point.info for point in self._points_generator()]
 
     @property
     def hypervolume(self):
@@ -262,7 +295,7 @@ class MOArchive:
 
     @property
     def contributing_hypervolumes(self):
-        return [self.contributing_hypervolume(point) for point in self.cdllist_to_list()]
+        return [self.contributing_hypervolume(point) for point in self._points_generator()]
 
     def contributing_hypervolume(self, f_pair):
         raise NotImplementedError()
@@ -303,9 +336,6 @@ class MOArchive:
             if p.ndomr < 1:
                 p.cnext[0] = p.closest[0]
                 p.cnext[1] = p.closest[1]
-
-                if len(self.infos) < 80:
-                    pass
 
                 area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
 
