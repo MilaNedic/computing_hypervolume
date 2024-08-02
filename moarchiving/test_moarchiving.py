@@ -172,6 +172,28 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(list_to_set(points), list_to_set(moa.dominators([3, 3, 3])))
         self.assertEqual(6, moa.dominators([3, 3, 3], number_only=True))
 
+    def test_distance_to_hypervolume_area(self):
+        moa = MOArchive()
+        self.assertEqual(0, moa.distance_to_hypervolume_area([1, 1, 1]))
+
+        moa.reference_point = [2, 2, 2]
+        # for points in the hypervolume area, the distance should be 0
+        self.assertEqual(0, moa.distance_to_hypervolume_area([0, 0, 0]))
+        self.assertEqual(0, moa.distance_to_hypervolume_area([1, 1, 1]))
+        self.assertEqual(0, moa.distance_to_hypervolume_area([2, 2, 2]))
+        self.assertEqual(0, moa.distance_to_hypervolume_area([0, 1, 2]))
+
+        # for points outside the hypervolume area, the distance should be the Euclidean distance
+        # to the hypervolume area
+        self.assertEqual(1, moa.distance_to_hypervolume_area([2, 2, 3]))
+        self.assertEqual(1, moa.distance_to_hypervolume_area([2, 0, 3]))
+        self.assertEqual(10, moa.distance_to_hypervolume_area([0, 0, 12]))
+
+        self.assertAlmostEqual(np.sqrt(2), moa.distance_to_hypervolume_area([0, 3, 3]), places=6)
+        self.assertAlmostEqual(np.sqrt(2), moa.distance_to_hypervolume_area([2, 3, 3]), places=6)
+        self.assertAlmostEqual(np.sqrt(3), moa.distance_to_hypervolume_area([3, 3, 3]), places=6)
+        self.assertAlmostEqual(np.sqrt(147), moa.distance_to_hypervolume_area([9, 9, 9]), places=6)
+
 
 if __name__ == '__main__':
     unittest.main()

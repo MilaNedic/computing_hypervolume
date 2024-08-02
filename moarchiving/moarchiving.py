@@ -12,7 +12,7 @@ __version__ = "0.6.0"
 
 import copy
 from hv_plus import (compute_area_simple, init_sentinels_new, remove_from_z, restart_list_y,
-                     lexicographic_less)
+                     lexicographic_less, one_contribution_3d)
 from sortedcontainers import SortedList
 import numpy as np
 
@@ -47,6 +47,7 @@ class MOArchive:
                                  " as first element" % str(list_of_f_vals[0]))
         else:
             self.n_dim = 3  # TODO: how to deal with this?
+            list_of_f_vals = []
         if infos is None:
             infos = [None] * len(list_of_f_vals)
 
@@ -304,7 +305,10 @@ class MOArchive:
         raise NotImplementedError()
 
     def distance_to_hypervolume_area(self, f_pair):
-        raise NotImplementedError()
+        if self.reference_point is None:
+            return 0
+        return sum([max((0, f_pair[i] - self.reference_point[i]))**2
+                    for i in range(self.n_dim)])**0.5
 
     def hypervolume_improvement(self, f_pair):
         raise NotImplementedError()
