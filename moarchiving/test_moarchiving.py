@@ -1,4 +1,6 @@
+import time
 from moarchiving import MOArchive
+from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from hv_plus import calc_hypervolume_3D
 
 import unittest
@@ -193,6 +195,61 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(np.sqrt(2), moa.distance_to_hypervolume_area([2, 3, 3]), places=6)
         self.assertAlmostEqual(np.sqrt(3), moa.distance_to_hypervolume_area([3, 3, 3]), places=6)
         self.assertAlmostEqual(np.sqrt(147), moa.distance_to_hypervolume_area([9, 9, 9]), places=6)
+
+    def test_kink_points(self):
+        print(f"num points | non-dom p |  moa init  |   alg tea  |   alg new  |")
+        test_n_points = [2**i for i in range(1, 11)]
+
+        for n_points in test_n_points:
+            # read the data points and the reference point from the file
+            data_points = np.random.rand(n_points, 1)
+            data_points = np.hstack([np.sin(data_points), np.cos(data_points), data_points])
+            infos = [str(p) for p in data_points.tolist()]
+            ref_point = [1, 1, 1]
+
+            # calculate the hypervolume using the new implementation
+
+            t0 = time.time()
+            moa = MOArchive(data_points, ref_point, infos)
+            t1 = time.time()
+            kink_points_tea = moa._get_kink_points_tea()
+            t2 = time.time()
+            kink_points = moa._get_kink_points()
+            t3 = time.time()
+            non_dom_p = len(moa.points_list)
+
+            print(f"{n_points:10} | {non_dom_p:9} | {t1-t0:.8f} | {t2-t1:.8f} | {t3-t2:.8f} |")
+
+            self.assertSetEqual(list_to_set(kink_points_tea), list_to_set(kink_points))
+
+    def test_distance_to_pareto_front_simple(self):
+        points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
+        moa = MOArchive(points, reference_point=[6, 6, 6])
+
+        self.assertEqual(0, moa.distance_to_pareto_front([1, 1, 1]))
+        self.assertEqual(3 ** 0.5, moa.distance_to_pareto_front([4, 4, 4]))
+        self.assertEqual((1 + 1 + 6 ** 2) ** 0.5, moa.distance_to_pareto_front([7, 7, 7]))
+        self.assertEqual(0, moa.distance_to_pareto_front([2, 4, 3]))
+        self.assertEqual(0, moa.distance_to_pareto_front([3, 2, 4]))
+        self.assertEqual(1, moa.distance_to_pareto_front([3, 3, 4]))
+
+    def test_distance_to_pareto_front_compare_2d(self):
+        # first make a pseudo 3D pareto front and compare it to 2D pareto front
+        n_points = 100
+        n_test_points = 100
+        points = np.hstack([np.random.rand(n_points, 2), np.zeros((n_points, 1))])
+
+        moa3d = MOArchive(points, reference_point=[1, 1, 1])
+        moa2d = MOArchive2D(points[:, :2], reference_point=[1, 1])
+        moa3d_no_ref = MOArchive(points)
+
+        new_points = np.hstack([np.random.rand(n_test_points, 2), np.ones((n_test_points, 1))])
+        for point in new_points:
+            d2 = moa2d.distance_to_pareto_front(point[:2].tolist())
+            d3 = moa3d.distance_to_pareto_front(point.tolist())
+            d3_no_ref = moa3d_no_ref.distance_to_pareto_front(point.tolist())
+            self.assertAlmostEqual(d2, d3, places=8)
+            self.assertAlmostEqual(d3, d3_no_ref, places=8)
 
 
 if __name__ == '__main__':

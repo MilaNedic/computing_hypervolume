@@ -13,12 +13,11 @@ __version__ = "0.6.0"
 import copy
 from hv_plus import (compute_area_simple, init_sentinels_new, remove_from_z, restart_list_y,
                      lexicographic_less, one_contribution_3d)
+from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from sortedcontainers import SortedList
 import numpy as np
 
 del division, print_function, unicode_literals
-
-
 
 inf = float('inf')
 
@@ -301,8 +300,92 @@ class MOArchive:
     def contributing_hypervolume(self, f_pair):
         raise NotImplementedError()
 
-    def distance_to_pareto_front(self, f_pair, ref_factor=1):
-        raise NotImplementedError()
+    def _get_kink_points(self):
+        if self.reference_point is None:
+            ref_point = [inf] * self.n_dim
+        else:
+            ref_point = self.reference_point
+
+        points = self.points_list + [[0, 0, ref_point[2]]]
+        points_state = MOArchive2D([[ref_point[0], -inf],
+                                    [-inf, ref_point[1]]])
+        future_kink_points_state = MOArchive2D([ref_point[:2]])
+        point_dict = {
+            tuple(ref_point[:2]): -inf
+        }
+        kink_points = []
+
+        for point in points:
+            # add the point to the kink state to get the dominated kink points, then take it out
+            if future_kink_points_state.add(point[:2]) is not None:
+                removed = future_kink_points_state._removed.copy()
+                for removed_point in removed:
+                    z = point_dict[tuple(removed_point)]
+                    if z < point[2]:
+                        kink_points.append([removed_point[0], removed_point[1], point[2]])
+                future_kink_points_state._removed.clear()
+                future_kink_points_state.remove(point[:2])
+
+            # add the point to the point state, and get two new kink point candidates
+            idx = points_state.add(point[:2])
+            for i in range(2):
+                p = [points_state[idx + i][0], points_state[idx - 1 + i][1]]
+                point_dict[tuple(p)] = point[2]
+                future_kink_points_state.add(p)
+
+        return kink_points
+
+
+    def _get_kink_points_tea(self):
+        points_set = self.points_list
+        result = [self.reference_point]
+
+        for a in points_set:
+            candidates = [b for b in result if self.strictly_dominates(a, b)]
+            for b in candidates:
+                result.remove(b)
+
+                for k in range(3):
+                    v = b.copy()
+                    v[k] = a[k]
+                    if not self._is_redundant(v, result):
+                        result.append(v)
+        return result
+
+    def _is_redundant(self, vector, existing_points):
+        if len(existing_points) == 0:
+            return False
+
+        for second in existing_points:
+            if self._collinear(vector, second) or self.weekly_dominates(vector, second):
+                return True
+        return False
+
+    def _collinear(self, p1, p2, tolerance=1e-9):
+        return sum(abs(p1[i] - p2[i]) < tolerance for i in range(self.n_dim)) >= 2
+
+    def distance_to_pareto_front(self, f_vals, ref_factor=1):
+        if self.in_domain(f_vals) and not self.dominates(f_vals):
+            return 0  # return minimum distance
+
+        if self.reference_point is not None:
+            ref_di = [ref_factor * max((0, f_vals[i] - self.reference_point[i]))
+                      for i in range(self.n_dim)]
+        else:
+            ref_di = [0] * self.n_dim
+
+        points = self.points_list
+
+        if len(points) == 0:
+            return sum([ref_di[i]**2 for i in range(self.n_dim)])**0.5
+
+        kink_points = self._get_kink_points()
+        distances_squared = []
+
+        for point in kink_points:
+            distances_squared.append(sum([max((0, f_vals[i] - point[i]))**2
+                                          for i in range(self.n_dim)]))
+        return min(distances_squared)**0.5
 
     def distance_to_hypervolume_area(self, f_pair):
         if self.reference_point is None:
@@ -472,6 +555,13 @@ class MOArchive:
     @staticmethod
     def _random_archive(max_size=500, p_ref_point=0.5):
         raise NotImplementedError()
+
+    def weekly_dominates(self, a, b):
+        return all(a[i] <= b[i] for i in range(self.n_dim))
+
+    def strictly_dominates(self, a, b):
+        return (all(a[i] <= b[i] for i in range(self.n_dim)) and
+                any(a[i] < b[i] for i in range(self.n_dim)))
 
     def _asserts(self):
         raise NotImplementedError()
