@@ -397,23 +397,13 @@ class MOArchive:
         raise NotImplementedError()
 
     def _set_HV(self):
-        if self.reference_point is None:
-            return None
-        self._hypervolume = self.compute_hypervolume(self.reference_point)
+        self._hypervolume = self.compute_hypervolume()
         return self._hypervolume
 
-    def compute_hypervolume(self, reference_point):
-        if reference_point is None:
-            raise ValueError("to compute the hypervolume a reference"
-                             " point is needed (was `None`)")
+    def compute_hypervolume(self):
         p = self.head
         area = 0
         volume = 0
-
-        # TODO: figure out why this three lines break the code (just changing self.head to p)
-        # restart_list_y(p)
-        # p = p.next[2].next[2]
-        # stop = p.prev[2]
 
         restart_list_y(self.head)
         p = p.next[2].next[2]
