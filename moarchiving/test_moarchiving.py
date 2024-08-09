@@ -1,5 +1,5 @@
 import time
-from moarchiving import MOArchive
+from moarchiving import MOArchive, DLNode
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from hv_plus import calc_hypervolume_3D
 
@@ -250,6 +250,24 @@ class MyTestCase(unittest.TestCase):
             d3_no_ref = moa3d_no_ref.distance_to_pareto_front(point.tolist())
             self.assertAlmostEqual(d2, d3, places=8)
             self.assertAlmostEqual(d3, d3_no_ref, places=8)
+
+    def test_copy_DLNode(self):
+        n1 = DLNode([1, 2, 3, 4], "node 1")
+        n2 = DLNode([5, 6, 7, 8], "node 2")
+        n1.closest[1] = n2
+        n2.closest[0] = n1
+
+        n1_copy = n1.copy()
+        n2_copy = n2.copy()
+        n2_copy.x = [-1, -2, -3, -4]
+
+        n1.x[0] = 10
+        n1.closest[1] = n1
+        self.assertEqual(n1_copy.x[0], 1)
+        self.assertEqual(n1_copy.closest[1].x[0], 5)
+        self.assertEqual(n2.x[0], 5)
+        self.assertEqual(n2_copy.x[0], -1)
+
 
 
 if __name__ == '__main__':

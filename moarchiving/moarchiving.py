@@ -32,6 +32,15 @@ class DLNode:
         self.ndomr = 0  # number of dominators
         self.info = info
 
+    def copy(self):
+        new_node = DLNode()
+        for var in self.__dict__:
+            if isinstance(getattr(self, var), list):
+                setattr(new_node, var, getattr(self, var).copy())
+            else:
+                setattr(new_node, var, getattr(self, var))
+        return new_node
+
 
 class MOArchive:
     def __init__(self, list_of_f_vals=None, reference_point=None, infos=None):
