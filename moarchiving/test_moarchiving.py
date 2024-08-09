@@ -268,6 +268,19 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(n2.x[0], 5)
         self.assertEqual(n2_copy.x[0], -1)
 
+    def test_copy_MOArchive(self):
+        points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
+        moa = MOArchive(points, reference_point=[6, 6, 6])
+        moa_copy = moa.copy()
+
+        self.assertEqual(moa.hypervolume, moa_copy.hypervolume)
+
+        moa.add([2, 2, 2])
+
+        self.assertEqual(len(moa.points_list), 4)
+        self.assertEqual(len(moa_copy.points_list), 3)
+
+        self.assertFalse(moa.hypervolume == moa_copy.hypervolume)
 
 
 if __name__ == '__main__':

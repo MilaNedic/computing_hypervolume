@@ -216,7 +216,11 @@ class MOArchive:
         self._set_HV()
 
     def copy(self):
-        raise NotImplementedError()
+        # TODO: I think this will work, but can probably be done more efficiently
+        points = self.points_list
+        infos = self.infos_list
+        new_moa = MOArchive(points, self.reference_point, infos)
+        return new_moa
 
     def dominates(self, f_val):
         """ return `True` if any element of `points` dominates or is equal to `f_val`.
