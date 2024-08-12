@@ -16,6 +16,7 @@ from hv_plus import (compute_area_simple, init_sentinels_new, remove_from_z, res
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from sortedcontainers import SortedList
 import numpy as np
+import warnings as _warnings
 
 del division, print_function, unicode_literals
 
@@ -196,7 +197,7 @@ class MOArchive:
             #  contribution of the new point
             self._set_HV()
 
-    def remove(self, u_vals):
+    def remove(self, f_vals):
         """
         Removing a point u ∈ Q also requires updating the cx and
         cy attributes of the remaining points, as follows.
@@ -206,7 +207,70 @@ class MOArchive:
         a point is not unique, the alternative with the smallest
         q_y (respectively, q_x) is preferred.
         """
-        raise NotImplementedError()
+
+        di = self.n_dim - 1  # Dimension index for sorting (z-axis in 3D)
+        current = self.head.next[di]
+        stop = self.head.prev[di]
+
+        # Using SortedList to manage nodes by their y-coordinate, supporting custom sorting needs
+        T = SortedList(key=lambda node: (node.x[1], node.x[0]))
+
+        # Include sentinel nodes to manage edge conditions
+        T.add(self.head)  # self.head is a left sentinel
+        T.add(self.head.prev[di])  # right sentinel
+        remove_node = None
+
+        while current != stop:
+            if current.x[:3] == f_vals:
+                remove_node = current
+                current = current.next[di]
+                continue
+            T.add(current)
+
+            # Remove nodes dominated by the current node
+            nodes_to_remove = [node for node in T if node != current and
+                               self.strictly_dominates(current.x, node.x, n_dim=2)]
+            for node in nodes_to_remove:
+                T.remove(node)
+
+            if current.closest[0].x[:3] == f_vals:
+                # For every p ∈ Q \ {u} such that p.cx = u, set p.cx to the
+                #         point q ∈ Q \ {u} with the smallest q_x > p_x such that
+                #         q_y < p_y and q <L p
+                current.closest[1] = current.closest[1]
+                cx_candidates = [node for node in T if node.x[0] > current.x[0] and node.x[1] < current.x[1]]
+                if cx_candidates:
+                    current.closest[0] = min(cx_candidates, key=lambda node: node.x[0])
+                else:
+                    current.closest[0] = self.head
+
+            if current.closest[1].x[:3] == f_vals:
+                # For every p ∈ Q \ {u} such that p.cy = u, set p.cy to the
+                #         point q ∈ Q \ {u} with the smallest q_y > p_y such that
+                #         q_x < p_x and q <L p
+                current.closest[1] = current.closest[1]
+                cy_candidates = [node for node in T if node.x[1] > current.x[1] and node.x[0] < current.x[0]]
+                if cy_candidates:
+                    current.closest[1] = min(cy_candidates, key=lambda node: node.x[1])
+                else:
+                    current.closest[1] = self.head.prev[di]
+
+            """
+            # Adjust closest if it points to itself
+            if current.closest[0] == current:
+                current.closest[0] = self.head
+            if current.closest[1] == current:
+                current.closest[1] = self.head.prev[di]
+            """
+            current = current.next[di]
+
+        if remove_node is not None:
+            remove_from_z(remove_node)
+        else:
+            _warnings.warn(f"Point {f_vals} not found in the archive")
+
+        T.clear()  # Clean up AVL tree after processing
+        self._set_HV()
 
     def add_list(self, list_of_f_vals, infos=None):
         if infos is None:
@@ -283,6 +347,8 @@ class MOArchive:
         else:
             curr = self.head.next[di].next[di]
             stop = self.head.prev[di]
+            if curr == stop:
+                return
         while curr != stop or first_iter:
             yield curr
             first_iter = False
@@ -559,12 +625,16 @@ class MOArchive:
     def _random_archive(max_size=500, p_ref_point=0.5):
         raise NotImplementedError()
 
-    def weekly_dominates(self, a, b):
-        return all(a[i] <= b[i] for i in range(self.n_dim))
+    def weekly_dominates(self, a, b, n_dim=None):
+        if n_dim is None:
+            n_dim = self.n_dim
+        return all(a[i] <= b[i] for i in range(n_dim))
 
-    def strictly_dominates(self, a, b):
-        return (all(a[i] <= b[i] for i in range(self.n_dim)) and
-                any(a[i] < b[i] for i in range(self.n_dim)))
+    def strictly_dominates(self, a, b, n_dim=None):
+        if n_dim is None:
+            n_dim = self.n_dim
+        return (all(a[i] <= b[i] for i in range(n_dim)) and
+                any(a[i] < b[i] for i in range(n_dim)))
 
     def _asserts(self):
         raise NotImplementedError()

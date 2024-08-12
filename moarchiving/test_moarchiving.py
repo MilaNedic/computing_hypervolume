@@ -282,6 +282,43 @@ class MyTestCase(unittest.TestCase):
 
         self.assertFalse(moa.hypervolume == moa_copy.hypervolume)
 
+    def test_remove_3d(self, n_points=100, n_points_remove=50):
+        points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
+        moa_remove = MOArchive(points, reference_point=[6, 6, 6])
+        moa_remove.remove([1, 2, 3])
+        self.assertEqual(len(moa_remove.points_list), 2)
+        self.assertSetEqual(list_to_set(moa_remove.points_list), list_to_set(points[1:]))
+        self.assertEqual(moa_remove.hypervolume, MOArchive(points[1:], reference_point=[6, 6, 6]).hypervolume)
+
+        points = np.random.rand(n_points, 1)
+        points = np.hstack([np.sin(points), np.cos(points), points])
+
+        remove_idx = np.random.choice(range(n_points), n_points_remove, replace=False)
+        keep_idx = [i for i in range(n_points) if i not in remove_idx]
+
+        moa_true = MOArchive(points[keep_idx, :], reference_point=[1, 1, 1])
+        moa_remove = MOArchive(points, reference_point=[1, 1, 1])
+        for i in remove_idx:
+            moa_remove.remove(points[i].tolist())
+        moa_add = MOArchive([], reference_point=[1, 1, 1])
+        for i in keep_idx:
+            moa_add.add(points[i].tolist())
+
+        # assert that the points are the same in all archives and the hypervolume is the same
+        self.assertEqual(len(moa_add.points_list), len(moa_true.points_list))
+        self.assertEqual(len(moa_remove.points_list), len(moa_true.points_list))
+
+        self.assertSetEqual(list_to_set(moa_remove.points_list), list_to_set(moa_true.points_list))
+        self.assertSetEqual(list_to_set(moa_add.points_list), list_to_set(moa_true.points_list))
+
+        self.assertEqual(moa_remove.hypervolume, moa_true.hypervolume)
+        self.assertEqual(moa_add.hypervolume, moa_true.hypervolume)
+
+        moa = MOArchive([[1, 2, 3], [2, 3, 1], [3, 1, 2]], reference_point=[6, 6, 6])
+        moa.add([1, 1, 1])
+        moa.remove([1, 1, 1])
+        self.assertEqual(len(moa.points_list), 0)
+
 
 if __name__ == '__main__':
     unittest.main()
