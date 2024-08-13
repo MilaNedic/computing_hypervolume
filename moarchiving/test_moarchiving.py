@@ -319,6 +319,20 @@ class MyTestCase(unittest.TestCase):
         moa.remove([1, 1, 1])
         self.assertEqual(len(moa.points_list), 0)
 
+    def test_lexsort(self):
+        pts3d = np.random.rand(100, 3)
+        pts4d = np.random.rand(100, 4)
+
+        result_my = MOArchive.my_lexsort((pts3d[:, 0], pts3d[:, 1], pts3d[:, 2]))
+        result_numpy = np.lexsort((pts3d[:, 0], pts3d[:, 1], pts3d[:, 2]))
+        for r1, r2 in zip(result_my, result_numpy):
+            self.assertEqual(r1, r2)
+
+        result_my = MOArchive.my_lexsort((pts4d[:, 0], pts4d[:, 1], pts4d[:, 2], pts4d[:, 3]))
+        result_numpy = np.lexsort((pts4d[:, 0], pts4d[:, 1], pts4d[:, 2], pts4d[:, 3]))
+        for r1, r2 in zip(result_my, result_numpy):
+            self.assertEqual(r1, r2)
+
 
 if __name__ == '__main__':
     unittest.main()

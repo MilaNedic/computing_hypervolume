@@ -10,7 +10,6 @@ __author__ = "Nikolaus Hansen"
 __license__ = "BSD 3-clause"
 __version__ = "0.6.0"
 
-import copy
 from hv_plus import (compute_area_simple, init_sentinels_new, remove_from_z, restart_list_y,
                      lexicographic_less, one_contribution_3d)
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
@@ -414,7 +413,6 @@ class MOArchive:
 
         return kink_points
 
-
     def _get_kink_points_tea(self):
         points_set = self.points_list
         result = [self.reference_point]
@@ -523,11 +521,11 @@ class MOArchive:
         if n > 0:
             # Convert data to a structured format suitable for sorting and linking
             if self.n_dim == 3:
-                # Using np.lexsort to sort by z, y, x in ascending order
-                sorted_indices = np.lexsort((points[:, 0], points[:, 1], points[:, 2]))
+                # Using lexsort to sort by z, y, x in ascending order
+                sorted_indices = self.my_lexsort((points[:, 0], points[:, 1], points[:, 2]))
             elif self.n_dim == 4:
-                # Using np.lexsort to sort by w, z, y, x in ascending order
-                sorted_indices = np.lexsort(
+                # Using lexsort to sort by w, z, y, x in ascending order
+                sorted_indices = self.my_lexsort(
                     (points[:, 0], points[:, 1], points[:, 2], points[:, 3]))
             else:
                 raise ValueError("Only 3D and 4D points are supported")
@@ -639,8 +637,8 @@ class MOArchive:
     def _asserts(self):
         raise NotImplementedError()
 
-
-if __name__ == "__main__":
-    import doctest
-    print('doctest.testmod() in moarchiving.py')
-    print(doctest.testmod())
+    @staticmethod
+    def my_lexsort(keys):
+        idk_key_tuple = list(enumerate([list(x)[::-1] for x in zip(*keys)]))
+        idk_key_tuple.sort(key=lambda x: x[1])
+        return [x[0] for x in idk_key_tuple]
