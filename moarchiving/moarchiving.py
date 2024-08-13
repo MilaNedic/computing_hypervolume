@@ -279,11 +279,8 @@ class MOArchive:
         self._set_HV()
 
     def copy(self):
-        # TODO: I think this will work, but can probably be done more efficiently
-        points = self.points_list
-        infos = self.infos_list
-        new_moa = MOArchive(points, self.reference_point, infos)
-        return new_moa
+        # TODO: can probably be done more efficiently (by looping over the DLL and copying nodes)
+        return MOArchive(self.points_list, self.reference_point, self.infos_list)
 
     def dominates(self, f_val):
         """ return `True` if any element of `points` dominates or is equal to `f_val`.
