@@ -14,6 +14,10 @@ def list_to_set(lst):
 
 class MyTestCase(unittest.TestCase):
     def test_hypervolume_3D(self):
+        points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
+        moa = MOArchive(points, reference_point=[4, 4, 4])
+        self.assertEqual(moa.hypervolume, 13)
+
         # loop over all files in the tests folder that contain "_3d_" in their name
         print(f"{'file name':20} |   new hv   |   old hv   |")
 
@@ -332,6 +336,60 @@ class MyTestCase(unittest.TestCase):
         result_numpy = np.lexsort((pts4d[:, 0], pts4d[:, 1], pts4d[:, 2], pts4d[:, 3]))
         for r1, r2 in zip(result_my, result_numpy):
             self.assertEqual(r1, r2)
+
+        print(f"{'num points':10} | {'my lexsort':10} | {'np lexsort':10} |")
+        for n in range(2, 7):
+            pts = np.random.rand(10 ** n, 3)
+            t0 = time.time()
+            MOArchive.my_lexsort([pts[:, i] for i in range(3)])
+            t1 = time.time()
+            np.lexsort([pts[:, i] for i in range(3)])
+            t2 = time.time()
+
+            print(f"{10**n:10} | {t1-t0:.8f} | {t2-t1:.8f} |")
+
+    def test_contributing_hypervolume(self):
+        points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
+        moa = MOArchive(points, reference_point=[4, 4, 4])
+        self.assertEqual(moa.contributing_hypervolume([1, 2, 3]), 3)
+        self.assertEqual(moa.contributing_hypervolume([2, 3, 1]), 3)
+        self.assertEqual(moa.contributing_hypervolume([3, 1, 2]), 3)
+
+        points = np.hstack([np.random.rand(100, 2), np.zeros((100, 1))])
+        moa = MOArchive(points, reference_point=[1, 1, 1])
+        moa2d = MOArchive2D(points[:, :2], reference_point=[1, 1])
+        for p in moa2d:
+            self.assertAlmostEqual(moa.contributing_hypervolume(p + [0]),
+                                   moa2d.contributing_hypervolume(p), places=8)
+
+    def test_hypervolume_improvement(self):
+        points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
+        moa = MOArchive(points, reference_point=[4, 4, 4])
+        self.assertEqual(moa.hypervolume_improvement([1, 2, 3]), 0)
+        self.assertEqual(moa.hypervolume_improvement([2, 3, 1]), 0)
+        self.assertEqual(moa.hypervolume_improvement([3, 1, 2]), 0)
+        self.assertEqual(moa.hypervolume_improvement([4, 4, 4]),
+                         -moa.distance_to_pareto_front([4, 4, 4]))
+        self.assertEqual(moa.hypervolume_improvement([1, 1, 1]), 14)
+        self.assertEqual(moa.hypervolume_improvement([2, 2, 2]), 1)
+
+        points = np.hstack([np.random.rand(100, 2), np.zeros((100, 1))])
+        new_points = np.random.rand(100, 2)
+        moa = MOArchive(points, reference_point=[1, 1, 1])
+        moa2d = MOArchive2D(points[:, :2], reference_point=[1, 1])
+
+        hv_start = moa.hypervolume
+        for p in new_points:
+            p = p.tolist()
+            hv_imp2d = float(moa2d.hypervolume_improvement(p))
+            if hv_imp2d > 0:
+                self.assertAlmostEqual(hv_imp2d, moa.hypervolume_improvement(p + [0]), places=8)
+            else:
+                self.assertAlmostEqual(hv_imp2d, moa.hypervolume_improvement(p + [1]), places=8)
+
+        # make sure this doesn't change the hypervolume of the archive
+        hv_end = moa.hypervolume
+        self.assertAlmostEqual(hv_start, hv_end, places=8)
 
 
 if __name__ == '__main__':
