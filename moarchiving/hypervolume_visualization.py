@@ -101,15 +101,7 @@ def draw_hypervolume(points, ref_point):
         ), row=1, col=1)
     eps = ref_point[0] / 100
 
-    kink_points2 = moa._get_kink_points_tea()
     kink_points = moa._get_kink_points()
-
-    """
-    for k2 in kink_points2:
-        assert k2 in kink_points, f"{k2} not in {kink_points}"
-    for k in kink_points:
-        assert k in kink_points2, f"{k} not in {kink_points2}"
-    """
 
     for k in kink_points:
         fig.add_trace(go.Scatter3d(
@@ -125,6 +117,30 @@ def draw_hypervolume(points, ref_point):
             name=str(k)
         ), row=1, col=1)
 
+    """
+    # remove the axis numbers
+    fig.update_layout(scene=dict(
+        xaxis=dict(
+            showticklabels=False,
+            showgrid=False,
+            title=''
+        ),
+        yaxis=dict(
+            showticklabels=False,
+            showgrid=False,
+            title=''
+        ),
+        zaxis=dict(
+            showticklabels=False,
+            # also hide grid lines
+            showgrid=False,
+            # also hide axis name
+            title=''
+        ),
+        bgcolor='white',
+        xaxis_visible=False, yaxis_visible=False, zaxis_visible=False
+    ))
+    """
     fig.show()
 
 
@@ -140,4 +156,4 @@ if __name__ == '__main__':
     pts = np.array(
         [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
     )
-    draw_hypervolume(pts, [6, 6, 6])
+    draw_hypervolume(pts, [4, 4, 4])
