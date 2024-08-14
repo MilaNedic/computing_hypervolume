@@ -489,7 +489,15 @@ class MOArchive:
 
     def hypervolume_improvement(self, f_vals):
         """ Returns the hypervolume improvement of adding a point to the archive """
-        # TODO: implement actual hypervolume improvement calculation
+        if f_vals in self.points_list:
+            return 0
+        if self.dominates(f_vals):
+            return -1 * self.distance_to_pareto_front(f_vals)
+
+        return one_contribution_3d(self.head, DLNode(x=f_vals))
+
+    def hypervolume_improvement_naive(self, f_vals):
+        """ Returns the hypervolume improvement of adding a point to the archive """
         if f_vals in self.points_list:
             return 0
         if self.dominates(f_vals):

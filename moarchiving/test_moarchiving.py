@@ -391,6 +391,26 @@ class MyTestCase(unittest.TestCase):
         hv_end = moa.hypervolume
         self.assertAlmostEqual(hv_start, hv_end, places=8)
 
+        # test speed of the naive and paper implementation
+        n_points_archive = 100
+        data_points = np.random.rand(n_points_archive, 1)
+        data_points = np.hstack([np.sin(data_points), np.cos(data_points), data_points])
+
+        print(f"{'num points':10} | {'paper':10} | {'naive':10} |")
+        moa = MOArchive(data_points, reference_point=[1, 1, 1])
+        for n_points_test in [2 ** i for i in range(11)]:
+            new_points = np.random.rand(n_points_test, 3)
+            new_points = [p.tolist() for p in new_points]
+            t0 = time.time()
+            hv1 = [moa.hypervolume_improvement(p) for p in new_points]
+            t1 = time.time()
+            hv2 = [moa.hypervolume_improvement_naive(p) for p in new_points]
+            t2 = time.time()
+            print(f"{n_points_test:10} | {t1-t0:.8f} | {t2-t1:.8f} |")
+
+            for h1, h2 in zip(hv1, hv2):
+                self.assertAlmostEqual(h1, h2, places=8)
+
 
 if __name__ == '__main__':
     unittest.main()
