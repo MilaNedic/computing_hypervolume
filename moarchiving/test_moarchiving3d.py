@@ -1,7 +1,8 @@
-from moarchiving3d import MOArchive3d, DLNode
+from moarchiving3d import MOArchive3d
+from moarchiving_utils import DLNode, my_lexsort
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from hv_plus import calc_hypervolume_3D
-from point_sampling import spherical_front, linear_front
+from point_sampling import get_non_dominated_points
 import matplotlib.pyplot as plt
 
 import time
@@ -12,13 +13,6 @@ import os
 
 def list_to_set(lst):
     return set([tuple(p) for p in lst])
-
-
-def get_non_dominated_points(n_points, mode='spherical'):
-    if mode == 'spherical':
-        return np.array(spherical_front(1, n_points, normalized=False))
-    elif mode == 'linear':
-        return np.array(linear_front(1, n_points, normalized=False))
 
 
 class MyTestCase(unittest.TestCase):
@@ -325,12 +319,12 @@ class MyTestCase(unittest.TestCase):
         pts3d = np.random.rand(100, 3)
         pts4d = np.random.rand(100, 4)
 
-        result_my = MOArchive3d.my_lexsort((pts3d[:, 0], pts3d[:, 1], pts3d[:, 2]))
+        result_my = my_lexsort((pts3d[:, 0], pts3d[:, 1], pts3d[:, 2]))
         result_numpy = np.lexsort((pts3d[:, 0], pts3d[:, 1], pts3d[:, 2]))
         for r1, r2 in zip(result_my, result_numpy):
             self.assertEqual(r1, r2)
 
-        result_my = MOArchive3d.my_lexsort((pts4d[:, 0], pts4d[:, 1], pts4d[:, 2], pts4d[:, 3]))
+        result_my = my_lexsort((pts4d[:, 0], pts4d[:, 1], pts4d[:, 2], pts4d[:, 3]))
         result_numpy = np.lexsort((pts4d[:, 0], pts4d[:, 1], pts4d[:, 2], pts4d[:, 3]))
         for r1, r2 in zip(result_my, result_numpy):
             self.assertEqual(r1, r2)
@@ -339,7 +333,7 @@ class MyTestCase(unittest.TestCase):
         for n in range(2, 7):
             pts = np.random.rand(10 ** n, 3)
             t0 = time.time()
-            MOArchive3d.my_lexsort([pts[:, i] for i in range(3)])
+            my_lexsort([pts[:, i] for i in range(3)])
             t1 = time.time()
             np.lexsort([pts[:, i] for i in range(3)])
             t2 = time.time()
