@@ -1,9 +1,9 @@
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
-from moarchiving import MOArchive
+from moarchiving3d import MOArchive3d
 from moarchiving2d import BiobjectiveNondominatedSortedList
-from test_moarchiving import get_non_dominated_points_3d
+from test_moarchiving3d import get_non_dominated_points
 
 
 def main():
@@ -62,7 +62,7 @@ def draw_point(point, ref_point, fig):
 
 def draw_hypervolume(points, ref_point):
     points = points.tolist()
-    moa = MOArchive(points, ref_point)
+    moa = MOArchive3d(points, ref_point)
     points = moa.points_list
 
     fig = make_subplots(rows=1, cols=1,
@@ -151,8 +151,8 @@ def random_3d_structure(n_points):
     draw_hypervolume(points, ref_point)
 
 
-def plot_non_dominated__points(n_points=1000, mode="spherical"):
-    points = get_non_dominated_points_3d(n_points, mode=mode)
+def plot_non_dominated_points(n_points=1000, mode="spherical"):
+    points = get_non_dominated_points(n_points, mode=mode)
 
     fig = go.Figure(data=[
         go.Scatter3d(
@@ -179,5 +179,5 @@ if __name__ == '__main__':
         [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
     )
     # draw_hypervolume(pts, [4, 4, 4])
-    plot_non_dominated__points(1000, mode="linear")
-    plot_non_dominated__points(1000, mode="spherical")
+    plot_non_dominated_points(1000, mode="linear")
+    plot_non_dominated_points(1000, mode="spherical")

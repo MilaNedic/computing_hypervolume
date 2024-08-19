@@ -42,7 +42,7 @@ class DLNode:
         return new_node
 
 
-class MOArchive:
+class MOArchive3d:
     def __init__(self, list_of_f_vals=None, reference_point=None, infos=None):
         if list_of_f_vals is not None and len(list_of_f_vals):
             try:
@@ -50,11 +50,11 @@ class MOArchive:
             except:
                 pass
             self.n_dim = len(list_of_f_vals[0])
-            if self.n_dim < 3 or self.n_dim > 4:
-                raise ValueError("need elements of len 3 or 4, got %s"
+            if self.n_dim != 3:
+                raise ValueError("need elements of length 3, got %s"
                                  " as first element" % str(list_of_f_vals[0]))
         else:
-            self.n_dim = 3  # TODO: how to deal with this?
+            self.n_dim = 3
             list_of_f_vals = []
         if infos is None:
             infos = [None] * len(list_of_f_vals)
@@ -280,14 +280,14 @@ class MOArchive:
 
     def copy(self):
         # TODO: can probably be done more efficiently (by looping over the DLL and copying nodes)
-        return MOArchive(self.points_list, self.reference_point, self.infos_list)
+        return MOArchive3d(self.points_list, self.reference_point, self.infos_list)
 
     def dominates(self, f_val):
         """ return `True` if any element of `points` dominates or is equal to `f_val`.
         Otherwise return `False`.
         """
         for point in self._points_generator():
-            if self.weekly_dominates(point.x, f_val):
+            if self.weakly_dominates(point.x, f_val):
                 return True
             # points are sorted in lexicographic order, so we can return False
             # once we find a point that is lexicographically greater than f_val
@@ -432,7 +432,7 @@ class MOArchive:
                 return False
 
             for second in existing_points:
-                if _collinear(vector, second) or self.weekly_dominates(vector, second):
+                if _collinear(vector, second) or self.weakly_dominates(vector, second):
                     return True
             return False
 
@@ -453,7 +453,6 @@ class MOArchive:
                     if not _is_redundant(v, result):
                         result.append(v)
         return result
-
 
     def distance_to_pareto_front(self, f_vals, ref_factor=1):
         """ Returns the distance to the Pareto front of the archive,
@@ -538,12 +537,6 @@ class MOArchive:
             p = p.next[2]
 
         return volume
-
-    def _subtract_HV(self, idx0, idx1=None):
-        raise NotImplementedError()
-
-    def _add_HV(self, idx):
-        raise NotImplementedError()
 
     def setup_cdllist(self, data, ref, infos):
         """ Set up a circular doubly linked list from the given data and reference point """
@@ -654,7 +647,7 @@ class MOArchive:
 
         avl_tree.clear()  # Clean up AVL tree after processing
 
-    def weekly_dominates(self, a, b, n_dim=None):
+    def weakly_dominates(self, a, b, n_dim=None):
         """ Return True if a weakly dominates b, False otherwise """
         if n_dim is None:
             n_dim = self.n_dim
