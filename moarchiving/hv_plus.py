@@ -533,3 +533,12 @@ def calc_hypervolume_3D(data_points, ref_point):
     preprocessing(head, 3)
     hv3d = hv3dplus(head)
     return hv3d
+
+
+def calc_hypervolume_4D(data_points, ref_point):
+    n_points = len(data_points)
+    dimension = 4
+    data_points = data_points.flatten()
+    cdllist_4d = setup_cdllist(data_points, n_points, dimension, ref_point)
+    hv4d = hv4dplusR(cdllist_4d)
+    return hv4d
