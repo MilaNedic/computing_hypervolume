@@ -113,21 +113,50 @@ class MyTestCase(unittest.TestCase):
         moa.add(u3)
         self.assertSetEqual(list_to_set(start_points[:2] + [u1, u3]), list_to_set(moa.points_list))
 
-    def test_hypervolume_after_add(self, n_points=1000, n_tests=10):
+    def test_hypervolume_after_add(self, n_points=1000):
         ref_point = [1, 1, 1]
 
-        for t in range(n_tests):
-            np.random.seed(t)
-            points = np.round(np.random.rand(n_points, 3), 3).tolist()
-            infos = [str(p) for p in range(n_points)]
-            moa = MOArchive3d(points, ref_point, infos=infos)
-            true_hv = moa.hypervolume
+        test_n_points = [2**i for i in range(15)]
+        times_one_by_one = []
+        times_all_at_once = []
+        archive_size = []
+        print("TEST HYPERVOLUME AFTER ADD")
+        print(f"{'num points':10} | {'all at once':10} | {'one by one':10} |")
+        for n_points in test_n_points:
+            points = get_non_dominated_points(n_points)
+            points = points + np.random.rand(n_points, 3) * 0.2
+            points = points.tolist()
+            t0 = time.time()
+            moa_true = MOArchive3d(points, ref_point)
+            true_hv = moa_true.hypervolume
+            t1 = time.time()
 
-            moa_add = MOArchive3d(points[:1], ref_point, infos=infos[:1])
-            for i in range(1, n_points):
-                moa_add.add(points[i], infos[i])
+            moa_add = MOArchive3d([], ref_point)
+            for i in range(n_points):
+                moa_add.add(points[i])
+            t2 = time.time()
 
+            archive_size.append(len(moa_add.points_list))
+            times_all_at_once.append(t1-t0)
+            times_one_by_one.append(t2-t1)
+
+            print(f"{n_points:10} | {t1-t0:.8f} | {t2-t1:.8f} |")
             self.assertAlmostEqual(moa_add.hypervolume, true_hv, places=6)
+
+        fig, ax1 = plt.subplots()
+        ax1.set_xlabel("Number of nondominated points")
+        ax1.set_ylabel("Time [s]")
+        ax1.plot(test_n_points, times_one_by_one, label="one by one", color='tab:orange')
+        ax1.plot(test_n_points, times_all_at_once, label="all at once", color='tab:red')
+        plt.legend()
+
+        ax2 = ax1.twinx()
+        ax2.set_ylabel('archive size', color='tab:green')
+        ax2.plot(test_n_points, archive_size, label="archive size", linestyle='dashed',
+                 color='tab:green')
+        ax2.tick_params(axis='y', labelcolor='tab:green')
+        plt.title("Adding points to archive")
+        plt.show()
 
     def test_dominates(self):
         ref_point = [6, 6, 6]
