@@ -2,11 +2,40 @@ from moarchiving3d import MOArchive3d
 from moarchiving_utils import my_lexsort
 from point_sampling import get_non_dominated_points
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import pandas as pd
 
 import time
 import numpy as np
 import os
+
+
+def plot_performance(f_name=None, plot_function="add", poly_degree=2, xlabel="Archive size",
+                     ylabel="Time [s]", title=""):
+    if f_name is None:
+        f_names = os.listdir("test_results")
+        f_names = [f for f in f_names if plot_function in f]
+        f_names.sort()
+        f_name = f_names[-1]
+
+    df = pd.read_csv(f"test_results/{f_name}", index_col=0)
+
+    colors = list(mcolors.TABLEAU_COLORS.keys())
+
+    fig, ax = plt.subplots()
+    for i, col in enumerate(df.columns):
+        p = np.polyfit(df.index, df[col], poly_degree)
+        ax.plot(df.index, df[col], 'o', label=col, color=colors[i])
+        ax.plot(df.index, np.polyval(p, df.index), '--', color=colors[i], alpha=0.4,
+                label=f"{p[0]:.2E} x^{poly_degree} + O(x^{poly_degree-1})")
+
+
+
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    plt.legend()
+    plt.title(f"{plot_function}: ({f_name[(len(plot_function)+1):-4]}) \n{title}")
+    plt.show()
 
 
 def test_add(pop_size=100, n_gen=10):
@@ -53,49 +82,15 @@ def test_add(pop_size=100, n_gen=10):
     df.to_csv(f_name)
 
 
-def plot_add_results():
-    # get the latest file with the results
-    f_names = os.listdir("test_results")
-    f_names = [f for f in f_names if "add" in f]
-    f_names.sort()
-    f_name = f_names[-1]
-
-    df = pd.read_csv(f"test_results/{f_name}", index_col=0)
-
-    # use polyval to fit a quadratic polynomial to the data
-    p_one_by_one = np.polyfit(df.index, df["one_by_one"], 2)
-    p_gen_by_gen = np.polyfit(df.index, df["gen_by_gen"], 2)
-    p_all_at_once = np.polyfit(df.index, df["all_at_once"], 2)
-
-    # plot the data and the fitted polynomials
-    fig, ax = plt.subplots()
-    ax.set_xlabel("Number of nondominated points")
-    ax.set_ylabel("Time [s]")
-    # style: -o
-    ax.plot(df.index, df["one_by_one"], 'o', label="one by one", color='tab:orange')
-    ax.plot(df.index, np.polyval(p_one_by_one, df.index), '--', color='tab:orange', alpha=0.4,
-            label=f"{p_one_by_one[0]:.2E} x^2 + O(x)")
-
-    ax.plot(df.index, df["gen_by_gen"], 'o', label="gen by gen", color='tab:red')
-    ax.plot(df.index, np.polyval(p_gen_by_gen, df.index), '--', color='tab:red', alpha=0.4,
-            label=f"{p_gen_by_gen[0]:.2E} x^2 + O(x)")
-
-    ax.plot(df.index, df["all_at_once"], 'o', label="all at once", color='tab:blue')
-    ax.plot(df.index, np.polyval(p_all_at_once, df.index), '--', color='tab:blue', alpha=0.4,
-            label=f"{p_all_at_once[0]:.2E} x^2 + O(x)")
-
-    plt.legend()
-    plt.title(f"Adding points to archive - {f_name[4:-4]}")
-    plt.show()
-
-
-def test_kink_points():
+def test_kink_points(include_tea=False):
     print("TEST KINK POINTS")
+    test_n_points = list(range(500, 5001, 500))
+    df = pd.DataFrame()
     for pareto_type in ['spherical', 'linear']:
         print(f"{pareto_type} pareto front")
         print(f"num points | non-dom p |  moa init  |   alg tea  |   alg new  |")
-        test_n_points = [2**i for i in range(1, 11)]
-
+        time_tea = []
+        time_new = []
         for n_points in test_n_points:
             # read the data points and the reference point from the file
             data_points = get_non_dominated_points(n_points, mode=pareto_type)
@@ -107,85 +102,141 @@ def test_kink_points():
             t0 = time.time()
             moa = MOArchive3d(data_points, ref_point, infos)
             t1 = time.time()
-            kink_points_tea = moa._get_kink_points_tea()
+            if include_tea:
+                kink_points_tea = moa._get_kink_points_tea()
             t2 = time.time()
             kink_points = moa._get_kink_points()
             t3 = time.time()
             non_dom_p = len(moa.points_list)
 
+            time_tea.append(t2-t1)
+            time_new.append(t3-t2)
+
             print(f"{n_points:10} | {non_dom_p:9} | {t1-t0:.8f} | {t2-t1:.8f} | {t3-t2:.8f} |")
+        if include_tea:
+            df[f"tea_{pareto_type}"] = time_tea
+        df[f"new_{pareto_type}"] = time_new
+    df.index = test_n_points
+
+    date = time.strftime("%m%d-%H%M%S")
+    f_name = f"test_results/kink_points_{date}.csv"
+    df.to_csv(f_name)
 
 
 def test_lexsort():
+    n_test_points = list(range(10000, 100001, 10000))
+    df = pd.DataFrame()
+    time_np = []
+    time_my = []
+
     print("TEST LEXSORT")
     print(f"{'num points':10} | {'my lexsort':10} | {'np lexsort':10} |")
-    for n in range(7):
-        pts = np.random.rand(10 ** n, 3)
+    for n in n_test_points:
+        pts = np.random.rand(n, 3)
         t0 = time.time()
         my_lexsort([pts[:, i] for i in range(3)])
         t1 = time.time()
         np.lexsort([pts[:, i] for i in range(3)])
         t2 = time.time()
 
-        print(f"{10**n:10} | {t1-t0:.8f} | {t2-t1:.8f} |")
+        time_my.append(t1-t0)
+        time_np.append(t2-t1)
+        print(f"{n:10} | {t1-t0:.8f} | {t2-t1:.8f} |")
+    df["my_lexsort"] = time_my
+    df["np_lexsort"] = time_np
+    df.index = n_test_points
+
+    date = time.strftime("%m%d-%H%M%S")
+    f_name = f"test_results/lexsort_{date}.csv"
+    df.to_csv(f_name)
 
 
 def test_contributing_hypervolume():
+    df = pd.DataFrame()
+    n_points_test = list(range(500, 5001, 500))
+    n = 20
+
     print("TEST CONTRIBUTING HYPERVOLUME")
     for pareto_type in ['spherical', 'linear']:
+        times = []
         print(f"{pareto_type} pareto front")
         print(f"{'archive s':10} | {'naive':10} |")
-        n_points_test = 1000
-        for n_points_archive in [2 ** i for i in range(10)]:
-            data_points = get_non_dominated_points(n_points_archive)
+        for n_points_archive in n_points_test:
+            data_points = get_non_dominated_points(n_points_archive, mode=pareto_type)
             moa = MOArchive3d(data_points, reference_point=[1, 1, 1])
 
-            new_points = np.random.rand(n_points_test, 3)
-            new_points = [p.tolist() for p in new_points]
+            new_points = [p.tolist() for p in data_points[:n]]
             t0 = time.time()
             hv1 = [moa.contributing_hypervolume(p) for p in new_points]
             t1 = time.time()
-            print(f"{n_points_archive:10} | {t1-t0:.8f} |")
+            t = (t1 - t0) / n
+            times.append(t)
+            print(f"{n_points_archive:10} | {t:.8f} |")
+
+        df[f"naive_{pareto_type}"] = times
+    df.index = n_points_test
+
+    date = time.strftime("%m%d-%H%M%S")
+    f_name = f"test_results/contributing_hypervolume_{date}.csv"
+    df.to_csv(f_name)
 
 
-def test_hypervolume_improvement():
+def test_hypervolume_improvement(include_naive=False):
+    df = pd.DataFrame()
+    archive_sizes = list(range(100, 1001, 100))
+
     print("TEST HYPERVOLUME IMPROVEMENT")
-    fig = plt.figure()
     for pareto_type in ['spherical', 'linear']:
         print(f"{pareto_type} pareto front")
         print(f"{'archive s':10} | {'mila':10} | {'naive':10} |")
-        n_points_test = 1000
-        archive_sizes = [2 ** i for i in range(7)]
+        n_points_test = 100
         results_naive = []
         results_mila = []
         for n_points_archive in archive_sizes:
-            data_points = get_non_dominated_points(n_points_archive)
+            data_points = get_non_dominated_points(n_points_archive, mode=pareto_type)
             moa = MOArchive3d(data_points, reference_point=[1, 1, 1])
 
-            new_points = np.random.rand(n_points_test, 3)
+            new_points = get_non_dominated_points(n_points_test, mode=pareto_type)
             new_points = [p.tolist() for p in new_points]
             t0 = time.time()
             hv1 = [moa.hypervolume_improvement(p) for p in new_points]
             t1 = time.time()
+            print("t0-t1", t1-t0, end=" ")
+
             hv2 = [moa.hypervolume_improvement_naive(p) for p in new_points]
             t2 = time.time()
+            print("t1-t2", t2-t1)
 
-            results_naive.append(t2-t1)
-            results_mila.append(t1-t0)
-            print(f"{n_points_archive:10} | {t1-t0:.8f} | {t2-t1:.8f} |")
+            results_naive.append((t2-t1) / n_points_test)
+            results_mila.append((t1-t0) / n_points_test)
+            print(f"{n_points_archive:10} | {(t1-t0) / n_points_test:.8f} "
+                  f"| {(t2-t1) / n_points_test:.8f} |")
 
-        plt.plot(archive_sizes, results_mila, label=f"mila {pareto_type}")
-        plt.plot(archive_sizes, results_naive, label=f"naive {pareto_type}")
+        df[f"mila_{pareto_type}"] = results_mila
+        if include_naive:
+            df[f"naive_{pareto_type}"] = results_naive
+    df.index = archive_sizes
 
-    plt.legend()
-    plt.title("Hypervolume improvement")
-    plt.show()
+    date = time.strftime("%m%d-%H%M%S")
+    f_name = f"test_results/hypervolume_improvement_{date}.csv"
+    df.to_csv(f_name)
 
 
 if __name__ == "__main__":
-    test_add(n_gen=20)
-    plot_add_results()
+    # test_add(n_gen=20)
+    # plot_performance(plot_function="add", title="(cumulative time to add points)")
+
     # test_kink_points()
+    # plot_performance(plot_function="kink_points", poly_degree=1,
+    #                  title=r"($\approx$ time to calculate distance to pareto front for one point)")
+
     # test_lexsort()
-    # test_contributing_hypervolume()
-    test_hypervolume_improvement()
+    # plot_performance(plot_function="lexsort", poly_degree=1)
+
+    test_contributing_hypervolume()
+    plot_performance(plot_function="contributing_hypervolume",
+                     title="(time to calculate contributing hv for one point from archive)")
+
+    # test_hypervolume_improvement(include_naive=True)
+    # plot_performance(plot_function="hypervolume_improvement",
+    #                  title="(time to calculate hypervolume improvement for one point not in archive)")
