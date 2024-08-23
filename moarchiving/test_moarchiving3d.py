@@ -21,9 +21,6 @@ class MyTestCase(unittest.TestCase):
         moa = MOArchive3d(points, reference_point=[4, 4, 4])
         self.assertEqual(moa.hypervolume, 13)
 
-        # loop over all files in the tests folder that contain "_3d_" in their name
-        print(f"{'file name':20} |   new hv   |   old hv   |")
-
         for f_name in os.listdir('tests'):
             if "_3d_" not in f_name:
                 continue
@@ -39,9 +36,6 @@ class MyTestCase(unittest.TestCase):
 
             # calculate the hypervolume using the old implementation
             hv_old = calc_hypervolume_3D(data_points, ref_point)
-
-            # compare the hypervolumes
-            print(f"{f_name:20} | {hv_new:.8f} | {hv_old:.8f} |")
 
             # assert hyper volumes are equal
             self.assertAlmostEqual(hv_new, hv_old, places=8)
@@ -113,50 +107,28 @@ class MyTestCase(unittest.TestCase):
         moa.add(u3)
         self.assertSetEqual(list_to_set(start_points[:2] + [u1, u3]), list_to_set(moa.points_list))
 
-    def test_hypervolume_after_add(self, n_points=1000):
+    def test_hypervolume_after_add(self):
         ref_point = [1, 1, 1]
 
-        test_n_points = [2**i for i in range(15)]
-        times_one_by_one = []
-        times_all_at_once = []
-        archive_size = []
-        print("TEST HYPERVOLUME AFTER ADD")
-        print(f"{'num points':10} | {'all at once':10} | {'one by one':10} |")
-        for n_points in test_n_points:
-            points = get_non_dominated_points(n_points)
-            points = points + np.random.rand(n_points, 3) * 0.2
-            points = points.tolist()
-            t0 = time.time()
-            moa_true = MOArchive3d(points, ref_point)
+        pop_size = 100
+        n_gen = 10
+        points = get_non_dominated_points(pop_size * n_gen)
+        points = points.tolist()
+
+        for gen in range(1, n_gen + 1):
+            moa_true = MOArchive3d(points[:(gen * pop_size)], ref_point)
             true_hv = moa_true.hypervolume
-            t1 = time.time()
 
             moa_add = MOArchive3d([], ref_point)
-            for i in range(n_points):
+            for i in range(gen * pop_size):
                 moa_add.add(points[i])
-            t2 = time.time()
 
-            archive_size.append(len(moa_add.points_list))
-            times_all_at_once.append(t1-t0)
-            times_one_by_one.append(t2-t1)
+            moa_add_gen = MOArchive3d([], ref_point)
+            for i in range(gen):
+                moa_add_gen.add_list(points[(i * pop_size):((i + 1) * pop_size)])
 
-            print(f"{n_points:10} | {t1-t0:.8f} | {t2-t1:.8f} |")
             self.assertAlmostEqual(moa_add.hypervolume, true_hv, places=6)
-
-        fig, ax1 = plt.subplots()
-        ax1.set_xlabel("Number of nondominated points")
-        ax1.set_ylabel("Time [s]")
-        ax1.plot(test_n_points, times_one_by_one, label="one by one", color='tab:orange')
-        ax1.plot(test_n_points, times_all_at_once, label="all at once", color='tab:red')
-        plt.legend()
-
-        ax2 = ax1.twinx()
-        ax2.set_ylabel('archive size', color='tab:green')
-        ax2.plot(test_n_points, archive_size, label="archive size", linestyle='dashed',
-                 color='tab:green')
-        ax2.tick_params(axis='y', labelcolor='tab:green')
-        plt.title("Adding points to archive")
-        plt.show()
+            self.assertAlmostEqual(moa_add_gen.hypervolume, true_hv, places=6)
 
     def test_dominates(self):
         ref_point = [6, 6, 6]
@@ -220,31 +192,19 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(np.sqrt(147), moa.distance_to_hypervolume_area([9, 9, 9]), places=6)
 
     def test_kink_points(self):
-        print("TEST KINK POINTS")
-        for pareto_type in ['spherical', 'linear']:
-            print(f"{pareto_type} pareto front")
-            print(f"num points | non-dom p |  moa init  |   alg tea  |   alg new  |")
-            test_n_points = [2**i for i in range(1, 11)]
+        ref_point = [1, 1, 1]
+        test_n_points = [2 ** i for i in range(9)]
 
+        for pareto_type in ['spherical', 'linear']:
             for n_points in test_n_points:
                 # read the data points and the reference point from the file
                 data_points = get_non_dominated_points(n_points, mode=pareto_type)
                 infos = [str(p) for p in data_points.tolist()]
-                ref_point = [1, 1, 1]
 
                 # calculate the hypervolume using the new implementation
-
-                t0 = time.time()
                 moa = MOArchive3d(data_points, ref_point, infos)
-                t1 = time.time()
                 kink_points_tea = moa._get_kink_points_tea()
-                t2 = time.time()
                 kink_points = moa._get_kink_points()
-                t3 = time.time()
-                non_dom_p = len(moa.points_list)
-
-                print(f"{n_points:10} | {non_dom_p:9} | {t1-t0:.8f} | {t2-t1:.8f} | {t3-t2:.8f} |")
-
                 self.assertSetEqual(list_to_set(kink_points_tea), list_to_set(kink_points))
 
     def test_distance_to_pareto_front_simple(self):
@@ -358,17 +318,6 @@ class MyTestCase(unittest.TestCase):
         for r1, r2 in zip(result_my, result_numpy):
             self.assertEqual(r1, r2)
 
-        print(f"{'num points':10} | {'my lexsort':10} | {'np lexsort':10} |")
-        for n in range(2, 7):
-            pts = np.random.rand(10 ** n, 3)
-            t0 = time.time()
-            my_lexsort([pts[:, i] for i in range(3)])
-            t1 = time.time()
-            np.lexsort([pts[:, i] for i in range(3)])
-            t2 = time.time()
-
-            print(f"{10**n:10} | {t1-t0:.8f} | {t2-t1:.8f} |")
-
     def test_contributing_hypervolume(self):
         points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
         moa = MOArchive3d(points, reference_point=[4, 4, 4])
@@ -382,23 +331,6 @@ class MyTestCase(unittest.TestCase):
         for p in moa2d:
             self.assertAlmostEqual(moa.contributing_hypervolume(p + [0]),
                                    moa2d.contributing_hypervolume(p), places=8)
-
-        # test speed of the naive and paper implementation
-        print("TEST CONTRIBUTING HYPERVOLUME")
-        for pareto_type in ['spherical', 'linear']:
-            print(f"{pareto_type} pareto front")
-            print(f"{'archive s':10} | {'naive':10} |")
-            n_points_test = 1000
-            for n_points_archive in [2 ** i for i in range(10)]:
-                data_points = get_non_dominated_points(n_points_archive)
-                moa = MOArchive3d(data_points, reference_point=[1, 1, 1])
-
-                new_points = np.random.rand(n_points_test, 3)
-                new_points = [p.tolist() for p in new_points]
-                t0 = time.time()
-                hv1 = [moa.contributing_hypervolume(p) for p in new_points]
-                t1 = time.time()
-                print(f"{n_points_archive:10} | {t1-t0:.8f} |")
 
     def test_hypervolume_improvement(self):
         points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
@@ -428,39 +360,6 @@ class MyTestCase(unittest.TestCase):
         # make sure this doesn't change the hypervolume of the archive
         hv_end = moa.hypervolume
         self.assertAlmostEqual(hv_start, hv_end, places=8)
-
-        # test speed of the naive and paper implementation
-        print("TEST HYPERVOLUME IMPROVEMENT")
-        fig = plt.figure()
-        for pareto_type in ['spherical', 'linear']:
-            print(f"{pareto_type} pareto front")
-            print(f"{'archive s':10} | {'mila':10} | {'naive':10} |")
-            n_points_test = 1000
-            archive_sizes = [2 ** i for i in range(7)]
-            results_naive = []
-            results_mila = []
-            for n_points_archive in archive_sizes:
-                data_points = get_non_dominated_points(n_points_archive)
-                moa = MOArchive3d(data_points, reference_point=[1, 1, 1])
-
-                new_points = np.random.rand(n_points_test, 3)
-                new_points = [p.tolist() for p in new_points]
-                t0 = time.time()
-                hv1 = [moa.hypervolume_improvement(p) for p in new_points]
-                t1 = time.time()
-                hv2 = [moa.hypervolume_improvement_naive(p) for p in new_points]
-                t2 = time.time()
-
-                results_naive.append(t2-t1)
-                results_mila.append(t1-t0)
-                print(f"{n_points_archive:10} | {t1-t0:.8f} | {t2-t1:.8f} |")
-
-            plt.plot(archive_sizes, results_mila, label=f"mila {pareto_type}")
-            plt.plot(archive_sizes, results_naive, label=f"naive {pareto_type}")
-
-        plt.legend()
-        plt.title("Hypervolume improvement")
-        plt.show()
 
     def test_get_non_dominated_points(self):
         n_points = 1000
