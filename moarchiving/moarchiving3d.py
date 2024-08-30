@@ -408,35 +408,6 @@ class MOArchive3d:
 
         return kink_points
 
-    def _get_kink_points_tea(self):
-        """ Function that returns the kink points of the archive, as described in Tea's PhD"""
-        def _is_redundant(vector, existing_points):
-            if len(existing_points) == 0:
-                return False
-
-            for second in existing_points:
-                if _collinear(vector, second) or self.weakly_dominates(vector, second):
-                    return True
-            return False
-
-        def _collinear(p1, p2, tolerance=1e-9):
-            return sum(abs(p1[i] - p2[i]) < tolerance for i in range(self.n_dim)) >= 2
-
-        points_set = self.points_list
-        result = [self.reference_point]
-
-        for a in points_set:
-            candidates = [b for b in result if self.strictly_dominates(a, b)]
-            for b in candidates:
-                result.remove(b)
-
-                for k in range(3):
-                    v = b.copy()
-                    v[k] = a[k]
-                    if not _is_redundant(v, result):
-                        result.append(v)
-        return result
-
     def distance_to_pareto_front(self, f_vals, ref_factor=1):
         """ Returns the distance to the Pareto front of the archive,
         by calculating the distances to the kink points """
@@ -477,17 +448,6 @@ class MOArchive3d:
             return -1 * self.distance_to_pareto_front(f_vals)
 
         return one_contribution_3d(self.head, DLNode(x=f_vals))
-
-    def hypervolume_improvement_naive(self, f_vals):
-        """ Returns the hypervolume improvement of adding a point to the archive """
-        if f_vals in self.points_list:
-            return 0
-        if self.dominates(f_vals):
-            return -1 * self.distance_to_pareto_front(f_vals)
-
-        moa_copy = self.copy()
-        moa_copy.add(f_vals)
-        return moa_copy.hypervolume - self.hypervolume
 
     def _set_HV(self):
         """ Set the hypervolume of the archive """
@@ -566,6 +526,85 @@ class MOArchive3d:
 
         return head[0]
 
+    def preprocessing(self):
+        """ Preprocessing step to determine the closest points in x and y directions,
+        as described in the paper and implemented in the original C code. """
+        di = self.n_dim - 1
+        t = MySortedList(iterable=[self.head, self.head.next[di]],
+                         key=lambda node: (node.x[1], node.x[0]))
+
+        p = self.head.next[di].next[di]
+        stop = self.head.prev[di]
+
+        while p != stop:
+            s = t.outer_delimiter_x(p)
+            if self.weakly_dominates(s.x, p.x):
+                p.ndomr = 1
+                p = p.next[di]
+                continue
+
+            t.remove_dominated_y(p, s)
+            p.closest[0] = s
+            p.closest[1] = t.next_y(s)
+            t.add_y(p, s)
+            p = p.next[di]
+
+        t.clear()
+
+    def weakly_dominates(self, a, b, n_dim=None):
+        """ Return True if a weakly dominates b, False otherwise """
+        if n_dim is None:
+            n_dim = self.n_dim
+        return all(a[i] <= b[i] for i in range(n_dim))
+
+    def strictly_dominates(self, a, b, n_dim=None):
+        """ Return True if a strictly dominates b, False otherwise """
+        if n_dim is None:
+            n_dim = self.n_dim
+        return (all(a[i] <= b[i] for i in range(n_dim)) and
+                any(a[i] < b[i] for i in range(n_dim)))
+
+    # OLD IMPLEMENTATIONS, NOT USED IN THE CURRENT CODE
+    def hypervolume_improvement_naive(self, f_vals):
+        """ Returns the hypervolume improvement of adding a point to the archive """
+        if f_vals in self.points_list:
+            return 0
+        if self.dominates(f_vals):
+            return -1 * self.distance_to_pareto_front(f_vals)
+
+        moa_copy = self.copy()
+        moa_copy.add(f_vals)
+        return moa_copy.hypervolume - self.hypervolume
+
+    def _get_kink_points_tea(self):
+        """ Function that returns the kink points of the archive, as described in Tea's PhD"""
+        def _is_redundant(vector, existing_points):
+            if len(existing_points) == 0:
+                return False
+
+            for second in existing_points:
+                if _collinear(vector, second) or self.weakly_dominates(vector, second):
+                    return True
+            return False
+
+        def _collinear(p1, p2, tolerance=1e-9):
+            return sum(abs(p1[i] - p2[i]) < tolerance for i in range(self.n_dim)) >= 2
+
+        points_set = self.points_list
+        result = [self.reference_point]
+
+        for a in points_set:
+            candidates = [b for b in result if self.strictly_dominates(a, b)]
+            for b in candidates:
+                result.remove(b)
+
+                for k in range(3):
+                    v = b.copy()
+                    v[k] = a[k]
+                    if not _is_redundant(v, result):
+                        result.append(v)
+        return result
+
     def preprocessing_old(self):
         """ Preprocessing step to determine the closest points in x and y directions,
         as described in the paper and implemented in the original C code. """
@@ -629,51 +668,3 @@ class MOArchive3d:
             current = current.next[di]
 
         avl_tree.clear()  # Clean up AVL tree after processing
-
-    def preprocessing(self):
-        """ Preprocessing step to determine the closest points in x and y directions,
-        as described in the paper and implemented in the original C code. """
-        di = self.n_dim - 1
-        t = MySortedList(iterable=[self.head, self.head.next[di]],
-                         key=lambda node: (node.x[1], node.x[0]))
-
-        p = self.head.next[di].next[di]
-        stop = self.head.prev[di]
-        #print("head", self.head.x)
-        #print("prev", self.head.prev[di].x)
-        #print("next", self.head.next[di].x)
-
-        while p != stop:
-            #print("p:", p.x)
-            s = t.outer_delimiter_x(p)
-            if self.weakly_dominates(s.x, p.x):
-                p.ndomr = 1
-                p = p.next[di]
-                continue
-
-            t.remove_dominated_y(p, s)
-            #print("setting cx:", s.x)
-            p.closest[0] = s
-            #print("setting cy:", t.next_y(s).x)
-            p.closest[1] = t.next_y(s)
-            t.add_y(p, s)
-            # t.add(p)
-            p = p.next[di]
-            #print(t)
-            #print()
-
-        t.clear()
-
-
-    def weakly_dominates(self, a, b, n_dim=None):
-        """ Return True if a weakly dominates b, False otherwise """
-        if n_dim is None:
-            n_dim = self.n_dim
-        return all(a[i] <= b[i] for i in range(n_dim))
-
-    def strictly_dominates(self, a, b, n_dim=None):
-        """ Return True if a strictly dominates b, False otherwise """
-        if n_dim is None:
-            n_dim = self.n_dim
-        return (all(a[i] <= b[i] for i in range(n_dim)) and
-                any(a[i] < b[i] for i in range(n_dim)))
