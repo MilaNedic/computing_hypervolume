@@ -221,6 +221,32 @@ def test_hypervolume_improvement(include_naive=False):
     f_name = f"test_results/hypervolume_improvement_{date}.csv"
     df.to_csv(f_name)
 
+def test_hypervolume_calculation():
+    df = pd.DataFrame()
+    archive_sizes = list(range(10000, 100001, 10000))
+
+    print("TEST HYPERVOLUME CALCULATION")
+    for pareto_type in ['spherical', 'linear']:
+        print(f"{pareto_type} pareto front")
+        print(f"{'archive s':10} | {'hv calc':10} |")
+        results = []
+        for n_points_archive in archive_sizes:
+            data_points = get_non_dominated_points(n_points_archive, mode=pareto_type)
+            moa = MOArchive3d(data_points, reference_point=[1, 1, 1])
+
+            t0 = time.time()
+            moa.compute_hypervolume()
+            t1 = time.time()
+            t = t1 - t0
+            results.append(t)
+            print(f"{n_points_archive:10} | {t:.8f} |")
+        df[f"set_hv_{pareto_type}"] = results
+    df.index = archive_sizes
+
+    date = time.strftime("%m%d-%H%M%S")
+    f_name = f"test_results/hypervolume_calculation_{date}.csv"
+    df.to_csv(f_name)
+
 
 if __name__ == "__main__":
     # test_add(n_gen=20)
@@ -233,10 +259,14 @@ if __name__ == "__main__":
     # test_lexsort()
     # plot_performance(plot_function="lexsort", poly_degree=1)
 
-    test_contributing_hypervolume()
-    plot_performance(plot_function="contributing_hypervolume",
-                     title="(time to calculate contributing hv for one point from archive)")
+    # test_contributing_hypervolume()
+    # plot_performance(plot_function="contributing_hypervolume",
+    #                  title="(time to calculate contributing hv for one point from archive)")
 
     # test_hypervolume_improvement(include_naive=True)
     # plot_performance(plot_function="hypervolume_improvement",
     #                  title="(time to calculate hypervolume improvement for one point not in archive)")
+
+    # test_hypervolume_calculation()
+    plot_performance(plot_function="hypervolume_calculation",
+                     title="(time to calculate hv for already existing archive structure)", poly_degree=1)
