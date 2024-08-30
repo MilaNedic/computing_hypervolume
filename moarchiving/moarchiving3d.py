@@ -16,7 +16,7 @@ from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from sortedcontainers import SortedList
 import numpy as np
 import warnings as _warnings
-from moarchiving_utils import DLNode, my_lexsort
+from moarchiving_utils import DLNode, my_lexsort, MySortedList
 
 del division, print_function, unicode_literals
 
@@ -48,6 +48,8 @@ class MOArchive3d:
             self.head = self.setup_cdllist(list_of_f_vals, [inf] * self.n_dim, infos)
 
         self.preprocessing()
+        # self.print_cdllist()
+        # self.print_cxcy()
         self._set_HV()
 
     def print_cdllist(self):
@@ -66,14 +68,14 @@ class MOArchive3d:
         di = self.n_dim - 1
         print("cx and cy values:")
         current = self.head.next[di]
-        print(f"({self.head.info + ')':4} {str(self.head.x[:self.n_dim]):22} "
-              f"cx={'(' + self.head.closest[0].info + ')':4}, "
-              f"cy={'(' + self.head.closest[1].info + ')':4}",
+        print(f"({f'{self.head.info})':6} {str(self.head.x[:self.n_dim]):22} "
+              f"cx={f'({self.head.closest[0].info}),':7} "
+              f"cy={f'({self.head.closest[1].info})':6}",
               f"ndomr={self.head.ndomr}")
         while current is not None and current != self.head:
-            print(f"({current.info + ')':4} {str(current.x[:self.n_dim]):22} "
-                  f"cx={'(' + current.closest[0].info + ')':4}, "
-                  f"cy={'(' + current.closest[1].info + ')':4}",
+            print(f"({f'{current.info})':6} {str(current.x[:self.n_dim]):22} "
+                  f"cx={f'({current.closest[0].info}),':7} "
+                  f"cy={f'({current.closest[1].info})':6}",
                   f"ndomr={current.ndomr}")
             current = current.next[di] if current.next[di] != self.head else None
 
@@ -564,7 +566,7 @@ class MOArchive3d:
 
         return head[0]
 
-    def preprocessing(self):
+    def preprocessing_old(self):
         """ Preprocessing step to determine the closest points in x and y directions,
         as described in the paper and implemented in the original C code. """
         di = self.n_dim - 1  # Dimension index for sorting (z-axis in 3D)
@@ -627,6 +629,41 @@ class MOArchive3d:
             current = current.next[di]
 
         avl_tree.clear()  # Clean up AVL tree after processing
+
+    def preprocessing(self):
+        """ Preprocessing step to determine the closest points in x and y directions,
+        as described in the paper and implemented in the original C code. """
+        di = self.n_dim - 1
+        t = MySortedList(iterable=[self.head, self.head.next[di]],
+                         key=lambda node: (node.x[1], node.x[0]))
+
+        p = self.head.next[di].next[di]
+        stop = self.head.prev[di]
+        #print("head", self.head.x)
+        #print("prev", self.head.prev[di].x)
+        #print("next", self.head.next[di].x)
+
+        while p != stop:
+            #print("p:", p.x)
+            s = t.outer_delimiter_x(p)
+            if self.weakly_dominates(s.x, p.x):
+                p.ndomr = 1
+                p = p.next[di]
+                continue
+
+            t.remove_dominated_y(p, s)
+            #print("setting cx:", s.x)
+            p.closest[0] = s
+            #print("setting cy:", t.next_y(s).x)
+            p.closest[1] = t.next_y(s)
+            t.add_y(p, s)
+            # t.add(p)
+            p = p.next[di]
+            #print(t)
+            #print()
+
+        t.clear()
+
 
     def weakly_dominates(self, a, b, n_dim=None):
         """ Return True if a weakly dominates b, False otherwise """

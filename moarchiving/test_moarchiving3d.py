@@ -16,11 +16,12 @@ def list_to_set(lst):
 
 
 class MyTestCase(unittest.TestCase):
-    def test_hypervolume(self):
+    def test_hypervolume_easy(self):
         points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
-        moa = MOArchive3d(points, reference_point=[4, 4, 4])
+        moa = MOArchive3d(points, reference_point=[4, 4, 4], infos=["A", "B", "C"])
         self.assertEqual(moa.hypervolume, 13)
 
+    def test_hypervolume(self):
         for f_name in os.listdir('tests'):
             if "_3d_" not in f_name:
                 continue
@@ -38,6 +39,7 @@ class MyTestCase(unittest.TestCase):
             hv_old = calc_hypervolume_3D(data_points, ref_point)
 
             # assert hyper volumes are equal
+            print(f"{f_name:20} | {hv_new:10.8f} | {hv_old:10.8f} |")
             self.assertAlmostEqual(hv_new, hv_old, places=8)
             # assert infos are stored correctly
             self.assertEqual([str(p[:3]) for p in moa.points_list], moa.infos_list)
