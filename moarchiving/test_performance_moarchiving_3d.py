@@ -44,8 +44,10 @@ def test_add(pop_size=100, n_gen=10):
     times_one_by_one = []
     times_all_at_once = []
     times_gen_by_gen = []
+    recompute_every_gen = []
     print("TEST HYPERVOLUME AFTER ADD")
-    print(f"{'num points':10} | {'all at once':10} | {'one by one':10} | {'gen by gen':10} |")
+    print(f"{'num points':10} | {'all at once':10} | {'one by one':10} | {'gen by gen':10} "
+          f"| {'recompute':10} |")
 
     points = get_non_dominated_points(pop_size * n_gen)
     points = points.tolist()
@@ -66,15 +68,22 @@ def test_add(pop_size=100, n_gen=10):
             moa_add_gen.add_list(points[(i * pop_size):((i + 1) * pop_size)])
         t3 = time.time()
 
+        for g in range(gen):
+            moa_add_gen2 = MOArchive3d(points[:(g * pop_size)], ref_point)
+        t4 = time.time()
+
         times_all_at_once.append(t1 - t0)
         times_one_by_one.append(t2 - t1)
         times_gen_by_gen.append(t3 - t2)
+        recompute_every_gen.append(t4 - t3)
 
-        print(f"{gen * pop_size:10} | {t1 - t0:.8f} | {t2 - t1:.8f} | {t3 - t2:.8f} |")
+        print(f"{gen * pop_size:10} | {t1 - t0:.8f} | {t2 - t1:.8f} | {t3 - t2:.8f} "
+              f"| {t4 - t3:.8f} |")
 
     x = list(range(pop_size, pop_size * (n_gen + 1), pop_size))
     df = pd.DataFrame({"all_at_once": times_all_at_once,
                        "one_by_one": times_one_by_one,
+                       "recompute_every_gen": recompute_every_gen,
                        "gen_by_gen": times_gen_by_gen}, index=x)
     # add current date and time to the file name
     date = time.strftime("%m%d-%H%M%S")
@@ -249,8 +258,8 @@ def test_hypervolume_calculation():
 
 
 if __name__ == "__main__":
-    # test_add(n_gen=20)
-    # plot_performance(plot_function="add", title="(cumulative time to add points)")
+    test_add(n_gen=20)
+    plot_performance(plot_function="add", title="(cumulative time to add points)")
 
     # test_kink_points()
     # plot_performance(plot_function="kink_points", poly_degree=1,
@@ -268,5 +277,5 @@ if __name__ == "__main__":
     #                  title="(time to calculate hypervolume improvement for one point not in archive)")
 
     # test_hypervolume_calculation()
-    plot_performance(plot_function="hypervolume_calculation",
-                     title="(time to calculate hv for already existing archive structure)", poly_degree=1)
+    # plot_performance(plot_function="hypervolume_calculation",
+    #                  title="(time to calculate hv for already existing archive structure)", poly_degree=1)
