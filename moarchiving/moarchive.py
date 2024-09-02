@@ -19,5 +19,5 @@ def MOArchive(list_of_f_vals=None, ref_point=None, infos=None, n_obj=None):
     elif n_obj == 4:
         return MOArchive4d(list_of_f_vals, ref_point, infos)
     else:
-        raise ValueError(f"Unsupported number of objectives: {len(list_of_f_vals[0])}")
+        raise ValueError(f"Unsupported number of objectives: {n_obj}")
 
