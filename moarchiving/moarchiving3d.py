@@ -90,6 +90,8 @@ class MOArchive3d:
         updated in a similar way, but with the roles of the x- and
         y-coordinate switched).
         """
+        if len(new) != self.n_dim:
+            raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new}``")
 
         # q is the current point (so that we are consistent with the paper),
         # stop is the head of the list, and first_iter is a flag to check if we are at the
