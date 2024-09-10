@@ -29,8 +29,6 @@ def plot_performance(f_name=None, plot_function="add", poly_degree=2, xlabel="Ar
         ax.plot(df.index, np.polyval(p, df.index), '--', color=colors[i], alpha=0.4,
                 label=f"{p[0]:.2E} x^{poly_degree} + O(x^{poly_degree-1})")
 
-
-
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     plt.legend()
@@ -229,6 +227,7 @@ def test_hypervolume_improvement(include_naive=False):
     date = time.strftime("%m%d-%H%M%S")
     f_name = f"test_results/hypervolume_improvement_{date}.csv"
     df.to_csv(f_name)
+
 
 def test_hypervolume_calculation():
     df = pd.DataFrame()

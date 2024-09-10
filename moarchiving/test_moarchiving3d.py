@@ -3,9 +3,7 @@ from moarchiving_utils import DLNode, my_lexsort
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from hv_plus import calc_hypervolume_3D
 from point_sampling import get_non_dominated_points
-import matplotlib.pyplot as plt
 
-import time
 import unittest
 import numpy as np
 import os

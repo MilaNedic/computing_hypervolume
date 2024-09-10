@@ -4,9 +4,7 @@ from moarchiving_utils import DLNode
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from hv_plus import calc_hypervolume_4D
 from point_sampling import get_non_dominated_points
-import matplotlib.pyplot as plt
 
-import time
 import unittest
 import numpy as np
 import os
@@ -181,9 +179,6 @@ class MyTestCase(unittest.TestCase):
                 self.assertAlmostEqual(d3, d4, places=8)
                 self.assertAlmostEqual(d4, d4_no_ref, places=8)
                 self.assertAlmostEqual(d4, d4_perm, places=8)
-
-
-
 
     def _test_copy_MOArchive(self):
         pass
