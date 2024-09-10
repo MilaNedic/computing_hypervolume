@@ -13,6 +13,7 @@ __version__ = "0.6.0"
 from hv_plus import (compute_area_simple, init_sentinels_new, remove_from_z, restart_list_y,
                      lexicographic_less, one_contribution_3d, hv4dplusR)
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
+from moarchiving3d import MOArchive3d
 from moarchiving_utils import DLNode, my_lexsort
 from sortedcontainers import SortedList
 import numpy as np
@@ -196,10 +197,76 @@ class MOArchive4d:
             return self.hypervolume_improvement(f_vals)
 
     def _get_kink_points(self):
-        raise NotImplementedError()
+        """ Function that returns the kink points of the archive.
+         Kink point are calculated by making a sweep of the archive, where the state is one
+         3D archive of all possible kink points found so far, and another 3D archive which stores
+         the non-dominated points so far in the sweep """
+        if self.reference_point is None:
+            almost_inf = 1e10  # TODO: this is a hack, should be replaced by a better solution
+            ref_point = [almost_inf] * self.n_dim
+        else:
+            ref_point = self.reference_point
 
-    def distance_to_pareto_front(self, f_vals, ref_factor=1):
-        raise NotImplementedError()
+        # initialize the two states, one for points and another for kink points
+        points_state = MOArchive3d(reference_point=ref_point[:3])
+        kink_candidates = MOArchive3d([ref_point[:3]])
+        # initialize the point dictionary, which will store the fourth coordinate of the points
+        point_dict = {
+            tuple(ref_point[:3]): -inf
+        }
+        kink_points = []
+
+        for point in self.points_list:
+            # add the point to the kink state to get the dominated kink points, then take it out
+            if kink_candidates.add(point[:3]):
+                removed = kink_candidates._removed.copy()
+                for removed_point in removed:
+                    w = point_dict[tuple(removed_point)]
+                    if w < point[3]:
+                        kink_points.append([removed_point[0], removed_point[1], removed_point[2],
+                                            point[3]])
+                kink_candidates._removed.clear()
+                kink_candidates.remove(point[:3])
+
+            # add the point to the point state, and get two new kink point candidates
+            points_state.add(point[:3])
+            new_kink_candidates = points_state._get_kink_points()
+            new_kink_candidates = [p for p in new_kink_candidates if
+                                   (p[0] == point[0] or p[1] == point[1] or p[2] == point[2])]
+                                    # and p[0] < inf and p[1] < inf and p[2] < inf]
+            for p in new_kink_candidates:
+                point_dict[tuple(p)] = point[3]
+                kink_candidates.add(p)
+
+        for point in kink_candidates.points_list:
+            kink_points.append([point[0], point[1], point[2], ref_point[3]])
+
+        return kink_points
+
+    def distance_to_pareto_front(self, f_vals, ref_factor=1):  # SAME AS IN 3D
+        """ Returns the distance to the Pareto front of the archive,
+        by calculating the distances to the kink points """
+        if self.in_domain(f_vals) and not self.dominates(f_vals):
+            return 0  # return minimum distance
+
+        if self.reference_point is not None:
+            ref_di = [ref_factor * max((0, f_vals[i] - self.reference_point[i]))
+                      for i in range(self.n_dim)]
+        else:
+            ref_di = [0] * self.n_dim
+
+        points = self.points_list
+
+        if len(points) == 0:
+            return sum([ref_di[i] ** 2 for i in range(self.n_dim)]) ** 0.5
+
+        kink_points = self._get_kink_points()
+        distances_squared = []
+
+        for point in kink_points:
+            distances_squared.append(sum([max((0, f_vals[i] - point[i])) ** 2
+                                          for i in range(self.n_dim)]))
+        return min(distances_squared) ** 0.5
 
     def distance_to_hypervolume_area(self, f_vals):  # SAME AS IN 3D
         """ Returns the distance to the hypervolume area of the archive """
