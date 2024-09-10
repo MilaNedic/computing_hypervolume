@@ -128,8 +128,62 @@ class MyTestCase(unittest.TestCase):
     def _test_distance_to_pareto_front_simple(self):
         pass
 
-    def _test_distance_to_pareto_front_compare_2d(self):
-        pass
+    def test_distance_to_pareto_front_compare_2d(self):
+        # first make a pseudo 4D pareto front and compare it to 2D pareto front
+        n_points = 100
+        n_test_points = 100
+        # set random seed
+        np.random.seed(0)
+        points = np.hstack([np.random.rand(n_points, 2), np.zeros((n_points, 2))])
+
+        moa4d = MOArchive4d(points, reference_point=[1, 1, 1, 1])
+        moa2d = MOArchive2D(points[:, :2], reference_point=[1, 1])
+        moa4d_no_ref = MOArchive4d(points)
+
+        permutations = [[0, 1, 2, 3], [1, 2, 0, 3], [2, 0, 1, 3], [3, 2, 1, 0], [2, 3, 0, 1]]
+        for indices in permutations:
+            perm_points = points[:, [indices]].reshape(-1, 4)
+            moa4d_perm = MOArchive4d(perm_points, reference_point=[1, 1, 1, 1])
+
+            new_points = np.hstack([np.random.rand(n_test_points, 2), np.ones((n_test_points, 2))])
+            for point in new_points:
+                d2 = moa2d.distance_to_pareto_front(point[:2].tolist())
+                d4 = moa4d.distance_to_pareto_front(point.tolist())
+                d4_no_ref = moa4d_no_ref.distance_to_pareto_front(point.tolist())
+                d4_perm = moa4d_perm.distance_to_pareto_front(point[indices].tolist())
+                self.assertAlmostEqual(d2, d4, places=8)
+                self.assertAlmostEqual(d4, d4_no_ref, places=8)
+                self.assertAlmostEqual(d4, d4_perm, places=8)
+
+    def test_distance_to_pareto_front_compare_3d(self):
+        # first make a pseudo 4D pareto front and compare it to 3D pareto front
+        n_points = 100
+        n_test_points = 10
+        # set random seed
+        np.random.seed(0)
+        points = np.hstack([np.random.rand(n_points, 3), np.zeros((n_points, 1))])
+
+        moa4d = MOArchive4d(points, reference_point=[1, 1, 1, 1])
+        moa3d = MOArchive3d(points[:, :3], reference_point=[1, 1, 1])
+        moa4d_no_ref = MOArchive4d(points)
+
+        permutations = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 0, 1, 3], [3, 2, 1, 0], [2, 3, 0, 1]]
+        for indices in permutations:
+            perm_points = points[:, [indices]].reshape(-1, 4)
+            moa4d_perm = MOArchive4d(perm_points, reference_point=[1, 1, 1, 1])
+
+            new_points = np.hstack([np.random.rand(n_test_points, 3), np.ones((n_test_points, 1))])
+            for point in new_points:
+                d3 = moa3d.distance_to_pareto_front(point[:3].tolist())
+                d4 = moa4d.distance_to_pareto_front(point.tolist())
+                d4_no_ref = moa4d_no_ref.distance_to_pareto_front(point.tolist())
+                d4_perm = moa4d_perm.distance_to_pareto_front(point[indices].tolist())
+                self.assertAlmostEqual(d3, d4, places=8)
+                self.assertAlmostEqual(d4, d4_no_ref, places=8)
+                self.assertAlmostEqual(d4, d4_perm, places=8)
+
+
+
 
     def _test_copy_MOArchive(self):
         pass
