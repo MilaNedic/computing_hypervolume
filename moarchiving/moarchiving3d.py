@@ -47,6 +47,7 @@ class MOArchive3d:
             self.reference_point = None
             self.head = self.setup_cdllist(list_of_f_vals, [inf] * self.n_dim, infos)
 
+        self._removed = []
         self.preprocessing()
         # self.print_cdllist()
         # self.print_cxcy()
@@ -112,6 +113,7 @@ class MOArchive3d:
         best_cx_candidates = None
         best_cy_candidates = None
         inserted = False
+        removed = []
 
         while q != stop or first_iter:
             first_iter = False
@@ -124,6 +126,7 @@ class MOArchive3d:
             if all(u.x[i] <= q.x[i] for i in range(self.n_dim)):
                 q_next = q.next[di]
                 remove_from_z(q)
+                removed.append(q.x[:3])
                 q = q_next
                 continue
 
@@ -176,10 +179,12 @@ class MOArchive3d:
             u.closest[0] = best_cx_candidates
             u.closest[1] = best_cy_candidates
 
-        if update_hypervolume:
-            # TODO: maybe this can be done more efficiently, by only adding hypervolume
-            #  contribution of the new point
+        self._removed = removed
+
+        if update_hypervolume and not dominated:
             self._set_HV()
+
+        return not dominated
 
     def remove(self, f_vals):
         """
@@ -239,13 +244,6 @@ class MOArchive3d:
                 else:
                     current.closest[1] = self.head.prev[di]
 
-            """
-            # Adjust closest if it points to itself
-            if current.closest[0] == current:
-                current.closest[0] = self.head
-            if current.closest[1] == current:
-                current.closest[1] = self.head.prev[di]
-            """
             current = current.next[di]
 
         if remove_node is not None:
@@ -378,9 +376,6 @@ class MOArchive3d:
         else:
             ref_point = self.reference_point
 
-        # Add a point that will be last in the sweep, to get the last kink points
-        points = self.points_list + [[0, 0, ref_point[2]]]
-
         # initialize the two states, one for points and another for kink points
         points_state = MOArchive2D([[ref_point[0], -inf], [-inf, ref_point[1]]])
         kink_candidates = MOArchive2D([ref_point[:2]])
@@ -390,7 +385,7 @@ class MOArchive3d:
         }
         kink_points = []
 
-        for point in points:
+        for point in self.points_list:
             # add the point to the kink state to get the dominated kink points, then take it out
             if kink_candidates.add(point[:2]) is not None:
                 removed = kink_candidates._removed.copy()
@@ -407,6 +402,10 @@ class MOArchive3d:
                 p = [points_state[idx + i][0], points_state[idx - 1 + i][1]]
                 point_dict[tuple(p)] = point[2]
                 kink_candidates.add(p)
+
+        # add all the remaining kink points to the list
+        for point in kink_candidates:
+            kink_points.append([point[0], point[1], ref_point[2]])
 
         return kink_points
 
