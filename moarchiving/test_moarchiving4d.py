@@ -166,8 +166,27 @@ class MyTestCase(unittest.TestCase):
         # test other dominated points
         pass
 
-    def _test_distance_to_hypervolume_area(self):
-        pass
+    def test_distance_to_hypervolume_area(self):
+        moa = MOArchive4d()
+        self.assertEqual(0, moa.distance_to_hypervolume_area([1, 1, 1, 1]))
+
+        moa.reference_point = [2, 2, 2, 2]
+        # for points in the hypervolume area, the distance should be 0
+        self.assertEqual(0, moa.distance_to_hypervolume_area([0, 0, 0, 0]))
+        self.assertEqual(0, moa.distance_to_hypervolume_area([1, 1, 1, 1]))
+        self.assertEqual(0, moa.distance_to_hypervolume_area([2, 2, 2, 2]))
+        self.assertEqual(0, moa.distance_to_hypervolume_area([0, 1, 2, 2]))
+
+        # for points outside the hypervolume area, the distance should be the Euclidean distance
+        # to the hypervolume area
+        self.assertEqual(1, moa.distance_to_hypervolume_area([2, 2, 3, 2]))
+        self.assertEqual(1, moa.distance_to_hypervolume_area([2, 0, 3, 2]))
+        self.assertEqual(10, moa.distance_to_hypervolume_area([0, 0, 0, 12]))
+
+        self.assertAlmostEqual(np.sqrt(2), moa.distance_to_hypervolume_area([0, 3, 3, 0]), places=6)
+        self.assertAlmostEqual(np.sqrt(2), moa.distance_to_hypervolume_area([2, 3, 3, 2]), places=6)
+        self.assertAlmostEqual(np.sqrt(4), moa.distance_to_hypervolume_area([3, 3, 3, 3]), places=6)
+        self.assertAlmostEqual(np.sqrt(7**2 * 4), moa.distance_to_hypervolume_area([9, 9, 9, 9]), places=6)
 
     def test_distance_to_pareto_front_compare_2d(self):
         # first make a pseudo 4D pareto front and compare it to 2D pareto front
