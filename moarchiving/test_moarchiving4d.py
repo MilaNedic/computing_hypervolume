@@ -169,12 +169,6 @@ class MyTestCase(unittest.TestCase):
     def _test_distance_to_hypervolume_area(self):
         pass
 
-    def _test_kink_points(self):
-        pass
-
-    def _test_distance_to_pareto_front_simple(self):
-        pass
-
     def test_distance_to_pareto_front_compare_2d(self):
         # first make a pseudo 4D pareto front and compare it to 2D pareto front
         n_points = 100
@@ -280,8 +274,31 @@ class MyTestCase(unittest.TestCase):
             self.assertAlmostEqual(moa.contributing_hypervolume([0] + p),
                                    moa3d.contributing_hypervolume(p), places=8)
 
-    def _test_hypervolume_improvement(self):
-        pass
+    def test_hypervolume_improvement(self):
+        points = list(itertools.permutations([1, 2, 3, 4]))
+        moa = MOArchive4d(points, reference_point=[5, 5, 5, 5])
+        self.assertEqual(moa.hypervolume_improvement([1, 2, 3, 4]), 0)
+        self.assertEqual(moa.hypervolume_improvement([2, 3, 4, 1]), 0)
+        self.assertEqual(moa.hypervolume_improvement([3, 4, 1, 2]), 0)
+        self.assertEqual(moa.hypervolume_improvement([4, 4, 4, 4]),
+                         -moa.distance_to_pareto_front([4, 4, 4, 4]))
+
+        self.assertEqual(moa.hypervolume_improvement([1, 1, 1, 1]), 131)
+        self.assertEqual(moa.hypervolume_improvement([2, 2, 2, 2]), 20)
+        self.assertEqual(moa.hypervolume_improvement([3, 3, 3, 3]), 1)
+
+        points = np.hstack([np.zeros((100, 1)), np.random.rand(100, 3)])
+        new_points = np.random.rand(100, 3)
+        moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
+        moa3d = MOArchive3d(points[:, 1:], reference_point=[1, 1, 1])
+
+        for p in new_points:
+            p = p.tolist()
+            hv_imp2d = float(moa3d.hypervolume_improvement(p))
+            if hv_imp2d > 0:
+                self.assertAlmostEqual(hv_imp2d, moa.hypervolume_improvement([0] + p), places=8)
+            else:
+                self.assertAlmostEqual(hv_imp2d, moa.hypervolume_improvement([1] + p), places=8)
 
 
 if __name__ == '__main__':
