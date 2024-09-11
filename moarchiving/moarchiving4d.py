@@ -11,7 +11,7 @@ __license__ = "BSD 3-clause"
 __version__ = "0.6.0"
 
 from hv_plus import (compute_area_simple, init_sentinels_new, remove_from_z, restart_list_y,
-                     lexicographic_less, one_contribution_3d, hv4dplusR)
+                     lexicographic_less_4d, one_contribution_3d, hv4dplusR)
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from moarchiving3d import MOArchive3d
 from moarchiving_utils import DLNode, my_lexsort
@@ -69,27 +69,36 @@ class MOArchive4d:
         current = self.head.next[di]
         print(f"({self.head.info + ')':4} {str(self.head.x[:self.n_dim]):22} "
               f"cx={'(' + self.head.closest[0].info + ')':4}, "
-              f"cy={'(' + self.head.closest[1].info + ')':4}",
+              f"cy={'(' + self.head.closest[1].info + ')':4}, "
               f"ndomr={self.head.ndomr}")
         while current is not None and current != self.head:
             print(f"({current.info + ')':4} {str(current.x[:self.n_dim]):22} "
                   f"cx={'(' + current.closest[0].info + ')':4}, "
-                  f"cy={'(' + current.closest[1].info + ')':4}",
+                  f"cy={'(' + current.closest[1].info + ')':4}, "
                   f"ndomr={current.ndomr}")
             current = current.next[di] if current.next[di] != self.head else None
 
     def add(self, new, info=None, update_hypervolume=True):
-        raise NotImplementedError()
+        if len(new) != self.n_dim:
+            raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new}``")
+
+        if self.dominates(new) or not self.in_domain(new):
+            return False
+
+        self.__init__(self.points_list + [new], self.reference_point, self.infos_list + [info])
 
     def remove(self, f_vals):
-        raise NotImplementedError()
+        points_list = self.points_list
+        if f_vals not in points_list:
+            return False
+        self.__init__([p for p in points_list if p != f_vals], self.reference_point,
+                      [info for p, info in zip(points_list, self.infos_list) if p != f_vals])
 
-    def add_list(self, list_of_f_vals, infos=None):  # SAME AS IN 3D
+    def add_list(self, list_of_f_vals, infos=None):
         if infos is None:
             infos = [None] * len(list_of_f_vals)
         for f_val, info in zip(list_of_f_vals, infos):
-            self.add(f_val, info=info, update_hypervolume=False)
-        self._set_HV()
+            self.add(f_val, info=info)
 
     def copy(self):  # SAME AS IN 3D
         # TODO: can probably be done more efficiently (by looping over the DLL and copying nodes)
@@ -233,7 +242,6 @@ class MOArchive4d:
             new_kink_candidates = points_state._get_kink_points()
             new_kink_candidates = [p for p in new_kink_candidates if
                                    (p[0] == point[0] or p[1] == point[1] or p[2] == point[2])]
-                                    # and p[0] < inf and p[1] < inf and p[2] < inf]
             for p in new_kink_candidates:
                 point_dict[tuple(p)] = point[3]
                 kink_candidates.add(p)
