@@ -8,7 +8,7 @@ from point_sampling import get_non_dominated_points
 import unittest
 import numpy as np
 import os
-
+import itertools
 
 def list_to_set(lst):
     return set([tuple(p) for p in lst])
@@ -267,8 +267,18 @@ class MyTestCase(unittest.TestCase):
         moa.remove([1, 1, 1, 1])
         self.assertEqual(len(moa.points_list), 0)
 
-    def _test_contributing_hypervolume(self):
-        pass
+    def test_contributing_hypervolume(self):
+        points = list(itertools.permutations([1, 2, 3, 4]))
+        moa = MOArchive4d(points, reference_point=[5, 5, 5, 5])
+        for p in points:
+            self.assertEqual(moa.contributing_hypervolume(list(p)), 1)
+
+        points = np.hstack([np.zeros((100, 1)), np.random.rand(100, 3)])
+        moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
+        moa3d = MOArchive3d(points[:, 1:], reference_point=[1, 1, 1])
+        for p in moa3d.points_list:
+            self.assertAlmostEqual(moa.contributing_hypervolume([0] + p),
+                                   moa3d.contributing_hypervolume(p), places=8)
 
     def _test_hypervolume_improvement(self):
         pass

@@ -284,7 +284,7 @@ class MOArchive4d:
                     for i in range(self.n_dim)])**0.5
 
     def hypervolume_improvement(self, f_vals):
-        raise NotImplementedError()
+        return self.hypervolume_improvement_naive(f_vals)
 
     def hypervolume_improvement_naive(self, f_vals):  # SAME AS IN 3D
         """ Returns the hypervolume improvement of adding a point to the archive """

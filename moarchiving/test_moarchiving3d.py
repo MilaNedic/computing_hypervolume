@@ -7,6 +7,7 @@ from point_sampling import get_non_dominated_points
 import unittest
 import numpy as np
 import os
+import itertools
 
 
 def list_to_set(lst):
@@ -324,6 +325,11 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(moa.contributing_hypervolume([1, 2, 3]), 3)
         self.assertEqual(moa.contributing_hypervolume([2, 3, 1]), 3)
         self.assertEqual(moa.contributing_hypervolume([3, 1, 2]), 3)
+
+        points = list(itertools.permutations([1, 2, 3]))
+        moa = MOArchive3d(points, reference_point=[4, 4, 4])
+        for p in points:
+            self.assertEqual(moa.contributing_hypervolume(list(p)), 1)
 
         points = np.hstack([np.random.rand(100, 2), np.zeros((100, 1))])
         moa = MOArchive3d(points, reference_point=[1, 1, 1])
