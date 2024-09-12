@@ -48,6 +48,7 @@ class MOArchive4d:
             self.reference_point = None
             self.head = self.setup_cdllist(list_of_f_vals, [inf] * self.n_dim, infos)
 
+        self._hypervolume_already_computed = False
         self.remove_dominated()
         self._set_HV()
 
@@ -97,11 +98,10 @@ class MOArchive4d:
     def add_list(self, list_of_f_vals, infos=None):
         if infos is None:
             infos = [None] * len(list_of_f_vals)
-        for f_val, info in zip(list_of_f_vals, infos):
-            self.add(f_val, info=info)
+
+        self.__init__(self.points_list + list_of_f_vals, self.reference_point, self.infos_list + infos)
 
     def copy(self):  # SAME AS IN 3D
-        # TODO: can probably be done more efficiently (by looping over the DLL and copying nodes)
         return MOArchive4d(self.points_list, self.reference_point, self.infos_list)
 
     def dominates(self, f_val):  # SAME AS IN 3D
@@ -303,6 +303,8 @@ class MOArchive4d:
         return self._hypervolume
 
     def compute_hypervolume(self):
+        if self._hypervolume_already_computed:
+            return self._hypervolume
         return hv4dplusR(self.head)
 
     def setup_cdllist(self, data, ref, infos):  # SAME AS IN 3D

@@ -136,7 +136,12 @@ class MyTestCase(unittest.TestCase):
             for i in range(gen * pop_size):
                 moa_add.add(points[i])
 
+            moa_add_list = MOArchive4d([], ref_point)
+            for i in range(gen):
+                moa_add_list.add_list(points[i * pop_size:(i + 1) * pop_size])
+
             self.assertAlmostEqual(moa_add.hypervolume, true_hv, places=6)
+            self.assertAlmostEqual(moa_add_list.hypervolume, true_hv, places=6)
 
     def test_dominates(self):
         moa = get_small_test_archive()
