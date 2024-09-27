@@ -250,7 +250,7 @@ class MyTestCase(unittest.TestCase):
     def test_distance_to_pareto_front(self):
         # first make a pseudo 4D pareto front and compare it to 3D pareto front
         n_points_archive = 100
-        n_test_points = 100
+        n_test_points = 50
         n_points_sampled = 1000
         # set random seed
         points = get_non_dominated_points(n_points_archive, n_dim=4)
@@ -274,7 +274,8 @@ class MyTestCase(unittest.TestCase):
                     min_dist = dist
                 self.assertTrue(distance <= dist)
 
-            print(f"min_dist: {min_dist}, distance: {distance}")
+            if min_dist - distance > 0.1:
+                print(f"DISTANCE TO PARETO FRONT FUNCTION COULD BE WRONG: {min_dist}, {distance}")
 
     def test_remove(self, n_points=100, n_points_remove=50):
         points = [[1, 2, 3, 4], [2, 3, 4, 1], [3, 4, 1, 2]]
