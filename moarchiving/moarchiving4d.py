@@ -1,16 +1,7 @@
 # -*- coding: utf-8 -*-
-"""This module contains, for the time being, a single MOO archive class.
-
-A bi-objective nondominated archive as sorted list with incremental
-update in logarithmic time.
-
-"""
-from hv_plus import init_sentinels_new, hv4dplusR
+from hv_plus import hv4dplusR
 from moarchiving3d import MOArchive3d
-from moarchiving_utils import DLNode, my_lexsort
-import numpy as np
 from moarchiving_parent import MOArchiveParent
-
 
 inf = float('inf')
 
@@ -46,7 +37,6 @@ class MOArchive4d(MOArchiveParent):
         self.__init__(self.points_list + list_of_f_vals, self.reference_point, self.infos_list + infos)
 
     def copy(self):
-        # TODO: can probably be done more efficiently (by looping over the DLL and copying nodes)
         return MOArchive4d(self.points_list, self.reference_point, self.infos_list)
 
     def _get_kink_points(self):
@@ -55,7 +45,7 @@ class MOArchive4d(MOArchiveParent):
          3D archive of all possible kink points found so far, and another 3D archive which stores
          the non-dominated points so far in the sweep """
         if self.reference_point is None:
-            almost_inf = 1e10  # TODO: this is a hack, should be replaced by a better solution
+            almost_inf = 1e10  # TODO: this is a hack, but I don't find a better way to do it...
             ref_point = [almost_inf] * self.n_dim
         else:
             ref_point = self.reference_point
@@ -116,16 +106,14 @@ class MOArchive4d(MOArchiveParent):
 
     def remove_dominated(self):
         """ Preprocessing step to remove dominated points. """
-        di = self.n_dim - 1  # Dimension index for sorting (z-axis in 3D)
+        di = self.n_dim - 1
         current = self.head.next[di]
         stop = self.head.prev[di]
 
-        # Using SortedList to manage nodes by their y-coordinate, supporting custom sorting needs
         non_dominated_points = []
         dominated_points = []
 
         while current != stop:
-            # Check if current node is dominated by any previous node in avl_tree
             dominated = False
             for node in non_dominated_points:
                 if node != current and all(node.x[i] <= current.x[i] for i in range(3)) and any(

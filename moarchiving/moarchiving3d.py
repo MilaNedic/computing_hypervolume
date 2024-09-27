@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
-"""This module contains, for the time being, a single MOO archive class.
-
-A bi-objective nondominated archive as sorted list with incremental
-update in logarithmic time.
-
-"""
 from hv_plus import (compute_area_simple, remove_from_z, restart_list_y,
                      lexicographic_less, one_contribution_3d)
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
-from sortedcontainers import SortedList
-import warnings as _warnings
 from moarchiving_utils import DLNode, MySortedList
 from moarchiving_parent import MOArchiveParent
+
+import warnings as _warnings
+from sortedcontainers import SortedList
 
 inf = float('inf')
 

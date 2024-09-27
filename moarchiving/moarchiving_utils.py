@@ -106,6 +106,7 @@ class MySortedList(SortedKeyList):
         elif p.x[0] < self.head_x().x[0] and s is None:
             self.add(p)
 
+
 def my_lexsort(keys):
     """ Sort an array of keys in lexicographic order and return the indices.
     Equivalent to np.lexsort """
