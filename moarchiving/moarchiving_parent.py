@@ -36,6 +36,7 @@ class MOArchiveParent:
         else:
             self.reference_point = None
             self.head = self.setup_cdllist(list_of_f_vals, [inf] * self.n_dim, infos)
+        self._kink_points = None
 
     def print_cdllist(self):
         """ For debugging purposes: print the circular doubly linked list"""
@@ -196,10 +197,11 @@ class MOArchiveParent:
         if len(points) == 0:
             return sum([ref_di[i] ** 2 for i in range(self.n_dim)]) ** 0.5
 
-        kink_points = self._get_kink_points()
+        if self._kink_points is None:
+            self._kink_points = self._get_kink_points()
         distances_squared = []
 
-        for point in kink_points:
+        for point in self._kink_points:
             distances_squared.append(sum([max((0, f_vals[i] - point[i])) ** 2
                                           for i in range(self.n_dim)]))
         return min(distances_squared) ** 0.5

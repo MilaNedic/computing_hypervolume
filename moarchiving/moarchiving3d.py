@@ -125,6 +125,7 @@ class MOArchive3d(MOArchiveParent):
             u.closest[1] = best_cy_candidates
 
         self._removed = removed
+        self._kink_points = None
 
         if update_hypervolume and not dominated:
             self._set_HV()
@@ -197,6 +198,7 @@ class MOArchive3d(MOArchiveParent):
             _warnings.warn(f"Point {f_vals} not found in the archive")
 
         T.clear()  # Clean up AVL tree after processing
+        self._kink_points = None
         self._set_HV()
 
     def add_list(self, list_of_f_vals, infos=None):
@@ -207,9 +209,7 @@ class MOArchive3d(MOArchiveParent):
         self._set_HV()
 
     def copy(self):
-        # TODO: can probably be done more efficiently (by looping over the DLL and copying nodes)
         return MOArchive3d(self.points_list, self.reference_point, self.infos_list)
-
 
     def _get_kink_points(self):
         """ Function that returns the kink points of the archive.

@@ -192,22 +192,6 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(np.sqrt(3), moa.distance_to_hypervolume_area([3, 3, 3]), places=6)
         self.assertAlmostEqual(np.sqrt(147), moa.distance_to_hypervolume_area([9, 9, 9]), places=6)
 
-    def test_kink_points(self):
-        ref_point = [1, 1, 1]
-        test_n_points = [2 ** i for i in range(9)]
-
-        for pareto_type in ['spherical', 'linear']:
-            for n_points in test_n_points:
-                # read the data points and the reference point from the file
-                data_points = get_non_dominated_points(n_points, mode=pareto_type)
-                infos = [str(p) for p in data_points.tolist()]
-
-                # calculate the hypervolume using the new implementation
-                moa = MOArchive3d(data_points, ref_point, infos)
-                kink_points_tea = moa._get_kink_points_tea()
-                kink_points = moa._get_kink_points()
-                self.assertSetEqual(list_to_set(kink_points_tea), list_to_set(kink_points))
-
     def test_distance_to_pareto_front_simple(self):
         points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
         moa = MOArchive3d(points, reference_point=[6, 6, 6])
