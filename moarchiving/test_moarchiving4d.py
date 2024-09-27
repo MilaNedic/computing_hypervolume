@@ -247,6 +247,35 @@ class MyTestCase(unittest.TestCase):
                 self.assertAlmostEqual(d4, d4_no_ref, places=8)
                 self.assertAlmostEqual(d4, d4_perm, places=8)
 
+    def test_distance_to_pareto_front(self):
+        # first make a pseudo 4D pareto front and compare it to 3D pareto front
+        n_points_archive = 100
+        n_test_points = 100
+        n_points_sampled = 1000
+        # set random seed
+        points = get_non_dominated_points(n_points_archive, n_dim=4)
+        moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
+
+        for i in range(n_test_points):
+            point = np.random.rand(4).tolist()
+            while not moa.dominates(point):
+                point = np.random.rand(4).tolist()
+            distance = moa.distance_to_pareto_front(point)
+
+            min_dist = 2
+            for j in range(n_points_sampled):
+                k = 0.7
+                sample = (np.array(point) + np.random.normal(0, k * distance, 4)).tolist()
+                while moa.dominates(sample):
+                    sample = (np.array(point) + np.random.normal(0, k * distance, 4)).tolist()
+                    k += 0.01
+                dist = np.linalg.norm(np.array(point) - np.array(sample))
+                if dist < min_dist:
+                    min_dist = dist
+                self.assertTrue(distance <= dist)
+
+            print(f"min_dist: {min_dist}, distance: {distance}")
+
     def test_remove(self, n_points=100, n_points_remove=50):
         points = [[1, 2, 3, 4], [2, 3, 4, 1], [3, 4, 1, 2]]
         moa_remove = MOArchive4d(points, reference_point=[6, 6, 6, 6])
