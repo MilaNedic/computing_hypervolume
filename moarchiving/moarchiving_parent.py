@@ -5,8 +5,7 @@ A bi-objective nondominated archive as sorted list with incremental
 update in logarithmic time.
 
 """
-from hv_plus import init_sentinels_new
-from moarchiving_utils import DLNode, my_lexsort
+from moarchiving_utils import DLNode, my_lexsort, init_sentinels_new
 import numpy as np
 
 

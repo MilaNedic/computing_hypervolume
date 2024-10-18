@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from hv_plus import (compute_area_simple, remove_from_z, restart_list_y,
-                     lexicographic_less, one_contribution_3d)
 from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
-from moarchiving_utils import DLNode, MySortedList
+from moarchiving_utils import (DLNode, MySortedList, compute_area_simple, remove_from_z,
+                               restart_list_y, lexicographic_less, one_contribution_3d)
 from moarchiving_parent import MOArchiveParent
 
 import warnings as _warnings
