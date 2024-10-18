@@ -1,30 +1,54 @@
 import math
 import random
-import numpy as np
 
 
 def get_non_dominated_points(n_points, n_dim=3, mode='spherical'):
     if n_dim == 3:
         if mode == 'spherical':
-            return np.array(spherical_front_3d(1, n_points, normalized=False))
+            return spherical_front_3d(1, n_points, normalized=False)
         elif mode == 'linear':
-            return np.array(linear_front_3d(1, n_points, normalized=False))
+            return linear_front_3d(1, n_points, normalized=False)
     elif n_dim == 4:
         if mode == 'spherical':
-            return np.array(spherical_front_4d(1, n_points, normalized=False))
+            return spherical_front_4d(1, n_points, normalized=False)
         elif mode == 'linear':
-            return np.array(linear_front_4d(1, n_points, normalized=False))
+            return linear_front_4d(1, n_points, normalized=False)
     else:
         raise ValueError("Invalid number of dimensions")
+
+
+def get_random_points(n_points, n_dim):
+    return [[random.random() for _ in range(n_dim)] for _ in range(n_points)]
+
+
+def get_stacked_points(n_points, points_definitions):
+    points = []
+    for i in range(n_points):
+        points.append([])
+        for p_def in points_definitions:
+            if p_def == 'random':
+                points[-1].append(random.random())
+            elif type(p_def) is int:
+                points[-1].append(p_def)
+            else:
+                raise ValueError("Invalid point definition")
+
+    return points
+
+
+def permute_points(points, permutation):
+    """ takes a list of points (n x dim) and a permutation (dim)
+    and returns the points with the permutation applied """
+    return [[point[permutation[i]] for i in range(len(permutation))] for point in points]
 
 
 def spherical_front_3d(distance, num_points, normalized=True):
     vectors = []
 
     if normalized:
-        v1 = np.array([0, 0, distance])
-        v2 = np.array([0, distance, 0])
-        v3 = np.array([distance, 0, 0])
+        v1 = [0, 0, distance]
+        v2 = [0, distance, 0]
+        v3 = [distance, 0, 0]
         vectors = [v1, v2, v3]
 
     while len(vectors) < num_points:
@@ -44,17 +68,18 @@ def spherical_front_3d(distance, num_points, normalized=True):
                 distance * math.cos(alpha)]
         vectors.append(vect)
 
-    return np.array(vectors)
+    return vectors
 
 
 def linear_front_3d(distance, num_points, normalized):
     vectors = []
 
     if normalized:
-        v1 = np.array([0, 0, distance])
-        v2 = np.array([0, distance, 0])
-        v3 = np.array([distance, 0, 0])
+        v1 = [1, 1, 1 - distance]
+        v2 = [1, 1 - distance, 1]
+        v3 = [1 - distance, 1, 1]
         vectors = [v1, v2, v3]
+
     while len(vectors) < num_points:
         array = [0.0]
         for _ in range(2):
@@ -62,14 +87,11 @@ def linear_front_3d(distance, num_points, normalized):
         array.append(distance)
         array.sort()
 
-        x = array[1] - array[0]
-        y = array[2] - array[1]
-        z = array[3] - array[2]
+        x = 1 - (array[1] - array[0])
+        y = 1 - (array[2] - array[1])
+        z = 1 - (array[3] - array[2])
+        vectors.append([x, y, z])
 
-        v = [x, y, z]
-        vectors.append(np.array(v))
-
-    vectors = np.array([1, 1, 1]) - vectors
     return vectors
 
 
@@ -77,14 +99,14 @@ def linear_front_4d(distance, num_points, normalized):
     vectors = []
 
     if normalized:
-        v1 = np.array([0, 0, 0, distance])
-        v2 = np.array([0, 0, distance, 0])
-        v3 = np.array([0, distance, 0, 0])
-        v4 = np.array([distance, 0, 0, 0])
+        v1 = [0, 0, 0, distance]
+        v2 = [0, 0, distance, 0]
+        v3 = [0, distance, 0, 0]
+        v4 = [distance, 0, 0, 0]
         vectors = [v1, v2, v3, v4]
 
     while len(vectors) < num_points:
-        array = [0.0] + [distance * np.random.random() for _ in range(3)] + [distance]
+        array = [0.0] + [distance * random.random() for _ in range(3)] + [distance]
         array.sort()
 
         x = array[1] - array[0]
@@ -92,7 +114,7 @@ def linear_front_4d(distance, num_points, normalized):
         z = array[3] - array[2]
         w = array[4] - array[3]
 
-        v = np.array([x, y, z, w])
+        v = [x, y, z, w]
         vectors.append(v)
 
     return vectors
@@ -102,10 +124,10 @@ def spherical_front_4d(distance, num_points, normalized):
     vectors = []
 
     if normalized:
-        v1 = np.array([0, 0, 0, distance])
-        v2 = np.array([0, 0, distance, 0])
-        v3 = np.array([0, distance, 0, 0])
-        v4 = np.array([distance, 0, 0, 0])
+        v1 = [0, 0, 0, distance]
+        v2 = [0, 0, distance, 0]
+        v3 = [0, distance, 0, 0]
+        v4 = [distance, 0, 0, 0]
         vectors = [v1, v2, v3, v4]
 
     while len(vectors) < num_points:
@@ -121,12 +143,12 @@ def spherical_front_4d(distance, num_points, normalized):
         beta = math.atan(math.sqrt(z * z + w * w) / y)
         gamma = 2 * math.atan(z / (math.sqrt(z * z + w * w) + w))
 
-        v = np.array([
+        v = [
             distance * math.cos(alpha),
             distance * math.sin(alpha) * math.cos(beta),
             distance * math.sin(alpha) * math.sin(beta) * math.cos(gamma),
             distance * math.sin(alpha) * math.sin(beta) * math.sin(gamma)
-        ])
+        ]
         vectors.append(v)
     return vectors
 

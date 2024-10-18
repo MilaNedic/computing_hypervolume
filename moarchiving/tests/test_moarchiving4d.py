@@ -1,11 +1,15 @@
+import random
+
 from moarchiving.moarchiving3d import MOArchive3d
 from moarchiving.moarchiving4d import MOArchive4d
 from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
-from moarchiving.tests.point_sampling import get_non_dominated_points
+from moarchiving.tests.point_sampling import (get_non_dominated_points, get_stacked_points,
+                                              get_random_points, permute_points)
 
 import unittest
-import numpy as np
 import itertools
+import math
+
 
 def list_to_set(lst):
     return set([tuple(p) for p in lst])
@@ -98,7 +102,6 @@ class MyTestCase(unittest.TestCase):
         pop_size = 100
         n_gen = 4
         points = get_non_dominated_points(pop_size * n_gen, n_dim=4)
-        points = points.tolist()
 
         for gen in range(1, n_gen + 1):
             print(f"gen: {gen}")
@@ -161,34 +164,33 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(1, moa.distance_to_hypervolume_area([2, 0, 3, 2]))
         self.assertEqual(10, moa.distance_to_hypervolume_area([0, 0, 0, 12]))
 
-        self.assertAlmostEqual(np.sqrt(2), moa.distance_to_hypervolume_area([0, 3, 3, 0]), places=6)
-        self.assertAlmostEqual(np.sqrt(2), moa.distance_to_hypervolume_area([2, 3, 3, 2]), places=6)
-        self.assertAlmostEqual(np.sqrt(4), moa.distance_to_hypervolume_area([3, 3, 3, 3]), places=6)
-        self.assertAlmostEqual(np.sqrt(7**2 * 4), moa.distance_to_hypervolume_area([9, 9, 9, 9]), places=6)
+        self.assertAlmostEqual(math.sqrt(2), moa.distance_to_hypervolume_area([0, 3, 3, 0]), places=6)
+        self.assertAlmostEqual(math.sqrt(2), moa.distance_to_hypervolume_area([2, 3, 3, 2]), places=6)
+        self.assertAlmostEqual(math.sqrt(4), moa.distance_to_hypervolume_area([3, 3, 3, 3]), places=6)
+        self.assertAlmostEqual(math.sqrt(7**2 * 4), moa.distance_to_hypervolume_area([9, 9, 9, 9]), places=6)
 
     def test_distance_to_pareto_front_compare_2d(self):
         # first make a pseudo 4D pareto front and compare it to 2D pareto front
         n_points = 100
         n_test_points = 100
         # set random seed
-        np.random.seed(0)
-        points = np.hstack([np.random.rand(n_points, 2), np.zeros((n_points, 2))])
+        points = get_stacked_points(n_points, ['random', 'random', 0, 0])
 
         moa4d = MOArchive4d(points, reference_point=[1, 1, 1, 1])
-        moa2d = MOArchive2D(points[:, :2], reference_point=[1, 1])
+        moa2d = MOArchive2D([[p[0], p[1]] for p in points], reference_point=[1, 1])
         moa4d_no_ref = MOArchive4d(points)
 
         permutations = [[0, 1, 2, 3], [1, 2, 0, 3], [2, 0, 1, 3], [3, 2, 1, 0], [2, 3, 0, 1]]
-        for indices in permutations:
-            perm_points = points[:, [indices]].reshape(-1, 4)
+        for permutation in permutations:
+            perm_points = permute_points(points, permutation)
             moa4d_perm = MOArchive4d(perm_points, reference_point=[1, 1, 1, 1])
 
-            new_points = np.hstack([np.random.rand(n_test_points, 2), np.ones((n_test_points, 2))])
+            new_points = get_stacked_points(n_test_points, ['random', 'random', 1, 1])
             for point in new_points:
-                d2 = moa2d.distance_to_pareto_front(point[:2].tolist())
-                d4 = moa4d.distance_to_pareto_front(point.tolist())
-                d4_no_ref = moa4d_no_ref.distance_to_pareto_front(point.tolist())
-                d4_perm = moa4d_perm.distance_to_pareto_front(point[indices].tolist())
+                d2 = moa2d.distance_to_pareto_front(point[:2])
+                d4 = moa4d.distance_to_pareto_front(point)
+                d4_no_ref = moa4d_no_ref.distance_to_pareto_front(point)
+                d4_perm = moa4d_perm.distance_to_pareto_front(permute_points([point], permutation)[0])
                 self.assertAlmostEqual(d2, d4, places=8)
                 self.assertAlmostEqual(d4, d4_no_ref, places=8)
                 self.assertAlmostEqual(d4, d4_perm, places=8)
@@ -198,24 +200,23 @@ class MyTestCase(unittest.TestCase):
         n_points = 100
         n_test_points = 10
         # set random seed
-        np.random.seed(0)
-        points = np.hstack([np.random.rand(n_points, 3), np.zeros((n_points, 1))])
+        points = get_stacked_points(n_points, ['random', 'random', 'random', 0])
 
         moa4d = MOArchive4d(points, reference_point=[1, 1, 1, 1])
-        moa3d = MOArchive3d(points[:, :3], reference_point=[1, 1, 1])
+        moa3d = MOArchive3d([[p[0], p[1], p[2]] for p in points], reference_point=[1, 1, 1])
         moa4d_no_ref = MOArchive4d(points)
 
         permutations = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 0, 1, 3], [3, 2, 1, 0], [2, 3, 0, 1]]
-        for indices in permutations:
-            perm_points = points[:, [indices]].reshape(-1, 4)
+        for permutation in permutations:
+            perm_points = permute_points(points, permutation)
             moa4d_perm = MOArchive4d(perm_points, reference_point=[1, 1, 1, 1])
 
-            new_points = np.hstack([np.random.rand(n_test_points, 3), np.ones((n_test_points, 1))])
+            new_points = get_stacked_points(n_test_points, ['random', 'random', 'random', 1])
             for point in new_points:
-                d3 = moa3d.distance_to_pareto_front(point[:3].tolist())
-                d4 = moa4d.distance_to_pareto_front(point.tolist())
-                d4_no_ref = moa4d_no_ref.distance_to_pareto_front(point.tolist())
-                d4_perm = moa4d_perm.distance_to_pareto_front(point[indices].tolist())
+                d3 = moa3d.distance_to_pareto_front(point[:3])
+                d4 = moa4d.distance_to_pareto_front(point)
+                d4_no_ref = moa4d_no_ref.distance_to_pareto_front(point)
+                d4_perm = moa4d_perm.distance_to_pareto_front(permute_points([point], permutation)[0])
                 self.assertAlmostEqual(d3, d4, places=8)
                 self.assertAlmostEqual(d4, d4_no_ref, places=8)
                 self.assertAlmostEqual(d4, d4_perm, places=8)
@@ -230,19 +231,18 @@ class MyTestCase(unittest.TestCase):
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
 
         for i in range(n_test_points):
-            point = np.random.rand(4).tolist()
+            point = get_random_points(1, 4)[0]
             while not moa.dominates(point):
-                point = np.random.rand(4).tolist()
+                point = get_random_points(1, 4)[0]
             distance = moa.distance_to_pareto_front(point)
 
             min_dist = 2
             for j in range(n_points_sampled):
-                k = 0.7
-                sample = (np.array(point) + np.random.normal(0, k * distance, 4)).tolist()
+                sample = [p + random.gauss(0, distance) for p in point]
                 while moa.dominates(sample):
-                    sample = (np.array(point) + np.random.normal(0, k * distance, 4)).tolist()
-                    k += 0.01
-                dist = np.linalg.norm(np.array(point) - np.array(sample))
+                    sample = [p + random.gauss(0, distance) for p in point]
+
+                dist = math.sqrt(sum([(p - s) ** 2 for p, s in zip(point, sample)]))
                 if dist < min_dist:
                     min_dist = dist
                 self.assertTrue(distance <= dist)
@@ -261,16 +261,16 @@ class MyTestCase(unittest.TestCase):
 
         points = get_non_dominated_points(n_points, n_dim=4)
 
-        remove_idx = np.random.choice(range(n_points), n_points_remove, replace=False)
+        remove_idx = list(range(n_points_remove))
         keep_idx = [i for i in range(n_points) if i not in remove_idx]
 
-        moa_true = MOArchive4d(points[keep_idx, :], reference_point=[1, 1, 1, 1])
+        moa_true = MOArchive4d([points[i] for i in keep_idx], reference_point=[1, 1, 1, 1])
         moa_remove = MOArchive4d(points, reference_point=[1, 1, 1, 1])
         for i in remove_idx:
-            moa_remove.remove(points[i].tolist())
+            moa_remove.remove(points[i])
         moa_add = MOArchive4d([], reference_point=[1, 1, 1, 1])
         for i in keep_idx:
-            moa_add.add(points[i].tolist())
+            moa_add.add(points[i])
 
         # assert that the points are the same in all archives and the hypervolume is the same
         self.assertEqual(len(moa_add.points_list), len(moa_true.points_list))
@@ -294,9 +294,10 @@ class MyTestCase(unittest.TestCase):
         for p in points:
             self.assertEqual(moa.contributing_hypervolume(list(p)), 1)
 
-        points = np.hstack([np.zeros((100, 1)), np.random.rand(100, 3)])
+        points = get_stacked_points(100, [0, 'random', 'random', 'random'])
+
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
-        moa3d = MOArchive3d(points[:, 1:], reference_point=[1, 1, 1])
+        moa3d = MOArchive3d([[p[1], p[2], p[3]] for p in points], reference_point=[1, 1, 1])
         for p in moa3d.points_list:
             self.assertAlmostEqual(moa.contributing_hypervolume([0] + p),
                                    moa3d.contributing_hypervolume(p), places=8)
@@ -314,13 +315,12 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(moa.hypervolume_improvement([2, 2, 2, 2]), 20)
         self.assertEqual(moa.hypervolume_improvement([3, 3, 3, 3]), 1)
 
-        points = np.hstack([np.zeros((100, 1)), np.random.rand(100, 3)])
-        new_points = np.random.rand(100, 3)
+        points = get_stacked_points(100, [0, 'random', 'random', 'random'])
+        new_points = get_random_points(100, 3)
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
-        moa3d = MOArchive3d(points[:, 1:], reference_point=[1, 1, 1])
+        moa3d = MOArchive3d([[p[1], p[2], p[3]] for p in points], reference_point=[1, 1, 1])
 
         for p in new_points:
-            p = p.tolist()
             hv_imp2d = float(moa3d.hypervolume_improvement(p))
             if hv_imp2d > 0:
                 self.assertAlmostEqual(hv_imp2d, moa.hypervolume_improvement([0] + p), places=8)

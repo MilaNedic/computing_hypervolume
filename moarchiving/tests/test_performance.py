@@ -1,10 +1,10 @@
 from moarchiving.moarchive import MOArchive
 from moarchiving.moarchiving_utils import my_lexsort
 from point_sampling import get_non_dominated_points
+
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import pandas as pd
-
 import time
 import numpy as np
 import os
