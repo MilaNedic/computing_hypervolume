@@ -11,27 +11,36 @@ inf = float('inf')
 
 
 class MOArchive3d(MOArchiveParent):
+    """ Class for storing a set of non-dominated points in 3D space and efficiently calculating
+    hypervolume with respect to the given reference point.
+    The archive is implemented as a doubly linked list, and can be modified using functions
+    add and remove. Points of the archive can be accessed as a list of points order by the third
+    coordinate using function points_list.
+    """
+
     def __init__(self, list_of_f_vals=None, reference_point=None, infos=None):
-        """Create a new 3D archive. """
+        """Create a new 3D archive object.
+        Args:
+            list_of_f_vals: list of objective vectors
+            reference_point: reference point for the archive
+            infos: list of additional information for each objective vector,
+            must be the same length as list_of_f_vals
+        """
         super().__init__(list_of_f_vals, reference_point, infos, 3)
 
         self._removed = []
         self.preprocessing()
         self._set_HV()
 
-    def add(self, new, info=None, update_hypervolume=True):
+    def add(self, new_point, info=None, update_hypervolume=True):
+        """ Adds a new point to the archive, and updates the hypervolume if needed.
+        Args:
+            new_point: the new point to add
+            info: additional information about the point
+            update_hypervolume: whether to update the hypervolume after adding the point
         """
-        4) Data Structure Updates: Adding a new point u to the
-        data structure maintained by HV3D+ requires setting attributes
-        u.cx and u.cy, updating the corresponding attributes of the
-        remaining points in the lexicographically sorted list Q, and
-        inserting u into Q. These operations are performed in linear
-        time in a single sweep of Q, as follows (cy attributes are
-        updated in a similar way, but with the roles of the x- and
-        y-coordinate switched).
-        """
-        if len(new) != self.n_dim:
-            raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new}``")
+        if len(new_point) != self.n_dim:
+            raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new_point}``")
 
         # q is the current point (so that we are consistent with the paper),
         # stop is the head of the list, and first_iter is a flag to check if we are at the
@@ -42,8 +51,8 @@ class MOArchive3d(MOArchiveParent):
 
         # Add 0.0 for 3d points so that it matches the original C code and create a new node object
         if self.n_dim == 3:
-            new = new + [0.0]
-        u = DLNode(x=new, info=info)
+            new_point = new_point + [0.0]
+        u = DLNode(x=new_point, info=info)
         di = self.n_dim - 1
 
         # loop over all the points in the archive and save the best candidates for cx and cy,
@@ -64,7 +73,7 @@ class MOArchive3d(MOArchiveParent):
             # check if the new point dominates the current point
             if all(u.x[i] <= q.x[i] for i in range(self.n_dim)):
                 q_next = q.next[di]
-                remove_from_z(q)
+                remove_from_z(q, archive_dim=self.n_dim)
                 removed.append(q.x[:3])
                 q = q_next
                 continue
@@ -126,15 +135,10 @@ class MOArchive3d(MOArchiveParent):
 
         return not dominated
 
-    def remove(self, f_vals):
-        """
-        Removing a point u ∈ Q also requires updating the cx and
-        cy attributes of the remaining points, as follows.
-        1) For every p ∈ Q \ {u} such that p.cx = u, set p.cx to the
-        point q ∈ Q \ {u} with the smallest qx > p_x such that
-        q_y < py and q <L p (and analogously for p.cy). If such
-        a point is not unique, the alternative with the smallest
-        q_y (respectively, q_x) is preferred.
+    def remove(self, remove_point):
+        """ Removes a point from the archive, and updates the hypervolume.
+        Args:
+            remove_point: the point that should be removed
         """
 
         di = self.n_dim - 1  # Dimension index for sorting (z-axis in 3D)
@@ -150,7 +154,7 @@ class MOArchive3d(MOArchiveParent):
         remove_node = None
 
         while current != stop:
-            if current.x[:3] == f_vals:
+            if current.x[:3] == remove_point:
                 remove_node = current
                 current = current.next[di]
                 continue
@@ -162,7 +166,7 @@ class MOArchive3d(MOArchiveParent):
             for node in nodes_to_remove:
                 T.remove(node)
 
-            if current.closest[0].x[:3] == f_vals:
+            if current.closest[0].x[:3] == remove_point:
                 # For every p ∈ Q \ {u} such that p.cx = u, set p.cx to the
                 #         point q ∈ Q \ {u} with the smallest q_x > p_x such that
                 #         q_y < p_y and q <L p
@@ -173,7 +177,7 @@ class MOArchive3d(MOArchiveParent):
                 else:
                     current.closest[0] = self.head
 
-            if current.closest[1].x[:3] == f_vals:
+            if current.closest[1].x[:3] == remove_point:
                 # For every p ∈ Q \ {u} such that p.cy = u, set p.cy to the
                 #         point q ∈ Q \ {u} with the smallest q_y > p_y such that
                 #         q_x < p_x and q <L p
@@ -187,15 +191,20 @@ class MOArchive3d(MOArchiveParent):
             current = current.next[di]
 
         if remove_node is not None:
-            remove_from_z(remove_node)
+            remove_from_z(remove_node, archive_dim=self.n_dim)
         else:
-            _warnings.warn(f"Point {f_vals} not found in the archive")
+            _warnings.warn(f"Point {remove_point} not found in the archive")
 
         T.clear()  # Clean up AVL tree after processing
         self._kink_points = None
         self._set_HV()
 
     def add_list(self, list_of_f_vals, infos=None):
+        """ Adds a list of points to the archive, and updates the hypervolume.
+        Args:
+            list_of_f_vals: list of points to add
+            infos: additional information about the points
+        """
         if infos is None:
             infos = [None] * len(list_of_f_vals)
         for f_val, info in zip(list_of_f_vals, infos):
@@ -203,6 +212,7 @@ class MOArchive3d(MOArchiveParent):
         self._set_HV()
 
     def copy(self):
+        """ Returns a copy of the archive """
         return MOArchive3d(self.points_list, self.reference_point, self.infos_list)
 
     def _get_kink_points(self):
@@ -277,7 +287,7 @@ class MOArchive3d(MOArchiveParent):
                 p.cnext[0].cnext[1] = p
                 p.cnext[1].cnext[0] = p
             else:
-                remove_from_z(p)
+                remove_from_z(p, archive_dim=self.n_dim)
 
             volume += area * (p.next[2].x[2] - p.x[2])
             p = p.next[2]

@@ -217,9 +217,10 @@ def add_to_z(new):
     new.prev[2].next[2] = new
 
 
-def remove_from_z(old):
-    old.prev[2].next[2] = old.next[2]
-    old.next[2].prev[2] = old.prev[2]
+def remove_from_z(old, archive_dim):
+    di = archive_dim - 1
+    old.prev[di].next[di] = old.next[di]
+    old.next[di].prev[di] = old.prev[di]
 
 
 def setup_z_and_closest(head, new):
@@ -262,7 +263,7 @@ def update_links(head, new, p):
                 if new.x[1] <= p.x[1]:
                     p.ndomr += 1
                     ndom += 1
-                    remove_from_z(p)
+                    remove_from_z(p, 3)
                 elif new.x[0] < p.x[0] and (new.x[1] < p.closest[1].x[1] or (
                         new.x[1] == p.closest[1].x[1] and (new.x[0] < p.closest[1].x[0] or (
                         new.x[0] == p.closest[1].x[0] and new.x[2] < p.closest[1].x[2])))):
@@ -409,7 +410,7 @@ def hv3dplus(head):
             p.cnext[0].cnext[1] = p
             p.cnext[1].cnext[0] = p
         else:
-            remove_from_z(p)
+            remove_from_z(p, 3)
 
         # print(f"Contribution of {p.x} is {area * (p.next[2].x[2] - p.x[2])}")
         volume += area * (p.next[2].x[2] - p.x[2])

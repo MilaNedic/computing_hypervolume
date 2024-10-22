@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from moarchiving_utils import hv4dplusR
+from moarchiving_utils import hv4dplusR, remove_from_z
 from moarchiving3d import MOArchive3d
 from moarchiving_parent import MOArchiveParent
 
@@ -7,36 +7,66 @@ inf = float('inf')
 
 
 class MOArchive4d(MOArchiveParent):
+    """ Class for storing a set of non-dominated points in 4D space and calculating
+    hypervolume with respect to the given reference point.
+    The archive is implemented as a doubly linked list, and can be modified using functions
+    add and remove. Points of the archive can be accessed as a list of points order by the fourth
+    coordinate using function points_list.
+    """
+
     def __init__(self, list_of_f_vals=None, reference_point=None, infos=None):
+        """ Create a new 4D archive object.
+        Args:
+            list_of_f_vals: list of objective vectors
+            reference_point: reference point for the hypervolume calculation
+            infos: list of additional information for each objective vector, of the same length as
+            list_of_f_vals
+        """
         super().__init__(list_of_f_vals, reference_point, infos, 4)
 
         self._hypervolume_already_computed = False
         self.remove_dominated()
         self._set_HV()
 
-    def add(self, new, info=None, update_hypervolume=True):
-        if len(new) != self.n_dim:
-            raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new}``")
+    def add(self, new_point, info=None, update_hypervolume=True):
+        """ Add a new point to the archive.
+        Args:
+            new_point: new point to be added
+            info: additional information for the new point
+        """
+        # TODO: hypervolume will always be recomputed
+        if len(new_point) != self.n_dim:
+            raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new_point}``")
 
-        if self.dominates(new) or not self.in_domain(new):
+        if self.dominates(new_point) or not self.in_domain(new_point):
             return False
 
-        self.__init__(self.points_list + [new], self.reference_point, self.infos_list + [info])
+        self.__init__(self.points_list + [new_point], self.reference_point, self.infos_list + [info])
 
-    def remove(self, f_vals):
+    def remove(self, remove_point):
+        """ Remove a point from the archive.
+        Args:
+            remove_point: point to be removed
+        """
         points_list = self.points_list
-        if f_vals not in points_list:
+        if remove_point not in points_list:
             return False
-        self.__init__([p for p in points_list if p != f_vals], self.reference_point,
-                      [info for p, info in zip(points_list, self.infos_list) if p != f_vals])
+        self.__init__([p for p in points_list if p != remove_point], self.reference_point,
+                      [info for p, info in zip(points_list, self.infos_list) if p != remove_point])
 
     def add_list(self, list_of_f_vals, infos=None):
+        """ Add a list of points to the archive.
+        Args:
+            list_of_f_vals: list of points to be added
+            infos: list of additional information for each point
+        """
         if infos is None:
             infos = [None] * len(list_of_f_vals)
 
         self.__init__(self.points_list + list_of_f_vals, self.reference_point, self.infos_list + infos)
 
     def copy(self):
+        """ Return a copy of the archive. """
         return MOArchive4d(self.points_list, self.reference_point, self.infos_list)
 
     def _get_kink_points(self):
@@ -86,6 +116,7 @@ class MOArchive4d(MOArchiveParent):
         return kink_points
 
     def hypervolume_improvement(self, f_vals):
+        """ Returns the hypervolume improvement of adding a point to the archive """
         return self.hypervolume_improvement_naive(f_vals)
 
     def hypervolume_improvement_naive(self, f_vals):
@@ -100,6 +131,7 @@ class MOArchive4d(MOArchiveParent):
         return moa_copy.hypervolume - self.hypervolume
 
     def compute_hypervolume(self):
+        """ Compute the hypervolume of the archive. """
         if self._hypervolume_already_computed:
             return self._hypervolume
         return hv4dplusR(self.head)
@@ -127,9 +159,5 @@ class MOArchive4d(MOArchiveParent):
             current = current.next[di]
 
         for point in dominated_points:
-            self.remove_from_z(point)
+            remove_from_z(point, archive_dim=self.n_dim)
 
-    def remove_from_z(self, old):
-        di = self.n_dim - 1
-        old.prev[di].next[di] = old.next[di]
-        old.next[di].prev[di] = old.prev[di]

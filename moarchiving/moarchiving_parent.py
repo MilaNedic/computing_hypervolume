@@ -13,7 +13,16 @@ inf = float('inf')
 
 
 class MOArchiveParent:
+    """ Parent class for Moarchiving 3D and 4D classes, to avoid code duplication """
     def __init__(self, list_of_f_vals=None, reference_point=None, infos=None, n_obj=None):
+        """ Create a new archive object.
+        Args:
+            list_of_f_vals: list of objective vectors
+            reference_point: reference point for the hypervolume calculation
+            infos: list of additional information for each objective vector, of the same length as
+            list_of_f_vals
+            n_obj: number of objectives
+        """
         if list_of_f_vals is not None and len(list_of_f_vals):
             try:
                 list_of_f_vals = list_of_f_vals.tolist()
@@ -164,9 +173,11 @@ class MOArchiveParent:
 
     @property
     def contributing_hypervolumes(self):
+        """`list` of hypervolume contributions of each point in the archive"""
         return [self.contributing_hypervolume(point) for point in self._points_generator()]
 
     def contributing_hypervolume(self, f_vals):
+        """ Returns the hypervolume contribution of a point in the archive """
         if f_vals in self.points_list:
             hv_before = self._hypervolume
             self.remove(f_vals)
