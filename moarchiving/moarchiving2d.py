@@ -324,9 +324,9 @@ class BiobjectiveNondominatedSortedList(list):
         _warnings.warn('BiobjectiveNondominatedSortedList.copy has never been tested')
         nda = BiobjectiveNondominatedSortedList()
         for d in self.__dict__:
-            nda[d] = self[d]
+            setattr(nda, d, getattr(self, d))
         # now fix all mutable references as a true copy
-        list.__init__(nda, self)
+        list.__init__(nda, (p[:] for p in self))
         nda.reference_point = [xi for xi in self.reference_point]
         nda._hypervolume = self.hypervolume_final_float_type(self._hypervolume)  # with Fraction not necessary
         nda._contributing_hypervolumes = [hv for hv in self._contributing_hypervolumes]
