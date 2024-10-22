@@ -51,9 +51,9 @@ class MyTestCase(unittest.TestCase):
 
         moa = MOArchive3d(points, [6, 6, 6], infos)
         # assert that the infos are stored in the same order as the points
-        self.assertEqual([str(p[:3]) for p in moa.points_list], moa.infos_list)
+        self.assertEqual([str(p[:3]) for p in moa.points], moa.infos)
         # assert that all the points in the archive are non dominated and thus have the same info
-        self.assertSetEqual(set([str(p) for p in points]), set(moa.infos_list))
+        self.assertSetEqual(set([str(p) for p in points]), set(moa.infos))
 
     def test_infos_dominated(self):
         """ test if the infos about dominated points are removed """
@@ -67,7 +67,7 @@ class MyTestCase(unittest.TestCase):
 
         moa = MOArchive3d(points, [6, 6, 6], infos)
         # assert that only points A and D are stored in the archive
-        self.assertSetEqual({"A", "D"}, set(moa.infos_list))
+        self.assertSetEqual({"A", "D"}, set(moa.infos))
 
     def test_in_domain(self):
         """ test if the in_domain function works correctly for 3D points"""
@@ -91,17 +91,17 @@ class MyTestCase(unittest.TestCase):
         # add point that is not dominated and does not dominate any other point
         u1 = [2, 3, 3]
         moa.add(u1)
-        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points_list))
+        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
 
         # add point that is dominated by another point in the archive
         u2 = [4, 5, 2]
         moa.add(u2)
-        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points_list))
+        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
 
         # add point that dominates another point in the archive
         u3 = [3, 1, 2]
         moa.add(u3)
-        self.assertSetEqual(list_to_set(start_points[:2] + [u1, u3]), list_to_set(moa.points_list))
+        self.assertSetEqual(list_to_set(start_points[:2] + [u1, u3]), list_to_set(moa.points))
 
     def test_hypervolume_after_add(self):
         ref_point = [1, 1, 1]
@@ -241,8 +241,8 @@ class MyTestCase(unittest.TestCase):
 
         moa.add([2, 2, 2])
 
-        self.assertEqual(len(moa.points_list), 4)
-        self.assertEqual(len(moa_copy.points_list), 3)
+        self.assertEqual(len(moa.points), 4)
+        self.assertEqual(len(moa_copy.points), 3)
 
         self.assertFalse(moa.hypervolume == moa_copy.hypervolume)
 
@@ -250,8 +250,8 @@ class MyTestCase(unittest.TestCase):
         points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
         moa_remove = MOArchive3d(points, reference_point=[6, 6, 6])
         moa_remove.remove([1, 2, 3])
-        self.assertEqual(len(moa_remove.points_list), 2)
-        self.assertSetEqual(list_to_set(moa_remove.points_list), list_to_set(points[1:]))
+        self.assertEqual(len(moa_remove.points), 2)
+        self.assertSetEqual(list_to_set(moa_remove.points), list_to_set(points[1:]))
         self.assertEqual(moa_remove.hypervolume,
                          MOArchive3d(points[1:], reference_point=[6, 6, 6]).hypervolume)
 
@@ -269,11 +269,11 @@ class MyTestCase(unittest.TestCase):
             moa_add.add(points[i])
 
         # assert that the points are the same in all archives and the hypervolume is the same
-        self.assertEqual(len(moa_add.points_list), len(moa_true.points_list))
-        self.assertEqual(len(moa_remove.points_list), len(moa_true.points_list))
+        self.assertEqual(len(moa_add.points), len(moa_true.points))
+        self.assertEqual(len(moa_remove.points), len(moa_true.points))
 
-        self.assertSetEqual(list_to_set(moa_remove.points_list), list_to_set(moa_true.points_list))
-        self.assertSetEqual(list_to_set(moa_add.points_list), list_to_set(moa_true.points_list))
+        self.assertSetEqual(list_to_set(moa_remove.points), list_to_set(moa_true.points))
+        self.assertSetEqual(list_to_set(moa_add.points), list_to_set(moa_true.points))
 
         self.assertEqual(moa_remove.hypervolume, moa_true.hypervolume)
         self.assertEqual(moa_add.hypervolume, moa_true.hypervolume)
@@ -281,7 +281,7 @@ class MyTestCase(unittest.TestCase):
         moa = MOArchive3d([[1, 2, 3], [2, 3, 1], [3, 1, 2]], reference_point=[6, 6, 6])
         moa.add([1, 1, 1])
         moa.remove([1, 1, 1])
-        self.assertEqual(len(moa.points_list), 0)
+        self.assertEqual(len(moa.points), 0)
 
     def test_lexsort(self):
         # TODO: test the lexsort function without using numpy
@@ -341,8 +341,8 @@ class MyTestCase(unittest.TestCase):
             points = get_non_dominated_points(n_points, mode=mode)
             self.assertEqual(len(points), n_points)
             moa = MOArchive3d(points, reference_point=[1, 1, 1])
-            self.assertEqual(len(moa.points_list), n_points)
-            self.assertSetEqual(list_to_set(points), list_to_set(moa.points_list))
+            self.assertEqual(len(moa.points), n_points)
+            self.assertSetEqual(list_to_set(points), list_to_set(moa.points))
 
 
 if __name__ == '__main__':

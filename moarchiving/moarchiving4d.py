@@ -41,18 +41,18 @@ class MOArchive4d(MOArchiveParent):
         if self.dominates(new_point) or not self.in_domain(new_point):
             return False
 
-        self.__init__(self.points_list + [new_point], self.reference_point, self.infos_list + [info])
+        self.__init__(self.points + [new_point], self.reference_point, self.infos + [info])
 
     def remove(self, remove_point):
         """ Remove a point from the archive.
         Args:
             remove_point: point to be removed
         """
-        points_list = self.points_list
+        points_list = self.points
         if remove_point not in points_list:
             return False
         self.__init__([p for p in points_list if p != remove_point], self.reference_point,
-                      [info for p, info in zip(points_list, self.infos_list) if p != remove_point])
+                      [info for p, info in zip(points_list, self.infos) if p != remove_point])
 
     def add_list(self, list_of_f_vals, infos=None):
         """ Add a list of points to the archive.
@@ -63,11 +63,11 @@ class MOArchive4d(MOArchiveParent):
         if infos is None:
             infos = [None] * len(list_of_f_vals)
 
-        self.__init__(self.points_list + list_of_f_vals, self.reference_point, self.infos_list + infos)
+        self.__init__(self.points + list_of_f_vals, self.reference_point, self.infos + infos)
 
     def copy(self):
         """ Return a copy of the archive. """
-        return MOArchive4d(self.points_list, self.reference_point, self.infos_list)
+        return MOArchive4d(self.points, self.reference_point, self.infos)
 
     def _get_kink_points(self):
         """ Function that returns the kink points of the archive.
@@ -89,7 +89,7 @@ class MOArchive4d(MOArchiveParent):
         }
         kink_points = []
 
-        for point in self.points_list:
+        for point in self.points:
             # add the point to the kink state to get the dominated kink points, then take it out
             if kink_candidates.add(point[:3]):
                 removed = kink_candidates._removed.copy()
@@ -110,7 +110,7 @@ class MOArchive4d(MOArchiveParent):
                 point_dict[tuple(p)] = point[3]
                 kink_candidates.add(p)
 
-        for point in kink_candidates.points_list:
+        for point in kink_candidates.points:
             kink_points.append([point[0], point[1], point[2], ref_point[3]])
 
         return kink_points
@@ -121,7 +121,7 @@ class MOArchive4d(MOArchiveParent):
 
     def hypervolume_improvement_naive(self, f_vals):
         """ Returns the hypervolume improvement of adding a point to the archive """
-        if f_vals in self.points_list:
+        if f_vals in self.points:
             return 0
         if self.dominates(f_vals):
             return -1 * self.distance_to_pareto_front(f_vals)

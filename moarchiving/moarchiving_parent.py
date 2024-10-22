@@ -6,13 +6,13 @@ update in logarithmic time.
 
 """
 from moarchiving_utils import DLNode, my_lexsort, init_sentinels_new
-import numpy as np
+from moarchiving_abstract import MOArchiveAbstract
 
 
 inf = float('inf')
 
 
-class MOArchiveParent:
+class MOArchiveParent(MOArchiveAbstract):
     """ Parent class for Moarchiving 3D and 4D classes, to avoid code duplication """
     def __init__(self, list_of_f_vals=None, reference_point=None, infos=None, n_obj=None):
         """ Create a new archive object.
@@ -28,6 +28,7 @@ class MOArchiveParent:
                 list_of_f_vals = list_of_f_vals.tolist()
             except:
                 pass
+            list_of_f_vals = list(list_of_f_vals)
             if len(list_of_f_vals[0]) != n_obj:
                 raise ValueError(f"need elements of length {n_obj}, got {list_of_f_vals[0]}"
                                  " as first element")
@@ -154,12 +155,12 @@ class MOArchiveParent:
             curr = curr.next[di]
 
     @property
-    def points_list(self):
+    def points(self):
         """`list` of coordinates of the non-dominated points in the archive"""
         return [point.x[:self.n_dim] for point in self._points_generator()]
 
     @property
-    def infos_list(self):
+    def infos(self):
         """`list` of complementary information corresponding to each archive entry,
         corresponding to each of the points in the archive"""
         return [point.info for point in self._points_generator()]
@@ -178,7 +179,7 @@ class MOArchiveParent:
 
     def contributing_hypervolume(self, f_vals):
         """ Returns the hypervolume contribution of a point in the archive """
-        if f_vals in self.points_list:
+        if f_vals in self.points:
             hv_before = self._hypervolume
             self.remove(f_vals)
             hv_after = self._hypervolume
@@ -202,7 +203,7 @@ class MOArchiveParent:
         else:
             ref_di = [0] * self.n_dim
 
-        points = self.points_list
+        points = self.points
 
         if len(points) == 0:
             return sum([ref_di[i] ** 2 for i in range(self.n_dim)]) ** 0.5
@@ -234,31 +235,30 @@ class MOArchiveParent:
     def compute_hypervolume(self):
         raise NotImplementedError("This method should be implemented in the child class")
 
-    def setup_cdllist(self, data, ref, infos):
+    def setup_cdllist(self, points, ref, infos):
         """ Set up a circular doubly linked list from the given data and reference point """
-        n = len(data)
+        n = len(points)
         head = [DLNode(info=info) for info in ["s1", "s2", "s3"] + [None] * n]
         # init_sentinels_new accepts a list at the beginning, therefore we use head[0:3]
         init_sentinels_new(head[0:3], ref, self.n_dim)
         di = self.n_dim - 1  # Dimension index for sorting (z-axis in 3D)
 
-        points = np.array(data)
-
         if n > 0:
             # Convert data to a structured format suitable for sorting and linking
             if self.n_dim == 3:
                 # Using lexsort to sort by z, y, x in ascending order
-                sorted_indices = my_lexsort((points[:, 0], points[:, 1], points[:, 2]))
+                sorted_indices = my_lexsort(([p[0] for p in points], [p[1] for p in points],
+                                             [p[2] for p in points]))
             elif self.n_dim == 4:
                 # Using lexsort to sort by w, z, y, x in ascending order
-                sorted_indices = my_lexsort(
-                    (points[:, 0], points[:, 1], points[:, 2], points[:, 3]))
+                sorted_indices = my_lexsort(([p[0] for p in points], [p[1] for p in points],
+                                             [p[2] for p in points], [p[3] for p in points]))
             else:
                 raise ValueError("Only 3D and 4D points are supported")
 
             # Create nodes from sorted points
             for i, index in enumerate(sorted_indices):
-                head[i + 3].x = points[index].tolist()
+                head[i + 3].x = points[index]
                 head[i + 3].info = infos[index]
                 if self.n_dim == 3:
                     # Add 0.0 for 3d points so that it matches the original C code

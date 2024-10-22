@@ -213,7 +213,7 @@ class MOArchive3d(MOArchiveParent):
 
     def copy(self):
         """ Returns a copy of the archive """
-        return MOArchive3d(self.points_list, self.reference_point, self.infos_list)
+        return MOArchive3d(self.points, self.reference_point, self.infos)
 
     def _get_kink_points(self):
         """ Function that returns the kink points of the archive.
@@ -234,7 +234,7 @@ class MOArchive3d(MOArchiveParent):
         }
         kink_points = []
 
-        for point in self.points_list:
+        for point in self.points:
             # add the point to the kink state to get the dominated kink points, then take it out
             if kink_candidates.add(point[:2]) is not None:
                 removed = kink_candidates._removed.copy()
@@ -260,7 +260,7 @@ class MOArchive3d(MOArchiveParent):
 
     def hypervolume_improvement(self, f_vals):
         """ Returns the hypervolume improvement of adding a point to the archive """
-        if f_vals in self.points_list:
+        if f_vals in self.points:
             return 0
         if self.dominates(f_vals):
             return -1 * self.distance_to_pareto_front(f_vals)

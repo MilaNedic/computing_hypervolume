@@ -51,7 +51,7 @@ class MyTestCase(unittest.TestCase):
         the infos should be the same"""
         moa = get_small_test_archive()
         # assert that the infos are stored in the same order as the points
-        self.assertEqual([str(p) for p in moa.points_list], moa.infos_list)
+        self.assertEqual([str(p) for p in moa.points], moa.infos)
 
     def test_infos_dominated(self):
         """ test if the infos about dominated points are removed """
@@ -61,8 +61,8 @@ class MyTestCase(unittest.TestCase):
         moa.print_cdllist()
 
         non_dominated_points = [[1, 2, 3, 4], [5, 4, 3, 2]]
-        self.assertSetEqual(set([str(p) for p in non_dominated_points]), set(moa.infos_list))
-        self.assertEqual([str(p) for p in moa.points_list], moa.infos_list)
+        self.assertSetEqual(set([str(p) for p in non_dominated_points]), set(moa.infos))
+        self.assertEqual([str(p) for p in moa.points], moa.infos)
 
     def test_in_domain(self):
         """ test if the in_domain function works correctly for 3D points"""
@@ -91,7 +91,7 @@ class MyTestCase(unittest.TestCase):
         # add point that is not dominated and does not dominate any other point
         u1 = [3, 3, 3, 3]
         moa.add(u1, "D")
-        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points_list))
+        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
 
         moa.print_cdllist()
         moa.print_cxcy()
@@ -99,7 +99,7 @@ class MyTestCase(unittest.TestCase):
         # add point that is dominated by another point in the archive
         u2 = [4, 5, 2, 4]
         moa.add(u2, "E")
-        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points_list))
+        self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
 
         moa.print_cdllist()
         moa.print_cxcy()
@@ -107,7 +107,7 @@ class MyTestCase(unittest.TestCase):
         # add point that dominates another point in the archive
         u3 = [2, 3, 1, 4]
         moa.add(u3, "F")
-        self.assertSetEqual(list_to_set(start_points[:2] + [u1, u3]), list_to_set(moa.points_list))
+        self.assertSetEqual(list_to_set(start_points[:2] + [u1, u3]), list_to_set(moa.points))
 
     def test_hypervolume_after_add(self, n_points=1000, n_tests=10):
         ref_point = [1, 1, 1, 1]
@@ -136,7 +136,7 @@ class MyTestCase(unittest.TestCase):
         moa = get_small_test_archive()
 
         # test that the points that are already in the archive are dominated
-        for p in moa.points_list:
+        for p in moa.points:
             self.assertTrue(moa.dominates(p))
 
         # test other dominated points
@@ -153,7 +153,7 @@ class MyTestCase(unittest.TestCase):
         moa = get_small_test_archive()
 
         # test that the points that are already in the archive are dominated by itself
-        for p in moa.points_list:
+        for p in moa.points:
             self.assertEqual([p], moa.dominators(p))
             self.assertEqual(1, moa.dominators(p, number_only=True))
 
@@ -260,15 +260,12 @@ class MyTestCase(unittest.TestCase):
                     min_dist = dist
                 self.assertTrue(distance <= dist)
 
-            if min_dist - distance > 0.1:
-                print(f"DISTANCE TO PARETO FRONT FUNCTION COULD BE WRONG: {min_dist}, {distance}")
-
     def test_remove(self, n_points=100, n_points_remove=50):
         points = [[1, 2, 3, 4], [2, 3, 4, 1], [3, 4, 1, 2]]
         moa_remove = MOArchive4d(points, reference_point=[6, 6, 6, 6])
         moa_remove.remove([1, 2, 3, 4])
-        self.assertEqual(len(moa_remove.points_list), 2)
-        self.assertSetEqual(list_to_set(moa_remove.points_list), list_to_set(points[1:]))
+        self.assertEqual(len(moa_remove.points), 2)
+        self.assertSetEqual(list_to_set(moa_remove.points), list_to_set(points[1:]))
         self.assertEqual(moa_remove.hypervolume,
                          MOArchive4d(points[1:], reference_point=[6, 6, 6, 6]).hypervolume)
 
@@ -286,11 +283,11 @@ class MyTestCase(unittest.TestCase):
             moa_add.add(points[i])
 
         # assert that the points are the same in all archives and the hypervolume is the same
-        self.assertEqual(len(moa_add.points_list), len(moa_true.points_list))
-        self.assertEqual(len(moa_remove.points_list), len(moa_true.points_list))
+        self.assertEqual(len(moa_add.points), len(moa_true.points))
+        self.assertEqual(len(moa_remove.points), len(moa_true.points))
 
-        self.assertSetEqual(list_to_set(moa_remove.points_list), list_to_set(moa_true.points_list))
-        self.assertSetEqual(list_to_set(moa_add.points_list), list_to_set(moa_true.points_list))
+        self.assertSetEqual(list_to_set(moa_remove.points), list_to_set(moa_true.points))
+        self.assertSetEqual(list_to_set(moa_add.points), list_to_set(moa_true.points))
 
         self.assertEqual(moa_remove.hypervolume, moa_true.hypervolume)
         self.assertEqual(moa_add.hypervolume, moa_true.hypervolume)
@@ -299,10 +296,10 @@ class MyTestCase(unittest.TestCase):
                           reference_point=[6, 6, 6, 6])
         moa.add([1, 1, 1, 1])
         moa.remove([1, 1, 1, 1])
-        self.assertEqual(len(moa.points_list), 0)
+        self.assertEqual(len(moa.points), 0)
 
     def test_contributing_hypervolume(self):
-        points = list(itertools.permutations([1, 2, 3, 4]))
+        points = [list(p) for p in itertools.permutations([1, 2, 3, 4])]
         moa = MOArchive4d(points, reference_point=[5, 5, 5, 5])
         for p in points:
             self.assertEqual(moa.contributing_hypervolume(list(p)), 1)
@@ -311,12 +308,12 @@ class MyTestCase(unittest.TestCase):
 
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
         moa3d = MOArchive3d([[p[1], p[2], p[3]] for p in points], reference_point=[1, 1, 1])
-        for p in moa3d.points_list:
+        for p in moa3d.points:
             self.assertAlmostEqual(moa.contributing_hypervolume([0] + p),
                                    moa3d.contributing_hypervolume(p), places=8)
 
     def test_hypervolume_improvement(self):
-        points = list(itertools.permutations([1, 2, 3, 4]))
+        points = [list(p) for p in itertools.permutations([1, 2, 3, 4])]
         moa = MOArchive4d(points, reference_point=[5, 5, 5, 5])
         self.assertEqual(moa.hypervolume_improvement([1, 2, 3, 4]), 0)
         self.assertEqual(moa.hypervolume_improvement([2, 3, 4, 1]), 0)

@@ -2,8 +2,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
 from moarchiving3d import MOArchive3d
-from moarchiving2d import BiobjectiveNondominatedSortedList
-from test_moarchiving3d import get_non_dominated_points
+from moarchiving.tests.test_moarchiving3d import get_non_dominated_points
 
 
 def main():
@@ -63,7 +62,7 @@ def draw_point(point, ref_point, fig):
 def draw_hypervolume(points, ref_point):
     points = points.tolist()
     moa = MOArchive3d(points, ref_point)
-    points = moa.points_list
+    points = moa.points
 
     fig = make_subplots(rows=1, cols=1,
                         specs=[[{'type': 'surface'}]])
@@ -118,6 +117,14 @@ def draw_hypervolume(points, ref_point):
             name=str(k)
         ), row=1, col=1)
 
+    # set axis limits between 0 and ref_point
+    fig.update_layout(scene=dict(
+        xaxis=dict(range=[0, ref_point[0]]),
+        yaxis=dict(range=[0, ref_point[1]]),
+        zaxis=dict(range=[0, ref_point[2]]),
+        aspectmode='cube'
+    ))
+
     """
     # remove the axis numbers
     fig.update_layout(scene=dict(
@@ -156,9 +163,9 @@ def plot_non_dominated_points(n_points=1000, mode="spherical"):
 
     fig = go.Figure(data=[
         go.Scatter3d(
-            x=points[:, 0],
-            y=points[:, 1],
-            z=points[:, 2],
+            x=[p[0] for p in points],
+            y=[p[1] for p in points],
+            z=[p[2] for p in points],
             mode='markers',
             marker=dict(
                 size=4,
@@ -176,8 +183,9 @@ def plot_non_dominated_points(n_points=1000, mode="spherical"):
 
 if __name__ == '__main__':
     pts = np.array(
-        [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
+        [[3, 0, 0], [2, 1, 0], [1, 2, 0], [0, 3, 0], [2, 0, 1], [1, 1, 1], [0, 2, 1], [1, 0, 2], [0, 1, 2], [0, 0, 3]]
     )
-    # draw_hypervolume(pts, [4, 4, 4])
+    draw_hypervolume(pts, [4, 4, 4])
+
     plot_non_dominated_points(1000, mode="linear")
     plot_non_dominated_points(1000, mode="spherical")

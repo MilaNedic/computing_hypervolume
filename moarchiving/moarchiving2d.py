@@ -17,9 +17,12 @@ import bisect as _bisect # to find the insertion index efficiently
 try: import fractions
 except ImportError: _warnings.warn(
     '`fractions` module not installed, arbitrary precision hypervolume computation not available')
+
+from moarchiving.moarchiving_abstract import MOArchiveAbstract
 inf = float('inf')
 
-class BiobjectiveNondominatedSortedList(list):
+
+class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
     """A sorted list of non-dominated unique objective-pairs.
 
     Non-domination here means smaller in at least one objective. The list is
@@ -460,6 +463,10 @@ class BiobjectiveNondominatedSortedList(list):
     def infos(self):
         """`list` of complementary information corresponding to each archive entry"""
         return self._infos or len(self) * [None]  # tuple is slower for len >= 1000
+
+    def points(self):
+        """return a list of the points in the archive"""
+        return self
 
     @property
     def hypervolume(self):
