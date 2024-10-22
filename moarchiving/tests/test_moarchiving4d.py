@@ -1,5 +1,3 @@
-import random
-
 from moarchiving.moarchiving3d import MOArchive3d
 from moarchiving.moarchiving4d import MOArchive4d
 from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
@@ -8,6 +6,7 @@ from moarchiving.tests.point_sampling import (get_non_dominated_points, get_stac
 
 import unittest
 import itertools
+import random
 import math
 
 
@@ -23,15 +22,29 @@ def get_small_test_archive():
 
 class MyTestCase(unittest.TestCase):
     def test_hypervolume_easy(self):
-        # easy :)
+        """ test the hypervolume calculation for a 'simple' case """
         points = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 0, 1], [3, 0, 1, 2]]
         moa = MOArchive4d(points, reference_point=[4, 4, 4, 4], infos=["A", "B", "C", "D"])
         self.assertEqual(71, moa.hypervolume)
 
 
     def test_hypervolume(self):
-        # TODO:
-        pass
+        """ test the hypervolume calculation, by comparing to the result of original
+        implementation in C"""
+        points = [
+            [1.0, 2.0, 3.0, 1.0],
+            [4.0, 5.0, 6.0, 0.5],
+            [7.0, 8.0, 9.0, 0.7],
+            [2.0, 1.0, 0.5, 0.6],
+            [3.0, 4.0, 5.0, 0.8],
+            [6.0, 7.0, 8.0, 0.3],
+            [9.0, 1.0, 2.0, 0.9],
+            [5.0, 6.0, 7.0, 0.2],
+            [8.0, 9.0, 1.0, 0.4],
+            [0.0, 1.0, 2.0, 0.1]
+        ]
+        moa = MOArchive4d(points, reference_point=[10, 10, 10, 10])
+        self.assertEqual(8143.6, moa.hypervolume)
 
     def test_infos_non_dominated(self):
         """ test if the infos are stored correctly - if the points are non dominated,

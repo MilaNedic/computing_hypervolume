@@ -15,13 +15,28 @@ def list_to_set(lst):
 
 class MyTestCase(unittest.TestCase):
     def test_hypervolume_easy(self):
+        """ test the hypervolume calculation for a simple case """
         points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
         moa = MOArchive3d(points, reference_point=[4, 4, 4], infos=["A", "B", "C"])
         self.assertEqual(moa.hypervolume, 13)
 
     def test_hypervolume(self):
-        # TODO:
-        pass
+        """ test the hypervolume calculation, by comparing to the result of original
+        implementation in C"""
+        points = [
+            [0.16, 0.86, 0.47],
+            [0.66, 0.37, 0.29],
+            [0.79, 0.79, 0.04],
+            [0.28, 0.99, 0.29],
+            [0.51, 0.37, 0.38],
+            [0.92, 0.62, 0.07],
+            [0.16, 0.53, 0.70],
+            [0.01, 0.98, 0.94],
+            [0.67, 0.17, 0.54],
+            [0.79, 0.72, 0.05]
+        ]
+        moa = MOArchive3d(points, reference_point=[1, 1, 1])
+        self.assertAlmostEqual(moa.hypervolume, 0.318694, places=6)
 
     def test_infos_non_dominated(self):
         """ test if the infos are stored correctly - if the points are non dominated,
