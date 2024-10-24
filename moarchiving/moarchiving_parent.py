@@ -5,8 +5,8 @@ A bi-objective nondominated archive as sorted list with incremental
 update in logarithmic time.
 
 """
-from moarchiving_utils import DLNode, my_lexsort, init_sentinels_new
-from moarchiving_abstract import MOArchiveAbstract
+from moarchiving.moarchiving_utils import DLNode, my_lexsort, init_sentinels_new
+from moarchiving.moarchiving_abstract import MOArchiveAbstract
 
 
 inf = float('inf')
@@ -28,7 +28,7 @@ class MOArchiveParent(MOArchiveAbstract):
                 list_of_f_vals = list_of_f_vals.tolist()
             except:
                 pass
-            list_of_f_vals = list(list_of_f_vals)
+            list_of_f_vals = [list(f_vals) for f_vals in list_of_f_vals]
             if len(list_of_f_vals[0]) != n_obj:
                 raise ValueError(f"need elements of length {n_obj}, got {list_of_f_vals[0]}"
                                  " as first element")

@@ -1,6 +1,6 @@
-from moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2d
-from moarchiving3d import MOArchive3d
-from moarchiving4d import MOArchive4d
+from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2d
+from moarchiving.moarchiving3d import MOArchive3d
+from moarchiving.moarchiving4d import MOArchive4d
 
 
 def MOArchive(list_of_f_vals=None, reference_point=None, infos=None, n_obj=None):

@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
-from moarchiving3d import MOArchive3d
+from moarchiving.moarchiving3d import MOArchive3d
 from moarchiving.tests.test_moarchiving3d import get_non_dominated_points
 
 

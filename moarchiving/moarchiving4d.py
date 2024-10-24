@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from moarchiving_utils import hv4dplusR, remove_from_z
-from moarchiving3d import MOArchive3d
-from moarchiving_parent import MOArchiveParent
+from moarchiving.moarchiving_utils import hv4dplusR, remove_from_z
+from moarchiving.moarchiving3d import MOArchive3d
+from moarchiving.moarchiving_parent import MOArchiveParent
 
 inf = float('inf')
 
