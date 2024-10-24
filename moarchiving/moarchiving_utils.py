@@ -2,6 +2,7 @@ from sortedcontainers import SortedKeyList
 
 
 class DLNode:
+    """ A class to represent a node in a doubly linked list. """
     def __init__(self, x=None, info=None):
         self.x = x if x else [None, None, None, None]
         self.closest = [None, None]  # closest in x coordinate, closest in y coordinate
@@ -22,11 +23,10 @@ class DLNode:
 
 
 class MySortedList(SortedKeyList):
+    """ A class to represent a sorted list of nodes, together with additional methods that
+     follow the definition in the paper."""
     def __init__(self, iterable=None, key=lambda node: node.x[1]):
         super().__init__(iterable=iterable, key=key)
-
-    def __str__(self):
-        return str([x.x for x in self])
 
     def head_y(self):
         """ Return the point q from the list, with the smallest q_y """
@@ -115,69 +115,17 @@ def my_lexsort(keys):
     return [x[0] for x in idk_key_tuple]
 
 
-
-"""
-Main Python file which includes algorithms for computing the hyperovlume in 3- and 4-D.
-"""
-
-
 # --------------- Auxiliary Functions ---------------------
+
+
 def lexicographic_less(a, b):
+    """ Returns True if a is lexicographically less than b, False otherwise """
     return a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))
 
 
-# for 4D points
-def lexicographic_less_4d(a, b):
-    return a[3] < b[3] or (a[3] == b[3] and (
-                a[2] < b[2] or (a[2] == b[2] and (a[1] < b[1] or (a[1] == b[1] and a[0] <= b[0])))))
-
-
-def init_sentinels(ref, d):
-    s1 = DLNode()
-    s2 = DLNode()
-    s3 = DLNode()
-
-    # Set values for s1
-    s1.x[0] = float('-inf')
-    s1.x[1] = ref[1]
-    s1.x[2] = float('-inf')
-    s1.x[3] = float('-inf')
-    s1.closest[0] = s2
-    s1.closest[1] = s1
-    s1.next[2] = s2
-    s1.next[3] = s2
-    s1.prev[2] = s3
-    s1.prev[3] = s3
-
-    # Set values for s2
-    s2.x[0] = ref[0]
-    s2.x[1] = float('-inf')
-    s2.x[2] = float('-inf')
-    s2.x[3] = float('-inf')
-    s2.closest[0] = s2
-    s2.closest[1] = s1
-    s2.next[2] = s3
-    s2.next[3] = s3
-    s2.prev[2] = s1
-    s2.prev[3] = s1
-
-    # Set values for s3
-    s3.x[0] = s3.x[1] = float('-inf')
-    s3.x[2] = ref[2]
-    if d == 4:
-        s3.x[3] = ref[3]
-    else:
-        s3.x[3] = float('-inf')
-    s3.closest[0] = s2
-    s3.closest[1] = s1
-    s3.next[2] = s1
-    s3.prev[2] = s2
-    s3.prev[3] = s2
-
-    return s1
-
-
-def init_sentinels_new(list_nodes, ref, d):
+def init_sentinels_new(list_nodes, ref, dim):
+    """ Initialize the sentinel nodes for the list of nodes given
+    the reference point and the dimensionality """
     s1, s2, s3 = list_nodes[0], list_nodes[1], list_nodes[2]
 
     # Initialize s1 node
@@ -197,7 +145,7 @@ def init_sentinels_new(list_nodes, ref, d):
     s2.ndomr = 0
 
     # Initialize s3 node
-    s3.x = [float('-inf'), float('-inf'), ref[2], ref[3] if d == 4 else float('-inf')]
+    s3.x = [float('-inf'), float('-inf'), ref[2], ref[3] if dim == 4 else float('-inf')]
     s3.closest = [s2, s1]
     s3.next = [None, None, s1, None]
     s3.cnext = [None, None]
@@ -205,8 +153,6 @@ def init_sentinels_new(list_nodes, ref, d):
     s3.ndomr = 0
 
     return s1
-
-
 
 
 # --------------------- Updating Data Structures --------------------------
@@ -276,7 +222,7 @@ def update_links(head, new, p):
     return ndom
 
 
-# ------------------------- Hyperovlume Indicator Algorithms ---------------------------------------
+# ------------------------- Hypervolume Indicator Algorithms ---------------------------------------
 def restart_list_y(head):
     # resets the cnext pointers for the y-dimension.
     head.next[2].cnext[1] = head
@@ -296,8 +242,6 @@ def compute_area_simple(p, di, s, u):
 
     return area
 
-
-# ----------------------------------------------------------------
 
 def restart_base_setup_z_and_closest(head, new):
     # Sets up closest[0] and closest[1] for the new node
@@ -380,10 +324,8 @@ def one_contribution_3d(head, new):
     return volume
 
 
-"""Main function for computing the hypervolume in 3-D"""
-
-
 def hv3dplus(head):
+    """ Computes the hypervolume indicator in d=3 in linear time """
     p = head
     area = 0
     volume = 0
@@ -398,36 +340,21 @@ def hv3dplus(head):
             p.cnext[0] = p.closest[0]
             p.cnext[1] = p.closest[1]
 
-            # print("Current p", (p.x if p!= None else None))
-            # print("p ndomr", p.ndomr)
-            # print("p.closest[0]", p.closest[0].x)
-            # print("p.closest[1]", p.closest[1].x)
-            # print("p.cnext[0].cnext[1]", p.cnext[0].cnext[1].x, "\n")
-
             area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
-            # print("Area:", area)
-
             p.cnext[0].cnext[1] = p
             p.cnext[1].cnext[0] = p
         else:
             remove_from_z(p, 3)
 
-        # print(f"Contribution of {p.x} is {area * (p.next[2].x[2] - p.x[2])}")
         volume += area * (p.next[2].x[2] - p.x[2])
-        # print("Volume:", volume)
-
         p = p.next[2]
 
     return volume
 
 
-"""Compute the hypervolume indicator in d=4 by iteratively
-   computing the hypervolume indicator in d=3 (using hv3d+) """
-
-
 def hv4dplusR(head):
-    height = 0
-    volume = 0
+    """ Compute the hypervolume indicator in d=4 by iteratively
+    computing the hypervolume indicator in d=3 (using hv3d+) """
     hv = 0
 
     stop = head.prev[3]
@@ -443,7 +370,6 @@ def hv4dplusR(head):
         volume = hv3dplus(head)  # Compute hv indicator in d=3 in linear time
 
         height = new.next[3].x[3] - new.x[3]
-        # print("Hypervolume contribution of node", new.x, "is", volume * height)
         hv += volume * height  # Update hypervolume in d=4
 
         new = new.next[3]
@@ -451,14 +377,10 @@ def hv4dplusR(head):
     return hv
 
 
-"""
-Compute the hypervolume indicator in d=4 by iteratively
-computing the one contribution problem in d=3.
-"""
-
-
 def hv4dplusU(head):
-    height = 0
+    """ Compute the hypervolume indicator in d=4 by iteratively
+    computing the one contribution problem in d=3.
+    """
     volume = 0
     hv = 0
 
