@@ -175,15 +175,15 @@ class MOArchiveParent(MOArchiveAbstract):
     @property
     def contributing_hypervolumes(self):
         """`list` of hypervolume contributions of each point in the archive"""
-        return [self.contributing_hypervolume(point) for point in self._points_generator()]
+        return [self.contributing_hypervolume(point[:self.n_dim]) for point in self.points]
 
     def contributing_hypervolume(self, f_vals):
         """ Returns the hypervolume contribution of a point in the archive """
         if f_vals in self.points:
             hv_before = self._hypervolume
-            self.remove(f_vals)
+            removed_info = self.remove(f_vals)
             hv_after = self._hypervolume
-            self.add(f_vals)
+            self.add(f_vals, info=removed_info)
             return hv_before - hv_after
         else:
             return self.hypervolume_improvement(f_vals)

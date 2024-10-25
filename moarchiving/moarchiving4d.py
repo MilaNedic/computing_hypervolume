@@ -47,12 +47,17 @@ class MOArchive4d(MOArchiveParent):
         """ Remove a point from the archive.
         Args:
             remove_point: point to be removed
+        Returns:
+            False if the point is not in the archive and Info if the point is removed
         """
         points_list = self.points
         if remove_point not in points_list:
             return False
+        point_idx = points_list.index(remove_point)
+        point_info = self.infos[point_idx]
         self.__init__([p for p in points_list if p != remove_point], self.reference_point,
                       [info for p, info in zip(points_list, self.infos) if p != remove_point])
+        return point_info
 
     def add_list(self, list_of_f_vals, infos=None):
         """ Add a list of points to the archive.

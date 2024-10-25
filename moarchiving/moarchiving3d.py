@@ -139,6 +139,8 @@ class MOArchive3d(MOArchiveParent):
         """ Removes a point from the archive, and updates the hypervolume.
         Args:
             remove_point: the point that should be removed
+        Returns:
+            The information of the removed point
         """
 
         di = self.n_dim - 1  # Dimension index for sorting (z-axis in 3D)
@@ -192,12 +194,12 @@ class MOArchive3d(MOArchiveParent):
 
         if remove_node is not None:
             remove_from_z(remove_node, archive_dim=self.n_dim)
+            self._kink_points = None
+            self._set_HV()
+            return remove_node.info
         else:
             _warnings.warn(f"Point {remove_point} not found in the archive")
 
-        T.clear()  # Clean up AVL tree after processing
-        self._kink_points = None
-        self._set_HV()
 
     def add_list(self, list_of_f_vals, infos=None):
         """ Adds a list of points to the archive, and updates the hypervolume.
