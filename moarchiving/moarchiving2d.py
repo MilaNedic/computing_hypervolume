@@ -96,7 +96,8 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
     def __init__(self,
                  list_of_f_pairs=None,
                  reference_point=None,
-                 sort=sorted):
+                 sort=sorted,
+                 infos=None):
         """`list_of_f_pairs` does not need to be sorted.
 
         f-pairs beyond the `reference_point` are pruned away. The
@@ -121,13 +122,31 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
             if len(list_of_f_pairs[0]) != 2:
                 raise ValueError("need elements of len 2, got %s"
                                  " as first element" % str(list_of_f_pairs[0]))
-            list.__init__(self, sort(list_of_f_pairs) if sort else list_of_f_pairs)
+
+            if sort is None:
+                list.__init__(self, list_of_f_pairs)
+            else:
+                if infos is not None:
+                    f_pair2info = dict(zip([tuple(f_pair) for f_pair in list_of_f_pairs], infos))
+                    list.__init__(self, sort(list_of_f_pairs))
+                    infos = [f_pair2info[tuple(f_pair)] for f_pair in self]
+                else:
+                    list.__init__(self, sort(list_of_f_pairs))
+
             # super(BiobjectiveNondominatedSortedList, self).__init__(sort(list_of_f_pairs))
         if reference_point is not None:
             self.reference_point = list(reference_point)
         else:
             self.reference_point = reference_point
-        self._infos = None
+
+        if infos is not None:
+            if len(infos) != len(list_of_f_pairs):
+                raise ValueError(f"need as many infos as f_pairs, got "
+                                 f"{len(infos)} infos and {len(list_of_f_pairs)} f_pairs")
+            self._infos = infos
+        else:
+            self._infos = None
+
         self.prune()  # remove dominated entries, uses in_domain, hence ref-point
         if self.maintain_contributing_hypervolumes:
             self._contributing_hypervolumes = self.contributing_hypervolumes
@@ -464,6 +483,7 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
         """`list` of complementary information corresponding to each archive entry"""
         return self._infos or len(self) * [None]  # tuple is slower for len >= 1000
 
+    @property
     def points(self):
         """return a list of the points in the archive"""
         return self

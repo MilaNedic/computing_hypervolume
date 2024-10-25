@@ -22,13 +22,16 @@ def MOArchive(list_of_f_vals=None, reference_point=None, infos=None, n_obj=None)
             "The number of objectives in list_of_f_vals must match n_obj"
     if n_obj is None:
         n_obj = len(list_of_f_vals[0])
+    if reference_point is not None:
+        assert len(reference_point) == n_obj, \
+            "The number of objectives in reference_point must match n_obj"
 
     if n_obj == 2:
-        return MOArchive2d(list_of_f_vals, reference_point)  # TODO: add infos
+        return MOArchive2d(list_of_f_vals, reference_point=reference_point, infos=infos)
     elif n_obj == 3:
-        return MOArchive3d(list_of_f_vals, reference_point, infos)
+        return MOArchive3d(list_of_f_vals, reference_point=reference_point, infos=infos)
     elif n_obj == 4:
-        return MOArchive4d(list_of_f_vals, reference_point, infos)
+        return MOArchive4d(list_of_f_vals, reference_point=reference_point, infos=infos)
     else:
         raise ValueError(f"Unsupported number of objectives: {n_obj}")
 
