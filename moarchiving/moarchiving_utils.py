@@ -229,16 +229,16 @@ def restart_list_y(head):
     head.cnext[0] = head.next[2]
 
 
-def compute_area_simple(p, di, s, u):
+def compute_area_simple(p, di, s, u, Fc):
     dj = 1 - di
-    area = 0
+    area = Fc(0)
     q = s
-    area += (q.x[dj] - p[dj]) * (u.x[di] - p[di])
+    area += (Fc(q.x[dj]) - Fc(p[dj])) * (Fc(u.x[di]) - Fc(p[di]))
 
     while p[dj] < u.x[dj]:
         q = u
         u = u.cnext[di]
-        area += (q.x[dj] - p[dj]) * (u.x[di] - q.x[di])
+        area += (Fc(q.x[dj]) - Fc(p[dj])) * (Fc(u.x[di]) - Fc(q.x[di]))
 
     return area
 
@@ -279,39 +279,39 @@ def restart_base_setup_z_and_closest(head, new):
 
 # --------------- one contribution 3d ------------------
 
-def one_contribution_3d(head, new):
+def one_contribution_3d(head, new, Fc):
     restart_base_setup_z_and_closest(head, new)
     if new.ndomr > 0:
         return 0
 
     new.cnext[0] = new.closest[0]
     new.cnext[1] = new.closest[1]
-    area = compute_area_simple(new.x, 1, new.cnext[0], new.cnext[0].cnext[1])
+    area = compute_area_simple(new.x, 1, new.cnext[0], new.cnext[0].cnext[1], Fc)
 
     p = new.next[2]
-    lastz = new.x[2]
-    volume = 0
+    lastz = Fc(new.x[2])
+    volume = Fc(0)
 
     while p and (p.x[0] > new.x[0] or p.x[1] > new.x[1]):
-        volume += area * (p.x[2] - lastz)
+        volume += area * (Fc(p.x[2]) - lastz)
         p.cnext[0] = p.closest[0]
         p.cnext[1] = p.closest[1]
 
         if p.x[0] >= new.x[0] and p.x[1] >= new.x[1]:
-            area -= compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
+            area -= compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1], Fc)
             p.cnext[1].cnext[0] = p
             p.cnext[0].cnext[1] = p
         elif p.x[0] >= new.x[0]:
             if p.x[0] <= new.cnext[0].x[0]:
                 x = [p.x[0], new.x[1], p.x[2]]
-                area -= compute_area_simple(x, 1, new.cnext[0], new.cnext[0].cnext[1])
+                area -= compute_area_simple(x, 1, new.cnext[0], new.cnext[0].cnext[1], Fc)
                 p.cnext[0] = new.cnext[0]
                 p.cnext[1].cnext[0] = p
                 new.cnext[0] = p
         else:
             if p.x[1] <= new.cnext[1].x[1]:
                 x = [new.x[0], p.x[1], p.x[2]]
-                area -= compute_area_simple(x, 0, new.cnext[1], new.cnext[1].cnext[0])
+                area -= compute_area_simple(x, 0, new.cnext[1], new.cnext[1].cnext[0], Fc)
                 p.cnext[1] = new.cnext[1]
                 p.cnext[0].cnext[1] = p
                 new.cnext[1] = p
@@ -320,15 +320,15 @@ def one_contribution_3d(head, new):
         p = p.next[2]
 
     if p:
-        volume += area * (p.x[2] - lastz)
+        volume += area * (Fc(p.x[2]) - Fc(lastz))
     return volume
 
 
-def hv3dplus(head):
+def hv3dplus(head, Fc):
     """ Computes the hypervolume indicator in d=3 in linear time """
     p = head
-    area = 0
-    volume = 0
+    area = Fc(0)
+    volume = Fc(0)
 
     restart_list_y(head)
     p = p.next[2].next[2]
@@ -340,36 +340,35 @@ def hv3dplus(head):
             p.cnext[0] = p.closest[0]
             p.cnext[1] = p.closest[1]
 
-            area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
+            area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1], Fc)
             p.cnext[0].cnext[1] = p
             p.cnext[1].cnext[0] = p
         else:
             remove_from_z(p, 3)
 
-        volume += area * (p.next[2].x[2] - p.x[2])
+        volume += area * (Fc(p.next[2].x[2]) - Fc(p.x[2]))
         p = p.next[2]
 
     return volume
 
 
-def hv4dplusR(head):
+def hv4dplusR(head, Fc):
     """ Compute the hypervolume indicator in d=4 by iteratively
     computing the hypervolume indicator in d=3 (using hv3d+) """
-    hv = 0
+    hv = Fc(0)
 
     stop = head.prev[3]
     new = head.next[3].next[3]
 
     while new != stop:
-        setup_z_and_closest(head,
-                            new)  # Compute cx and cy of 'new' and determine next and prev in z
+        setup_z_and_closest(head, new)  # Compute cx and cy of 'new' and determine next and prev in z
         add_to_z(new)  # Add 'new' to list sorted by z
         update_links(head, new, new.next[2])  # Update cx and cy of the points above 'new' in z
         # and remove dominated points
 
-        volume = hv3dplus(head)  # Compute hv indicator in d=3 in linear time
+        volume = hv3dplus(head, Fc)  # Compute hv indicator in d=3 in linear time
 
-        height = new.next[3].x[3] - new.x[3]
+        height = Fc(new.next[3].x[3]) - Fc(new.x[3])
         hv += volume * height  # Update hypervolume in d=4
 
         new = new.next[3]
@@ -377,22 +376,22 @@ def hv4dplusR(head):
     return hv
 
 
-def hv4dplusU(head):
+def hv4dplusU(head, Fc):
     """ Compute the hypervolume indicator in d=4 by iteratively
     computing the one contribution problem in d=3.
     """
-    volume = 0
-    hv = 0
+    volume = Fc(0)
+    hv = Fc(0)
 
     last = head.prev[3]
     new = head.next[3].next[3]
 
     while new != last:
-        volume += one_contribution_3d(head, new)
+        volume += one_contribution_3d(head, new, Fc)
         add_to_z(new)
         update_links(head, new, new.next[2])
 
-        height = new.next[3].x[3] - new.x[3]
+        height = Fc(new.next[3].x[3]) - Fc(new.x[3])
         hv += volume * height
 
         new = new.next[3]

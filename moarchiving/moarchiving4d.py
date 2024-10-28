@@ -87,7 +87,8 @@ class MOArchive4d(MOArchiveParent):
 
         # initialize the two states, one for points and another for kink points
         points_state = MOArchive3d(reference_point=ref_point[:3])
-        kink_candidates = MOArchive3d([ref_point[:3]])
+        kink_candidates = MOArchive3d([ref_point[:3]],
+                                      reference_point=[r + 1 for r in ref_point[:3]])
         # initialize the point dictionary, which will store the fourth coordinate of the points
         point_dict = {
             tuple(ref_point[:3]): -inf
@@ -133,13 +134,14 @@ class MOArchive4d(MOArchiveParent):
 
         moa_copy = self.copy()
         moa_copy.add(f_vals)
-        return moa_copy.hypervolume - self.hypervolume
+        return self.hypervolume_final_float_type(moa_copy.hypervolume - self.hypervolume)
 
     def compute_hypervolume(self):
         """ Compute the hypervolume of the archive. """
         if self._hypervolume_already_computed:
             return self._hypervolume
-        return hv4dplusR(self.head)
+        return self.hypervolume_final_float_type(
+            hv4dplusR(self.head, self.hypervolume_computation_float_type))
 
     def remove_dominated(self):
         """ Preprocessing step to remove dominated points. """

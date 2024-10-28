@@ -267,13 +267,15 @@ class MOArchive3d(MOArchiveParent):
         if self.dominates(f_vals):
             return -1 * self.distance_to_pareto_front(f_vals)
 
-        return one_contribution_3d(self.head, DLNode(x=f_vals))
+        return one_contribution_3d(self.head, DLNode(x=f_vals),
+                                   self.hypervolume_computation_float_type)
 
     def compute_hypervolume(self):
         """ Compute the hypervolume of the current state of archive """
+        Fc = self.hypervolume_computation_float_type
         p = self.head
-        area = 0
-        volume = 0
+        area = Fc(0)
+        volume = Fc(0)
 
         restart_list_y(self.head)
         p = p.next[2].next[2]
@@ -284,17 +286,17 @@ class MOArchive3d(MOArchiveParent):
                 p.cnext[0] = p.closest[0]
                 p.cnext[1] = p.closest[1]
 
-                area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1])
+                area += compute_area_simple(p.x, 1, p.cnext[0], p.cnext[0].cnext[1], Fc)
 
                 p.cnext[0].cnext[1] = p
                 p.cnext[1].cnext[0] = p
             else:
                 remove_from_z(p, archive_dim=self.n_dim)
 
-            volume += area * (p.next[2].x[2] - p.x[2])
+            volume += area * (Fc(p.next[2].x[2]) - Fc(p.x[2]))
             p = p.next[2]
 
-        return volume
+        return self.hypervolume_final_float_type(volume)
 
     def preprocessing(self):
         """ Preprocessing step to determine the closest points in x and y directions,

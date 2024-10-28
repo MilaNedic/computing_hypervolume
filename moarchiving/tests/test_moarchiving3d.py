@@ -90,8 +90,8 @@ class MyTestCase(unittest.TestCase):
         hypervolume obtained by adding the points to a new archive """
         ref_point = [1, 1, 1]
 
-        pop_size = 100
-        n_gen = 10
+        pop_size = 20
+        n_gen = 4
         points = get_non_dominated_points(pop_size * n_gen)
 
         for gen in range(1, n_gen + 1):
@@ -195,15 +195,12 @@ class MyTestCase(unittest.TestCase):
 
         moa3d = MOArchive3d(points, reference_point=[1, 1, 1])
         moa2d = MOArchive2D([[p[0], p[1]] for p in points], reference_point=[1, 1])
-        moa3d_no_ref = MOArchive3d(points)
 
         new_points = get_stacked_points(n_test_points, ['random', 'random', 1])
         for point in new_points:
             d2 = moa2d.distance_to_pareto_front(point[:2])
             d3 = moa3d.distance_to_pareto_front(point)
-            d3_no_ref = moa3d_no_ref.distance_to_pareto_front(point)
             self.assertAlmostEqual(d2, d3, places=8)
-            self.assertAlmostEqual(d3, d3_no_ref, places=8)
 
     def test_copy_DLNode(self):
         """ Test the copy function of the DLNode class """

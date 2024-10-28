@@ -8,12 +8,26 @@ update in logarithmic time.
 from moarchiving.moarchiving_utils import DLNode, my_lexsort, init_sentinels_new
 from moarchiving.moarchiving_abstract import MOArchiveAbstract
 
+import warnings as _warnings
+try:
+    import fractions
+except ImportError:
+    _warnings.warn('`fractions` module not installed, arbitrary precision hypervolume '
+                   'computation not available')
+
 
 inf = float('inf')
 
 
 class MOArchiveParent(MOArchiveAbstract):
     """ Parent class for Moarchiving 3D and 4D classes, to avoid code duplication """
+    try:
+        hypervolume_final_float_type = fractions.Fraction
+        hypervolume_computation_float_type = fractions.Fraction
+    except:
+        hypervolume_final_float_type = float
+        hypervolume_computation_float_type = float
+
     def __init__(self, list_of_f_vals=None, reference_point=None, infos=None, n_obj=None):
         """ Create a new archive object.
         Args:
@@ -23,6 +37,10 @@ class MOArchiveParent(MOArchiveAbstract):
             list_of_f_vals
             n_obj: number of objectives
         """
+
+        self.hypervolume_final_float_type = MOArchiveParent.hypervolume_final_float_type
+        self.hypervolume_computation_float_type = MOArchiveParent.hypervolume_computation_float_type
+
         if list_of_f_vals is not None and len(list_of_f_vals):
             try:
                 list_of_f_vals = list_of_f_vals.tolist()
@@ -170,7 +188,7 @@ class MOArchiveParent(MOArchiveAbstract):
         if self.reference_point is None:
             raise ValueError("to compute the hypervolume a reference"
                              " point is needed (must be given initially)")
-        return self._hypervolume
+        return self.hypervolume_final_float_type(self._hypervolume)
 
     @property
     def contributing_hypervolumes(self):

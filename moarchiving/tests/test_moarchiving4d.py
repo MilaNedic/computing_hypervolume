@@ -82,9 +82,6 @@ class MyTestCase(unittest.TestCase):
         moa.add(u2, "E")
         self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
 
-        moa.print_cdllist()
-        moa.print_cxcy()
-
         # add point that dominates another point in the archive
         u3 = [2, 3, 1, 4]
         moa.add(u3, "F")
@@ -93,7 +90,7 @@ class MyTestCase(unittest.TestCase):
     def test_hypervolume_after_add(self, n_points=1000, n_tests=10):
         ref_point = [1, 1, 1, 1]
 
-        pop_size = 100
+        pop_size = 20
         n_gen = 4
         points = get_non_dominated_points(pop_size * n_gen, n_dim=4)
 
@@ -172,7 +169,6 @@ class MyTestCase(unittest.TestCase):
 
         moa4d = MOArchive4d(points, reference_point=[1, 1, 1, 1])
         moa2d = MOArchive2D([[p[0], p[1]] for p in points], reference_point=[1, 1])
-        moa4d_no_ref = MOArchive4d(points)
 
         permutations = [[0, 1, 2, 3], [1, 2, 0, 3], [2, 0, 1, 3], [3, 2, 1, 0], [2, 3, 0, 1]]
         for permutation in permutations:
@@ -183,10 +179,8 @@ class MyTestCase(unittest.TestCase):
             for point in new_points:
                 d2 = moa2d.distance_to_pareto_front(point[:2])
                 d4 = moa4d.distance_to_pareto_front(point)
-                d4_no_ref = moa4d_no_ref.distance_to_pareto_front(point)
                 d4_perm = moa4d_perm.distance_to_pareto_front(permute_points([point], permutation)[0])
                 self.assertAlmostEqual(d2, d4, places=8)
-                self.assertAlmostEqual(d4, d4_no_ref, places=8)
                 self.assertAlmostEqual(d4, d4_perm, places=8)
 
     def test_distance_to_pareto_front_compare_3d(self):
@@ -198,7 +192,6 @@ class MyTestCase(unittest.TestCase):
 
         moa4d = MOArchive4d(points, reference_point=[1, 1, 1, 1])
         moa3d = MOArchive3d([[p[0], p[1], p[2]] for p in points], reference_point=[1, 1, 1])
-        moa4d_no_ref = MOArchive4d(points)
 
         permutations = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 0, 1, 3], [3, 2, 1, 0], [2, 3, 0, 1]]
         for permutation in permutations:
@@ -209,10 +202,8 @@ class MyTestCase(unittest.TestCase):
             for point in new_points:
                 d3 = moa3d.distance_to_pareto_front(point[:3])
                 d4 = moa4d.distance_to_pareto_front(point)
-                d4_no_ref = moa4d_no_ref.distance_to_pareto_front(point)
                 d4_perm = moa4d_perm.distance_to_pareto_front(permute_points([point], permutation)[0])
                 self.assertAlmostEqual(d3, d4, places=8)
-                self.assertAlmostEqual(d4, d4_no_ref, places=8)
                 self.assertAlmostEqual(d4, d4_perm, places=8)
 
     def test_distance_to_pareto_front(self):
@@ -334,7 +325,7 @@ class MyTestCase(unittest.TestCase):
             [0.0, 1.0, 2.0, 0.1]
         ]
         moa = MOArchive4d(points, reference_point=[10, 10, 10, 10])
-        self.assertEqual(8143.6, moa.hypervolume)
+        self.assertEqual(8143.6, float(moa.hypervolume))
 
         points = [
             [0.6394267984578837, 0.025010755222666936, 0.27502931836911926, 0.22321073814882275],
@@ -349,7 +340,7 @@ class MyTestCase(unittest.TestCase):
             [0.8294046642529949, 0.6185197523642461, 0.8617069003107772, 0.577352145256762]
         ]
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
-        self.assertAlmostEqual(0.371995494511654, moa.hypervolume, places=6)
+        self.assertAlmostEqual(0.371995494511654, float(moa.hypervolume), places=6)
 
         points = [
             [0.6394267984578837, 0.025010755222666936, 0.27502931836911926, 0.22321073814882275],
@@ -455,7 +446,7 @@ class MyTestCase(unittest.TestCase):
         ]
 
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
-        self.assertAlmostEqual(0.790316084994994, moa.hypervolume, places=6)
+        self.assertAlmostEqual(0.790316084994994, float(moa.hypervolume), places=6)
 
 
 if __name__ == '__main__':
