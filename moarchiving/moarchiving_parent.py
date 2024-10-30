@@ -92,6 +92,9 @@ class MOArchiveParent(MOArchiveAbstract):
                   f"ndomr={current.ndomr}")
             current = current.next[di] if current.next[di] != self.head else None
 
+    def __len__(self):
+        return len(self.points)
+
     def add(self, new, info=None, update_hypervolume=True):
         raise NotImplementedError("This method should be implemented in the child class")
 
