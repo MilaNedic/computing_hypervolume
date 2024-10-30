@@ -79,8 +79,8 @@ class MOArchive4d(MOArchiveParent):
          3D archive of all possible kink points found so far, and another 3D archive which stores
          the non-dominated points so far in the sweep """
         if self.reference_point is None:
-            almost_inf = 1e10  # TODO: this is a hack, but I don't find a better way to do it...
-            ref_point = [almost_inf] * self.n_dim
+            max_point = max([max([point[i] for point in self.points]) for i in range(3)]) + 1
+            ref_point = [max_point] * self.n_dim
         else:
             ref_point = self.reference_point
 
