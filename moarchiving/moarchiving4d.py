@@ -34,7 +34,6 @@ class MOArchive4d(MOArchiveParent):
             new_point: new point to be added
             info: additional information for the new point
         """
-        # TODO: hypervolume will always be recomputed
         if len(new_point) != self.n_dim:
             raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new_point}``")
 

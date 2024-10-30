@@ -32,15 +32,15 @@ class MOArchive3d(MOArchiveParent):
         self.preprocessing()
         self._set_HV()
 
-    def add(self, new_point, info=None, update_hypervolume=True):
+    def add(self, f_vals, info=None, update_hypervolume=True):
         """ Adds a new point to the archive, and updates the hypervolume if needed.
         Args:
-            new_point: the new point to add
+            f_vals: the new point to add
             info: additional information about the point
             update_hypervolume: whether to update the hypervolume after adding the point
         """
-        if len(new_point) != self.n_dim:
-            raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new_point}``")
+        if len(f_vals) != self.n_dim:
+            raise ValueError(f"argument `f_vals` must be of length {self.n_dim}, was ``{f_vals}``")
 
         # q is the current point (so that we are consistent with the paper),
         # stop is the head of the list, and first_iter is a flag to check if we are at the
@@ -51,8 +51,8 @@ class MOArchive3d(MOArchiveParent):
 
         # Add 0.0 for 3d points so that it matches the original C code and create a new node object
         if self.n_dim == 3:
-            new_point = new_point + [0.0]
-        u = DLNode(x=new_point, info=info)
+            f_vals = f_vals + [0.0]
+        u = DLNode(x=f_vals, info=info)
         di = self.n_dim - 1
 
         # loop over all the points in the archive and save the best candidates for cx and cy,
@@ -135,10 +135,10 @@ class MOArchive3d(MOArchiveParent):
 
         return not dominated
 
-    def remove(self, remove_point):
+    def remove(self, f_vals):
         """ Removes a point from the archive, and updates the hypervolume.
         Args:
-            remove_point: the point that should be removed
+            f_vals: the point that should be removed
         Returns:
             The information of the removed point
         """
@@ -156,7 +156,7 @@ class MOArchive3d(MOArchiveParent):
         remove_node = None
 
         while current != stop:
-            if current.x[:3] == remove_point:
+            if current.x[:3] == f_vals:
                 remove_node = current
                 current = current.next[di]
                 continue
@@ -168,7 +168,7 @@ class MOArchive3d(MOArchiveParent):
             for node in nodes_to_remove:
                 T.remove(node)
 
-            if current.closest[0].x[:3] == remove_point:
+            if current.closest[0].x[:3] == f_vals:
                 # For every p ∈ Q \ {u} such that p.cx = u, set p.cx to the
                 #         point q ∈ Q \ {u} with the smallest q_x > p_x such that
                 #         q_y < p_y and q <L p
@@ -179,7 +179,7 @@ class MOArchive3d(MOArchiveParent):
                 else:
                     current.closest[0] = self.head
 
-            if current.closest[1].x[:3] == remove_point:
+            if current.closest[1].x[:3] == f_vals:
                 # For every p ∈ Q \ {u} such that p.cy = u, set p.cy to the
                 #         point q ∈ Q \ {u} with the smallest q_y > p_y such that
                 #         q_x < p_x and q <L p
@@ -198,7 +198,7 @@ class MOArchive3d(MOArchiveParent):
             self._set_HV()
             return remove_node.info
         else:
-            _warnings.warn(f"Point {remove_point} not found in the archive")
+            _warnings.warn(f"Point {f_vals} not found in the archive")
 
 
     def add_list(self, list_of_f_vals, infos=None):

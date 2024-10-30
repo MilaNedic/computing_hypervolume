@@ -136,21 +136,25 @@ class MOArchiveParent(MOArchiveAbstract):
                 break
         return dominators
 
-    def in_domain(self, f_pair, reference_point=None):
-        """return `True` if `f_pair` is dominating the reference point,
-        `False` otherwise. `True` means that `f_pair` contributes to
+    def in_domain(self, f_vals, reference_point=None):
+        """return `True` if `f_vals` is dominating the reference point,
+        `False` otherwise. `True` means that `f_vals` contributes to
         the hypervolume if not dominated by other elements.
-
-        TODO: in Nikos' code, f_pair can also be an index, not just a list of values,
-        TODO: this is not implemented here (due to not having a state in form of a list of points)
         """
+
+        try:
+            if len(f_vals) != self.n_dim:
+                raise ValueError(f"argument `f_vals` must be of length {self.n_dim}, "
+                                 f"was ``{f_vals}``")
+        except TypeError:
+            raise TypeError(f"argument `f_vals` must be a list, was ``{f_vals}``")
 
         if reference_point is None:
             reference_point = self.reference_point
         if reference_point is None:
             return True
 
-        if any(f_pair[i] >= reference_point[i] for i in range(self.n_dim)):
+        if any(f_vals[i] >= reference_point[i] for i in range(self.n_dim)):
             return False
         return True
 
