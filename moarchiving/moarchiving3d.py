@@ -6,6 +6,7 @@ from moarchiving.moarchiving_parent import MOArchiveParent
 
 import warnings as _warnings
 from sortedcontainers import SortedList
+import math
 
 inf = float('inf')
 
@@ -200,18 +201,24 @@ class MOArchive3d(MOArchiveParent):
         else:
             _warnings.warn(f"Point {f_vals} not found in the archive")
 
-
     def add_list(self, list_of_f_vals, infos=None):
         """ Adds a list of points to the archive, and updates the hypervolume.
         Args:
             list_of_f_vals: list of points to add
             infos: additional information about the points
         """
+        n = len(self)
+        s = len(list_of_f_vals)
+
         if infos is None:
-            infos = [None] * len(list_of_f_vals)
-        for f_val, info in zip(list_of_f_vals, infos):
-            self.add(f_val, info=info, update_hypervolume=False)
-        self._set_HV()
+            infos = [None] * s
+
+        if s == 1 or s < math.log2(n) / 2:
+            for f_val, info in zip(list_of_f_vals, infos):
+                self.add(f_val, info=info, update_hypervolume=False)
+            self._set_HV()
+        else:
+            self.__init__(self.points + list_of_f_vals, self.reference_point, self.infos + infos)
 
     def copy(self):
         """ Returns a copy of the archive """
