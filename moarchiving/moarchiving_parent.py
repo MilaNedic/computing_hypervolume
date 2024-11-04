@@ -262,7 +262,9 @@ class MOArchiveParent(MOArchiveAbstract):
 
     def setup_cdllist(self, points, ref, infos):
         """ Set up a circular doubly linked list from the given data and reference point """
+        points = [p for p in points if self.strictly_dominates(p, ref)]
         n = len(points)
+
         head = [DLNode(info=info) for info in ["s1", "s2", "s3"] + [None] * n]
         # init_sentinels_new accepts a list at the beginning, therefore we use head[0:3]
         init_sentinels_new(head[0:3], ref, self.n_dim)
