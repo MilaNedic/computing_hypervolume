@@ -27,6 +27,14 @@ class MOArchive4d(MOArchiveParent):
         self._hypervolume_already_computed = False
         self.remove_dominated()
         self._set_HV()
+        if self._hypervolume > 0:
+            self._hypervolume_plus = -self._hypervolume
+        else:
+            if list_of_f_vals is None or len(list_of_f_vals) == 0:
+                self._hypervolume_plus = inf
+            else:
+                self._hypervolume_plus = min([self.distance_to_hypervolume_area(f)
+                                              for f in list_of_f_vals])
 
     def add(self, new_point, info=None, update_hypervolume=True):
         """ Add a new point to the archive.
@@ -37,7 +45,13 @@ class MOArchive4d(MOArchiveParent):
         if len(new_point) != self.n_dim:
             raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new_point}``")
 
-        if self.dominates(new_point) or not self.in_domain(new_point):
+        if self.dominates(new_point):
+            return False
+
+        if not self.in_domain(new_point):
+            dist_to_hv_area = self.distance_to_hypervolume_area(new_point)
+            if dist_to_hv_area < self.hypervolume_plus:
+                self._hypervolume_plus = dist_to_hv_area
             return False
 
         self.__init__(self.points + [new_point], self.reference_point, self.infos + [info])

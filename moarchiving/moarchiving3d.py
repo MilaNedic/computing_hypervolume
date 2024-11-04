@@ -32,6 +32,14 @@ class MOArchive3d(MOArchiveParent):
         self._removed = []
         self.preprocessing()
         self._set_HV()
+        if self._hypervolume > 0:
+            self._hypervolume_plus = -self._hypervolume
+        else:
+            if list_of_f_vals is None or len(list_of_f_vals) == 0:
+                self._hypervolume_plus = inf
+            else:
+                self._hypervolume_plus = min([self.distance_to_hypervolume_area(f)
+                                              for f in list_of_f_vals])
 
     def add(self, f_vals, info=None, update_hypervolume=True):
         """ Adds a new point to the archive, and updates the hypervolume if needed.
@@ -42,6 +50,10 @@ class MOArchive3d(MOArchiveParent):
         """
         if len(f_vals) != self.n_dim:
             raise ValueError(f"argument `f_vals` must be of length {self.n_dim}, was ``{f_vals}``")
+
+        dist_to_hv_area = self.distance_to_hypervolume_area(f_vals)
+        if dist_to_hv_area < self.hypervolume_plus:
+            self._hypervolume_plus = dist_to_hv_area
 
         # q is the current point (so that we are consistent with the paper),
         # stop is the head of the list, and first_iter is a flag to check if we are at the

@@ -59,5 +59,10 @@ class MOArchiveAbstract(ABC):
     def hypervolume(self):
         pass
 
+    @property
+    @abstractmethod
+    def hypervolume_plus(self):
+        pass
+
 
 

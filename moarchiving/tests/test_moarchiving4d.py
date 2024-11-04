@@ -39,7 +39,6 @@ class MyTestCase(unittest.TestCase):
         points = [[1, 2, 3, 4], [2, 2, 3, 5], [5, 4, 3, 2], [5, 5, 5, 5]]
         infos = [str(p) for p in points]
         moa = MOArchive4d(points, [6, 6, 6, 6], infos)
-        moa.print_cdllist()
 
         non_dominated_points = [[1, 2, 3, 4], [5, 4, 3, 2]]
         self.assertSetEqual(set([str(p) for p in non_dominated_points]), set(moa.infos))
@@ -66,16 +65,10 @@ class MyTestCase(unittest.TestCase):
         start_points = [[1, 2, 5, 4], [2, 3, 5, 1], [3, 5, 1, 4]]
         moa = MOArchive4d(start_points, ref_point, infos=["A", "B", "C"])
 
-        moa.print_cdllist()
-        moa.print_cxcy()
-
         # add point that is not dominated and does not dominate any other point
         u1 = [3, 3, 3, 3]
         moa.add(u1, "D")
         self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
-
-        moa.print_cdllist()
-        moa.print_cxcy()
 
         # add point that is dominated by another point in the archive
         u2 = [4, 5, 2, 4]
@@ -87,7 +80,7 @@ class MyTestCase(unittest.TestCase):
         moa.add(u3, "F")
         self.assertSetEqual(list_to_set(start_points[:2] + [u1, u3]), list_to_set(moa.points))
 
-    def test_hypervolume_after_add(self, n_points=1000, n_tests=10):
+    def test_hypervolume_after_add(self):
         ref_point = [1, 1, 1, 1]
 
         pop_size = 20
@@ -95,7 +88,6 @@ class MyTestCase(unittest.TestCase):
         points = get_non_dominated_points(pop_size * n_gen, n_dim=4)
 
         for gen in range(1, n_gen + 1):
-            print(f"gen: {gen}")
             moa_true = MOArchive4d(points[:(gen * pop_size)], ref_point)
             true_hv = moa_true.hypervolume
 
@@ -309,6 +301,32 @@ class MyTestCase(unittest.TestCase):
             else:
                 self.assertAlmostEqual(hv_imp2d, moa.hypervolume_improvement([1] + p), places=8)
 
+    def test_hypervolume_plus(self):
+        """ test the hypervolume_plus indicator """
+        moa = MOArchive4d(reference_point=[1, 1, 1, 1])
+        self.assertEqual(moa.hypervolume_plus, float('inf'))
+
+        moa.add([2, 2, 2, 2])
+        self.assertEqual(moa.hypervolume_plus, math.sqrt(4))
+
+        moa.add_list([[0, 0, 0, 5], [1, 1, 2, 1], [0, 3, 3, 2]])
+        self.assertEqual(moa.hypervolume_plus, 1)
+
+        moa.add([1, 1, 1, 1])
+        self.assertEqual(moa.hypervolume_plus, 0)
+
+        moa.add([0.5, 0.5, 0.5, 0.5])
+        self.assertEqual(moa.hypervolume_plus, -moa.hypervolume)
+
+        moa = MOArchive4d(reference_point=[2, 2, 2, 2])
+        prev_hv_plus = moa.hypervolume_plus
+        for i in range(1000):
+            point = [10 * random.random(), 10 * random.random(), 10 * random.random(),
+                     10 * random.random()]
+            moa.add(point)
+            self.assertLessEqual(moa.hypervolume_plus, prev_hv_plus)
+            prev_hv_plus = moa.hypervolume_plus
+
     def test_hypervolume(self):
         """ test the hypervolume calculation, by comparing to the result of original
         implementation in C"""
@@ -326,6 +344,7 @@ class MyTestCase(unittest.TestCase):
         ]
         moa = MOArchive4d(points, reference_point=[10, 10, 10, 10])
         self.assertEqual(8143.6, float(moa.hypervolume))
+        self.assertEqual(moa.hypervolume_plus, -moa.hypervolume)
 
         points = [
             [0.6394267984578837, 0.025010755222666936, 0.27502931836911926, 0.22321073814882275],
@@ -341,6 +360,7 @@ class MyTestCase(unittest.TestCase):
         ]
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
         self.assertAlmostEqual(0.37037902191204, float(moa.hypervolume), places=6)
+        self.assertEqual(moa.hypervolume_plus, -moa.hypervolume)
 
         points = [
             [0.6394267984578837, 0.025010755222666936, 0.27502931836911926, 0.22321073814882275],
@@ -447,6 +467,7 @@ class MyTestCase(unittest.TestCase):
 
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
         self.assertAlmostEqual(0.666453313693048, float(moa.hypervolume), places=6)
+        self.assertEqual(moa.hypervolume_plus, -moa.hypervolume)
 
 
 if __name__ == '__main__':

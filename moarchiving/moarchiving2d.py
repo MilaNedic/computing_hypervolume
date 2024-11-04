@@ -156,6 +156,18 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
         self._set_HV()
         self.make_expensive_asserts and self._asserts()
 
+        if reference_point is not None:
+            if self._hypervolume > 0:
+                self._hypervolume_plus = -self._hypervolume
+            else:
+                if list_of_f_pairs is None or len(list_of_f_pairs) == 0:
+                    self._hypervolume_plus = inf
+                else:
+                    self._hypervolume_plus = min([self.distance_to_hypervolume_area(f)
+                                                  for f in list_of_f_pairs])
+        else:
+            self._hypervolume_plus = None
+
     def add(self, f_pair, info=None):
         """insert `f_pair` in `self` if it is not (weakly) dominated.
 
@@ -194,6 +206,11 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
             raise ValueError("argument `f_pair` must be of length 2, was"
                              " ``%s``" % str(f_pair))
         if not self.in_domain(f_pair):
+            if self.hypervolume_plus is not None and self.hypervolume_plus > 0:
+                dist_to_hv_area = self.distance_to_hypervolume_area(f_pair)
+                if dist_to_hv_area < self.hypervolume_plus:
+                    self._hypervolume_plus = dist_to_hv_area
+
             self._removed = [f_pair]
             return None
         idx = self.bisect_left(f_pair)
@@ -521,6 +538,20 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
         return self._hypervolume
 
     @property
+    def hypervolume_plus(self):
+        """hypervolume_plus indicator of the entire list w.r.t. the "initial" reference point.
+
+        Raise `ValueError` when no reference point was given initially.
+
+        TODO: doctest
+        """
+        if self.reference_point is None:
+            raise ValueError("to compute the hypervolume_plus a reference"
+                             " point is needed (must be given initially)")
+        return self._hypervolume_plus
+
+
+    @property
     def contributing_hypervolumes(self):
         """`list` of contributing hypervolumes.
 
@@ -698,6 +729,8 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
         if self.reference_point is None:
             return None
         self._hypervolume = self.compute_hypervolume(self.reference_point)
+        if self._hypervolume > 0:
+            self._hypervolume_plus = -self._hypervolume
         return self._hypervolume
 
     def compute_hypervolume(self, reference_point):
@@ -806,6 +839,7 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
             _warnings.warn("_subtract_HV: %f + %f loses many digits of precision"
                           % (dHV, self._hypervolume))
         self._hypervolume += Ff(dHV)
+        self._hypervolume_plus = -self._hypervolume
         return dHV
 
     def prune(self):

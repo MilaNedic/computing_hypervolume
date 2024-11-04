@@ -195,7 +195,14 @@ class MOArchiveParent(MOArchiveAbstract):
         if self.reference_point is None:
             raise ValueError("to compute the hypervolume a reference"
                              " point is needed (must be given initially)")
-        return self.hypervolume_final_float_type(self._hypervolume)
+        return self._hypervolume
+
+    @property
+    def hypervolume_plus(self):
+        if self.reference_point is None:
+            raise ValueError("to compute the hypervolume_plus a reference"
+                             " point is needed (must be given initially)")
+        return self._hypervolume_plus
 
     @property
     def contributing_hypervolumes(self):
@@ -254,7 +261,9 @@ class MOArchiveParent(MOArchiveAbstract):
 
     def _set_HV(self):
         """ Set the hypervolume of the archive """
-        self._hypervolume = self.compute_hypervolume()
+        self._hypervolume = self.hypervolume_final_float_type(self.compute_hypervolume())
+        if self._hypervolume > 0:
+            self._hypervolume_plus = -self._hypervolume
         return self._hypervolume
 
     def compute_hypervolume(self):
