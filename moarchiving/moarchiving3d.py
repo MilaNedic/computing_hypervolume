@@ -213,7 +213,7 @@ class MOArchive3d(MOArchiveParent):
         if infos is None:
             infos = [None] * s
 
-        if s == 1 or s < math.log2(n) / 2:
+        if s == 1 or (n > 0 and s < math.log2(n) / 2):
             for f_val, info in zip(list_of_f_vals, infos):
                 self.add(f_val, info=info, update_hypervolume=False)
             self._set_HV()
@@ -317,7 +317,7 @@ class MOArchive3d(MOArchiveParent):
 
         while p != stop:
             s = t.outer_delimiter_x(p)
-            if self.weakly_dominates(s.x, p.x):
+            if self.weakly_dominates(s.x, p.x) or self.weakly_dominates(t.next_y(s).x, p.x):
                 p.ndomr = 1
                 p = p.next[di]
                 continue
