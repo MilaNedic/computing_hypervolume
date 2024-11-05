@@ -3,6 +3,10 @@ import random
 
 
 def get_non_dominated_points(n_points, n_dim=3, mode='spherical'):
+    """ Returns a list of non-dominated points:
+     - n_points: number of points
+     - n_dim: number of dimensions
+     - mode: 'spherical' or 'linear' """
     if n_dim == 3:
         if mode == 'spherical':
             return spherical_front_3d(1, n_points, normalized=False)
@@ -18,10 +22,15 @@ def get_non_dominated_points(n_points, n_dim=3, mode='spherical'):
 
 
 def get_random_points(n_points, n_dim):
+    """ Returns a list of random points between 0 and 1, with n_points and n_dim dimensions """
     return [[random.random() for _ in range(n_dim)] for _ in range(n_points)]
 
 
 def get_stacked_points(n_points, points_definitions):
+    """ Returns a list of points with n_points and n_dim dimensions,
+    where point from i-th dimension is defined by points_definitions[i]:
+    - 'random' for random value between 0 and 1
+    - int for a fixed value """
     points = []
     for i in range(n_points):
         points.append([])
@@ -43,6 +52,7 @@ def permute_points(points, permutation):
 
 
 def spherical_front_3d(distance, num_points, normalized=True):
+    """ Returns a list of non-dominated points on the 3D spherical front """
     vectors = []
 
     if normalized:
@@ -72,6 +82,7 @@ def spherical_front_3d(distance, num_points, normalized=True):
 
 
 def linear_front_3d(distance, num_points, normalized):
+    """ Returns a list of non-dominated points on the 3D linear front """
     vectors = []
 
     if normalized:
@@ -96,6 +107,7 @@ def linear_front_3d(distance, num_points, normalized):
 
 
 def linear_front_4d(distance, num_points, normalized):
+    """ Returns a list of non-dominated points on the 4D linear front """
     vectors = []
 
     if normalized:
@@ -121,6 +133,7 @@ def linear_front_4d(distance, num_points, normalized):
 
 
 def spherical_front_4d(distance, num_points, normalized):
+    """ Returns a list of non-dominated points on the 4D spherical front """
     vectors = []
 
     if normalized:
