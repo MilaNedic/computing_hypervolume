@@ -298,7 +298,7 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
         del self[idx]  # == list.remove(self, f_pair)
         if self._infos: del self._infos[idx]
 
-    def add_list(self, list_of_f_pairs):
+    def add_list(self, list_of_f_pairs, infos=None):
         """insert a list of f-pairs which doesn't need to be sorted.
 
         This is just a shortcut for looping over `add`, but `discarded`
@@ -325,9 +325,11 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
         a small performance benefit.
         """
         removed = []
+        if infos is None:
+            infos = len(list_of_f_pairs) * [None]
         # should we better create a non-dominated list and do a merge?
-        for f_pair in list_of_f_pairs:
-            if self.add(f_pair) is not None:
+        for f_pair, info in zip(list_of_f_pairs, infos):
+            if self.add(f_pair, info=info) is not None:
                 removed += [self._removed]  # slightly faster than .extend
         self._removed = removed  # could contain elements of `list_of_f_pairs`
         self.make_expensive_asserts and self._asserts()

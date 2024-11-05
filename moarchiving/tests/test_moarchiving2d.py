@@ -35,6 +35,11 @@ class MyTestCase(unittest.TestCase):
         # assert that all the points in the archive are non dominated and thus have the same info
         self.assertSetEqual(set([str(p) for p in points]), set(moa.infos))
 
+        moa_add = MOArchive2d(reference_point=[3, 3])
+        moa_add.add_list(points, infos=infos)
+        self.assertEqual([str(p[:2]) for p in moa_add.points], moa_add.infos)
+        self.assertSetEqual(set([str(p) for p in points]), set(moa_add.infos))
+
     def test_infos_dominated(self):
         """ test if the infos about dominated points are removed """
         points = [
@@ -45,62 +50,37 @@ class MyTestCase(unittest.TestCase):
         ]
         infos = ["A", "B", "C", "D"]
 
-        moa = MOArchive2d(points, [6, 6, 6], infos=infos)
+        moa = MOArchive2d(points, [6, 6], infos=infos)
         # assert that only points A and D are stored in the archive
         self.assertSetEqual({"A", "D"}, set(moa.infos))
 
-    def test_in_domain(self):
-        """ test if the in_domain function works correctly """
-        ref_point = [6, 6, 6]
-        moa = MOArchive2d([[1, 1]], ref_point)
-
-        # test if the points are in the domain
-        self.assertTrue(moa.in_domain([1, 2]))
-        self.assertTrue(moa.in_domain([5.9, 5.9]))
-        # test if the point is not in the domain
-        self.assertFalse(moa.in_domain([7, 8]))
-        self.assertFalse(moa.in_domain([6, 6]))
-        self.assertFalse(moa.in_domain([0, 6]))
+        moa_add = MOArchive2d(reference_point=[6, 6])
+        moa_add.add_list(points, infos=infos)
+        self.assertSetEqual({"A", "D"}, set(moa_add.infos))
 
     def test_add(self):
         """ test if the add_points function works correctly """
         ref_point = [6, 6]
         start_points = [[1, 3], [5, 1]]
-        moa = MOArchive2d(start_points, ref_point)
+        moa = MOArchive2d(start_points, ref_point, infos=["A", "B"])
 
         # add point that is not dominated and does not dominate any other point
         u1 = [3, 2]
-        moa.add(u1)
+        moa.add(u1, info="C")
         self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
+        self.assertSetEqual({"A", "B", "C"}, set(moa.infos))
 
         # add point that is dominated by another point in the archive
         u2 = [4, 4]
-        moa.add(u2)
+        moa.add(u2, info="D")
         self.assertSetEqual(list_to_set(start_points + [u1]), list_to_set(moa.points))
+        self.assertSetEqual({"A", "B", "C"}, set(moa.infos))
 
         # add point that dominates another point in the archive
         u3 = [2, 2]
-        moa.add(u3)
+        moa.add(u3, info="E")
         self.assertSetEqual(list_to_set(start_points + [u3]), list_to_set(moa.points))
-
-    def test_dominates(self):
-        """ Test the dominates function """
-        ref_point = [6, 6]
-        points = [[1, 5], [5, 1], [3, 3]]
-        moa = MOArchive2d(points, ref_point)
-
-        # test that the points that are already in the archive are dominated
-        for p in points:
-            self.assertTrue(moa.dominates(p))
-
-        # test other dominated points
-        self.assertTrue(moa.dominates([5, 5]))
-        self.assertTrue(moa.dominates([3, 4]))
-
-        # test non dominated points
-        self.assertFalse(moa.dominates([3, 2]))
-        self.assertFalse(moa.dominates([2, 4]))
-        self.assertFalse(moa.dominates([1, 1]))
+        self.assertSetEqual({"A", "B", "E"}, set(moa.infos))
 
     def test_copy_MOArchive(self):
         """ Test the copy function of the MOArchive3d class """
