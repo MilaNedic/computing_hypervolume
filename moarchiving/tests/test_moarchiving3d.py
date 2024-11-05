@@ -5,7 +5,6 @@ from moarchiving.tests.point_sampling import (get_non_dominated_points, get_rand
                                               get_stacked_points)
 
 import unittest
-import itertools
 import math
 import random
 
@@ -284,7 +283,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(moa.contributing_hypervolume([2, 3, 1]), 3)
         self.assertEqual(moa.contributing_hypervolume([3, 1, 2]), 3)
 
-        points = list(itertools.permutations([1, 2, 3]))
+        points = [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
         moa = MOArchive3d(points, reference_point=[4, 4, 4])
         for p in points:
             self.assertEqual(moa.contributing_hypervolume(list(p)), 1)
@@ -400,7 +399,6 @@ class MyTestCase(unittest.TestCase):
             moa.add(point)
             self.assertLessEqual(moa.hypervolume_plus, prev_hv_plus)
             prev_hv_plus = moa.hypervolume_plus
-
 
     def test_hypervolume(self):
         """ test the hypervolume calculation, by comparing to the result of original

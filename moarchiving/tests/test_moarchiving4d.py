@@ -5,7 +5,6 @@ from moarchiving.tests.point_sampling import (get_non_dominated_points, get_stac
                                               get_random_points, permute_points)
 
 import unittest
-import itertools
 import random
 import math
 
@@ -147,10 +146,14 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(1, moa.distance_to_hypervolume_area([2, 0, 3, 2]))
         self.assertEqual(10, moa.distance_to_hypervolume_area([0, 0, 0, 12]))
 
-        self.assertAlmostEqual(math.sqrt(2), moa.distance_to_hypervolume_area([0, 3, 3, 0]), places=6)
-        self.assertAlmostEqual(math.sqrt(2), moa.distance_to_hypervolume_area([2, 3, 3, 2]), places=6)
-        self.assertAlmostEqual(math.sqrt(4), moa.distance_to_hypervolume_area([3, 3, 3, 3]), places=6)
-        self.assertAlmostEqual(math.sqrt(7**2 * 4), moa.distance_to_hypervolume_area([9, 9, 9, 9]), places=6)
+        self.assertAlmostEqual(math.sqrt(2),
+                               moa.distance_to_hypervolume_area([0, 3, 3, 0]), places=6)
+        self.assertAlmostEqual(math.sqrt(2),
+                               moa.distance_to_hypervolume_area([2, 3, 3, 2]), places=6)
+        self.assertAlmostEqual(math.sqrt(4),
+                               moa.distance_to_hypervolume_area([3, 3, 3, 3]), places=6)
+        self.assertAlmostEqual(math.sqrt(7**2 * 4),
+                               moa.distance_to_hypervolume_area([9, 9, 9, 9]), places=6)
 
     def test_distance_to_pareto_front_compare_2d(self):
         # first make a pseudo 4D pareto front and compare it to 2D pareto front
@@ -171,7 +174,8 @@ class MyTestCase(unittest.TestCase):
             for point in new_points:
                 d2 = moa2d.distance_to_pareto_front(point[:2])
                 d4 = moa4d.distance_to_pareto_front(point)
-                d4_perm = moa4d_perm.distance_to_pareto_front(permute_points([point], permutation)[0])
+                d4_perm = moa4d_perm.distance_to_pareto_front(permute_points([point],
+                                                                             permutation)[0])
                 self.assertAlmostEqual(d2, d4, places=8)
                 self.assertAlmostEqual(d4, d4_perm, places=8)
 
@@ -194,7 +198,8 @@ class MyTestCase(unittest.TestCase):
             for point in new_points:
                 d3 = moa3d.distance_to_pareto_front(point[:3])
                 d4 = moa4d.distance_to_pareto_front(point)
-                d4_perm = moa4d_perm.distance_to_pareto_front(permute_points([point], permutation)[0])
+                d4_perm = moa4d_perm.distance_to_pareto_front(permute_points([point],
+                                                                             permutation)[0])
                 self.assertAlmostEqual(d3, d4, places=8)
                 self.assertAlmostEqual(d4, d4_perm, places=8)
 
@@ -263,7 +268,11 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(moa.points), 0)
 
     def test_contributing_hypervolume(self):
-        points = [list(p) for p in itertools.permutations([1, 2, 3, 4])]
+        points = [[1, 2, 3, 4], [1, 2, 4, 3], [1, 3, 2, 4], [1, 3, 4, 2], [1, 4, 2, 3],
+                  [1, 4, 3, 2], [2, 1, 3, 4], [2, 1, 4, 3], [2, 3, 1, 4], [2, 3, 4, 1],
+                  [2, 4, 1, 3], [2, 4, 3, 1], [3, 1, 2, 4], [3, 1, 4, 2], [3, 2, 1, 4],
+                  [3, 2, 4, 1], [3, 4, 1, 2], [3, 4, 2, 1], [4, 1, 2, 3], [4, 1, 3, 2],
+                  [4, 2, 1, 3], [4, 2, 3, 1], [4, 3, 1, 2], [4, 3, 2, 1]]
         moa = MOArchive4d(points, reference_point=[5, 5, 5, 5])
         for p in points:
             self.assertEqual(moa.contributing_hypervolume(list(p)), 1)
@@ -277,7 +286,11 @@ class MyTestCase(unittest.TestCase):
                                    moa3d.contributing_hypervolume(p), places=8)
 
     def test_hypervolume_improvement(self):
-        points = [list(p) for p in itertools.permutations([1, 2, 3, 4])]
+        points = [[1, 2, 3, 4], [1, 2, 4, 3], [1, 3, 2, 4], [1, 3, 4, 2], [1, 4, 2, 3],
+                  [1, 4, 3, 2], [2, 1, 3, 4], [2, 1, 4, 3], [2, 3, 1, 4], [2, 3, 4, 1],
+                  [2, 4, 1, 3], [2, 4, 3, 1], [3, 1, 2, 4], [3, 1, 4, 2], [3, 2, 1, 4],
+                  [3, 2, 4, 1], [3, 4, 1, 2], [3, 4, 2, 1], [4, 1, 2, 3], [4, 1, 3, 2],
+                  [4, 2, 1, 3], [4, 2, 3, 1], [4, 3, 1, 2], [4, 3, 2, 1]]
         moa = MOArchive4d(points, reference_point=[5, 5, 5, 5])
         self.assertEqual(moa.hypervolume_improvement([1, 2, 3, 4]), 0)
         self.assertEqual(moa.hypervolume_improvement([2, 3, 4, 1]), 0)
