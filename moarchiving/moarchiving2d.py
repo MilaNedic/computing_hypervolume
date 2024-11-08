@@ -30,7 +30,7 @@ class BiobjectiveNondominatedSortedList(list):
 
     The operation
 
-    >>> from moarchiving import BiobjectiveNondominatedSortedList
+    >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList
     >>> any_list = BiobjectiveNondominatedSortedList(any_list)  # doctest:+SKIP
 
     sorts and prunes the pair list `any_list` to become a consistent
@@ -194,7 +194,7 @@ class BiobjectiveNondominatedSortedList(list):
         Implementation detail: For performance reasons, `insert` is
         avoided in favor of `__setitem__`, if possible.
 
-        >>> from moarchiving import BiobjectiveNondominatedSortedList
+        >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList
         >>> arch = BiobjectiveNondominatedSortedList()
         >>> len(arch.infos) == len(arch) == 0
         True
@@ -278,7 +278,7 @@ class BiobjectiveNondominatedSortedList(list):
         To avoid the error, checking ``if f_pair is in self`` first is a
         possible coding solution, like
 
-        >>> from moarchiving import BiobjectiveNondominatedSortedList
+        >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList
         >>> nda = BiobjectiveNondominatedSortedList([[2, 3]])
         >>> f_pair = [1, 2]
         >>> assert [2, 3] in nda and f_pair not in nda
@@ -313,7 +313,7 @@ class BiobjectiveNondominatedSortedList(list):
         This is just a shortcut for looping over `add`, but `discarded`
         now contains the discarded elements from all `add` operations.
 
-        >>> from moarchiving import BiobjectiveNondominatedSortedList
+        >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList
         >>> arch = BiobjectiveNondominatedSortedList()
         >>> list_of_f_pairs = [[1, 2], [0, 3]]
         >>> for f_pair in list_of_f_pairs:
@@ -400,7 +400,7 @@ class BiobjectiveNondominatedSortedList(list):
 
         Otherwise return `False`.
 
-        >>> from moarchiving import BiobjectiveNondominatedSortedList as NDA
+        >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as NDA
         >>> a = NDA([[0.39, 0.075], [0.0087, 0.14]])
         >>> a.dominates(a[0])  # is always True if `a` is not empty
         True
@@ -422,7 +422,7 @@ class BiobjectiveNondominatedSortedList(list):
 
         Otherwise return `False` or `None` if `idx` is out-of-range.
 
-        >>> from moarchiving import BiobjectiveNondominatedSortedList as NDA
+        >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as NDA
         >>> NDA().dominates_with(0, [1, 2]) is None  # empty NDA
         True
 
@@ -440,7 +440,7 @@ class BiobjectiveNondominatedSortedList(list):
         hence the number of dominating elements which can also be obtained
         without creating the list with ``number_only=True``.
 
-        >>> from moarchiving import BiobjectiveNondominatedSortedList as NDA
+        >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as NDA
         >>> a = NDA([[1.2, 0.1], [0.5, 1]])
         >>> len(a)
         2
@@ -477,7 +477,7 @@ class BiobjectiveNondominatedSortedList(list):
         `f_pair` may also be an index in `self` in which case
         ``self[f_pair]`` is tested to be in-domain.
 
-        >>> from moarchiving import BiobjectiveNondominatedSortedList as NDA
+        >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as NDA
         >>> a = NDA([[2.2, 0.1], [0.5, 1]], reference_point=[2, 2])
         >>> assert len(a) == 1
         >>> a.in_domain([0, 0])
@@ -522,7 +522,7 @@ class BiobjectiveNondominatedSortedList(list):
 
         Raise `ValueError` when no reference point was given initially.
 
-        >>> from moarchiving import BiobjectiveNondominatedSortedList as NDA
+        >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as NDA
         >>> a = NDA([[0.5, 0.4], [0.3, 0.7]], [2, 2.1])
         >>> a._asserts()
         >>> a.reference_point == [2, 2.1]
@@ -925,7 +925,7 @@ class BiobjectiveNondominatedSortedList(list):
 
         Example to create a list of rank-k-non-dominated fronts:
 
-        >>> from moarchiving import BiobjectiveNondominatedSortedList as NDA
+        >>> from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as NDA
         >>> all_ = [[0.1, 1], [-2, 3], [-4, 5], [-4, 5], [-4, 4.9]]
         >>> nda_list = [NDA(all_)]  # rank-0-non-dominated
         >>> while nda_list[-1].discarded:
@@ -954,7 +954,7 @@ class BiobjectiveNondominatedSortedList(list):
     def _asserts(self):
         """make all kind of consistency assertions.
 
-        >>> import moarchiving
+        >>> import moarchiving.moarchiving2d as moarchiving
         >>> a = moarchiving.BiobjectiveNondominatedSortedList(
         ...    [[-0.749, -1.188], [-0.557, 1.1076],
         ...    [0.2454, 0.4724], [-1.146, -0.110]], [10, 10])
@@ -1027,6 +1027,7 @@ class BiobjectiveNondominatedSortedList(list):
                 diffs = np.diff(self, 1, 0)
                 assert all(diffs[:, 0] > 0)
                 assert all(diffs[:, 1] < 0)
+
 
 if __name__ == "__main__":
     import doctest
