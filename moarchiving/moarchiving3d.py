@@ -236,24 +236,34 @@ class MOArchive3d(MOArchiveParent):
         else:
             _warnings.warn(f"Point {f_vals} not found in the archive")
 
-    def add_list(self, list_of_f_vals, infos=None):
+    def add_list(self, list_of_f_vals, infos=None, add_method="compare"):
         """ Adds a list of points to the archive, and updates the hypervolume.
         Args:
             list_of_f_vals: list of points to add
             infos: additional information about the points
+            add_method: method to use for adding the points, possible values:
+            - compare: compares the number of points to add with the number of points in the archive
+            and uses the most efficient method based on that
+            - one_by_one: adds the points one by one to the archive
+            - reinit: reinitializes the archive with the new points
         """
-        n = len(self)
         s = len(list_of_f_vals)
+        if add_method == "compare":
+            n = len(self)
+            add_method = "one_by_one" if s == 1 or (n > 0 and s < math.log2(n) / 2) else "reinit"
 
         if infos is None:
             infos = [None] * s
 
-        if s == 1 or (n > 0 and s < math.log2(n) / 2):
+        if add_method == "one_by_one":
             for f_val, info in zip(list_of_f_vals, infos):
                 self.add(f_val, info=info, update_hypervolume=False)
             self._set_HV()
-        else:
+        elif add_method == "reinit":
             self.__init__(self.points + list_of_f_vals, self.reference_point, self.infos + infos)
+        else:
+            raise ValueError(f"Unknown add method: {add_method}, "
+                             f"should be one of: 'compare', 'one_by_one', 'reinit'")
 
     def copy(self):
         """ Returns a copy of the archive """
