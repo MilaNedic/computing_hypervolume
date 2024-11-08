@@ -18,11 +18,10 @@ try: import fractions
 except ImportError: _warnings.warn(
     '`fractions` module not installed, arbitrary precision hypervolume computation not available')
 
-from moarchiving.moarchiving_abstract import MOArchiveAbstract
 inf = float('inf')
 
 
-class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
+class BiobjectiveNondominatedSortedList(list):
     """A sorted list of non-dominated unique objective-pairs.
 
     Non-domination here means smaller in at least one objective. The list is
@@ -97,7 +96,9 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
                  list_of_f_pairs=None,
                  reference_point=None,
                  sort=sorted,
-                 infos=None):
+                 infos=None,
+                 hypervolume_final_float_type=None,
+                 hypervolume_computation_float_type=None):
         """`list_of_f_pairs` does not need to be sorted.
 
         f-pairs beyond the `reference_point` are pruned away. The
@@ -109,9 +110,17 @@ class BiobjectiveNondominatedSortedList(list, MOArchiveAbstract):
         CAVEAT: the interface, in particular the positional interface
         may change in future versions.
         """
+        if hypervolume_final_float_type is None:
+            self.hypervolume_final_float_type = BiobjectiveNondominatedSortedList.hypervolume_final_float_type
+        else:
+            self.hypervolume_final_float_type = hypervolume_final_float_type
+
+        if hypervolume_computation_float_type is None:
+            self.hypervolume_computation_float_type = BiobjectiveNondominatedSortedList.hypervolume_computation_float_type
+        else:
+            self.hypervolume_computation_float_type = hypervolume_computation_float_type
+
         self.make_expensive_asserts = BiobjectiveNondominatedSortedList.make_expensive_asserts
-        self.hypervolume_final_float_type = BiobjectiveNondominatedSortedList.hypervolume_final_float_type
-        self.hypervolume_computation_float_type = BiobjectiveNondominatedSortedList.hypervolume_computation_float_type
         self.maintain_contributing_hypervolumes = BiobjectiveNondominatedSortedList.maintain_contributing_hypervolumes
 
         if list_of_f_pairs is not None and len(list_of_f_pairs):

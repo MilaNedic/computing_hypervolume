@@ -7,6 +7,10 @@ from moarchiving.moarchiving_parent import MOArchiveParent
 import warnings as _warnings
 from sortedcontainers import SortedList
 import math
+try:
+    import fractions
+except ImportError:
+    _warnings.warn('`fractions` module not installed, arbitrary precision hypervolume computation not available')
 
 inf = float('inf')
 
@@ -18,8 +22,17 @@ class MOArchive3d(MOArchiveParent):
     add and remove. Points of the archive can be accessed as a list of points order by the third
     coordinate using function points_list.
     """
+    try:
+        hypervolume_final_float_type = fractions.Fraction
+        hypervolume_computation_float_type = fractions.Fraction
+    except:
+        hypervolume_final_float_type = float
+        hypervolume_computation_float_type = float
 
-    def __init__(self, list_of_f_vals=None, reference_point=None, infos=None):
+
+    def __init__(self, list_of_f_vals=None, reference_point=None, infos=None,
+                 hypervolume_final_float_type=None,
+                 hypervolume_computation_float_type=None):
         """Create a new 3D archive object.
         Args:
             list_of_f_vals: list of objective vectors
@@ -27,7 +40,17 @@ class MOArchive3d(MOArchiveParent):
             infos: list of additional information for each objective vector,
             must be the same length as list_of_f_vals
         """
-        super().__init__(list_of_f_vals, reference_point, infos, 3)
+        hypervolume_final_float_type = MOArchive3d.hypervolume_final_float_type \
+            if hypervolume_final_float_type is None else hypervolume_final_float_type
+        hypervolume_computation_float_type = MOArchive3d.hypervolume_computation_float_type \
+            if hypervolume_computation_float_type is None else hypervolume_computation_float_type
+
+        super().__init__(list_of_f_vals=list_of_f_vals,
+                         reference_point=reference_point,
+                         infos=infos,
+                         n_obj=3,
+                         hypervolume_final_float_type=hypervolume_final_float_type,
+                         hypervolume_computation_float_type=hypervolume_computation_float_type)
 
         self._removed = []
         self.preprocessing()

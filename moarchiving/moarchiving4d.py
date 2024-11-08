@@ -3,6 +3,13 @@ from moarchiving.moarchiving_utils import hv4dplusR, remove_from_z
 from moarchiving.moarchiving3d import MOArchive3d
 from moarchiving.moarchiving_parent import MOArchiveParent
 
+import warnings as _warnings
+try:
+    import fractions
+except ImportError:
+    _warnings.warn('`fractions` module not installed, arbitrary precision hypervolume computation not available')
+
+
 inf = float('inf')
 
 
@@ -13,8 +20,16 @@ class MOArchive4d(MOArchiveParent):
     add and remove. Points of the archive can be accessed as a list of points order by the fourth
     coordinate using function points_list.
     """
+    try:
+        hypervolume_final_float_type = fractions.Fraction
+        hypervolume_computation_float_type = fractions.Fraction
+    except:
+        hypervolume_final_float_type = float
+        hypervolume_computation_float_type = float
 
-    def __init__(self, list_of_f_vals=None, reference_point=None, infos=None):
+    def __init__(self, list_of_f_vals=None, reference_point=None, infos=None,
+                 hypervolume_final_float_type=None,
+                 hypervolume_computation_float_type=None):
         """ Create a new 4D archive object.
         Args:
             list_of_f_vals: list of objective vectors
@@ -22,7 +37,17 @@ class MOArchive4d(MOArchiveParent):
             infos: list of additional information for each objective vector, of the same length as
             list_of_f_vals
         """
-        super().__init__(list_of_f_vals, reference_point, infos, 4)
+        hypervolume_final_float_type = MOArchive4d.hypervolume_final_float_type \
+            if hypervolume_final_float_type is None else hypervolume_final_float_type
+        hypervolume_computation_float_type = MOArchive4d.hypervolume_computation_float_type \
+            if hypervolume_computation_float_type is None else hypervolume_computation_float_type
+
+        super().__init__(list_of_f_vals=list_of_f_vals,
+                         reference_point=reference_point,
+                         infos=infos,
+                         n_obj=4,
+                         hypervolume_final_float_type=hypervolume_final_float_type,
+                         hypervolume_computation_float_type=hypervolume_computation_float_type)
 
         self._hypervolume_already_computed = False
         self.remove_dominated()
@@ -41,6 +66,8 @@ class MOArchive4d(MOArchiveParent):
         Args:
             new_point: new point to be added
             info: additional information for the new point
+            update_hypervolume: should be set to True, unless adding multiple points at once,
+            in which case it is slightly more efficient to set it to True only for last point
         """
         if len(new_point) != self.n_dim:
             raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new_point}``")
