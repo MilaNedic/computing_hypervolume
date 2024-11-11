@@ -250,6 +250,8 @@ class MOArchiveParent:
 
     def _set_HV(self):
         """ Set the hypervolume of the archive """
+        if self.reference_point is None:
+            return None
         self._hypervolume = self.hypervolume_final_float_type(self.compute_hypervolume())
         if self._hypervolume > 0:
             self._hypervolume_plus = -self._hypervolume
