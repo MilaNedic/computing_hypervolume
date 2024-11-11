@@ -193,6 +193,13 @@ class MOArchiveParent:
 
     def contributing_hypervolume(self, f_vals):
         """ Returns the hypervolume contribution of a point in the archive """
+        try:
+            if len(f_vals) != self.n_dim:
+                raise ValueError(f"argument `f_vals` must be of length {self.n_dim}, "
+                                 f"was ``{f_vals}``")
+        except TypeError:
+            raise TypeError(f"argument `f_vals` must be a list, was ``{f_vals}``")
+
         if f_vals in self.points:
             hv_before = self._hypervolume
             removed_info = self.remove(f_vals)
