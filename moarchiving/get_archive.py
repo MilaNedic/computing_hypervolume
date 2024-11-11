@@ -32,13 +32,18 @@ def get_archive(list_of_f_vals=None, reference_point=None, infos=None, n_obj=Non
         except:
             get_archive.hypervolume_computation_float_type = float
 
-    assert list_of_f_vals is not None or n_obj is not None, \
-        "Either list_of_f_vals or n_obj must be provided"
-    if list_of_f_vals is not None and len(list_of_f_vals) > 0 and n_obj is not None:
+    assert list_of_f_vals is not None or n_obj is not None or reference_point is not None, \
+        "At least one of `list_of_f_vals`, `reference_point` or `n_obj` must be provided"
+
+    if n_obj is None:
+        if list_of_f_vals is not None and len(list_of_f_vals) > 0:
+            n_obj = len(list_of_f_vals[0])
+        else:
+            n_obj = len(reference_point)
+
+    if list_of_f_vals is not None and len(list_of_f_vals) > 0:
         assert len(list_of_f_vals[0]) == n_obj, \
             "The number of objectives in list_of_f_vals must match n_obj"
-    if n_obj is None:
-        n_obj = len(list_of_f_vals[0])
     if reference_point is not None:
         assert len(reference_point) == n_obj, \
             "The number of objectives in reference_point must match n_obj"

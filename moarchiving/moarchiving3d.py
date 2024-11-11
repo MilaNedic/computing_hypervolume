@@ -74,9 +74,10 @@ class MOArchive3d(MOArchiveParent):
         if len(f_vals) != self.n_dim:
             raise ValueError(f"argument `f_vals` must be of length {self.n_dim}, was ``{f_vals}``")
 
-        dist_to_hv_area = self.distance_to_hypervolume_area(f_vals)
-        if dist_to_hv_area < self.hypervolume_plus:
-            self._hypervolume_plus = dist_to_hv_area
+        if self.hypervolume_plus is not None:
+            dist_to_hv_area = self.distance_to_hypervolume_area(f_vals)
+            if dist_to_hv_area < self.hypervolume_plus:
+                self._hypervolume_plus = dist_to_hv_area
 
         # q is the current point (so that we are consistent with the paper),
         # stop is the head of the list, and first_iter is a flag to check if we are at the
