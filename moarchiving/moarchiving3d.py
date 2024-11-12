@@ -21,6 +21,26 @@ class MOArchive3d(MOArchiveParent):
     The archive is implemented as a doubly linked list, and can be modified using functions
     add and remove. Points of the archive can be accessed as a list of points order by the third
     coordinate using function points_list.
+
+    >>> from moarchiving.get_archive import get_archive
+    >>> moa = get_archive([[1, 2, 3], [3, 2, 1]])
+    >>> moa.points # returns the list of points in the archive sorted by the third coordinate
+    [[3, 2, 1], [1, 2, 3]]
+    >>> moa.add([2, 2, 2]) # add a new point to the archive
+    True
+    >>> moa.add([3, 3, 3])
+    False
+    >>> moa = get_archive([[1, 2, 3], [2, 3, 4], [3, 2, 1]],
+    ...                   reference_point=[4, 4, 4], infos=["A", "B", "C"])
+    >>> moa.infos # returns the list of infos for each point in the archive
+    ['C', 'A']
+    >>> moa.hypervolume
+    Fraction(10, 1)
+    >>> get_archive.hypervolume_final_float_type = float
+    >>> get_archive.hypervolume_computation_float_type = float
+    >>> moa2 = get_archive([[1, 2, 3], [2, 3, 4], [3, 2, 1]], reference_point=[4, 4, 4])
+    >>> moa2.hypervolume
+    10.0
     """
     try:
         hypervolume_final_float_type = fractions.Fraction
@@ -38,7 +58,12 @@ class MOArchive3d(MOArchiveParent):
             list_of_f_vals: list of objective vectors
             reference_point: reference point for the archive
             infos: list of additional information for each objective vector,
-            must be the same length as list_of_f_vals
+                must be the same length as list_of_f_vals
+            hypervolume_final_float_type: type of the final hypervolume value,
+                defaults to fractions.Fraction
+            hypervolume_computation_float_type: type of the intermediate hypervolume computation,
+                defaults to fractions.Fraction
+
         """
         hypervolume_final_float_type = MOArchive3d.hypervolume_final_float_type \
             if hypervolume_final_float_type is None else hypervolume_final_float_type
@@ -70,6 +95,25 @@ class MOArchive3d(MOArchiveParent):
             f_vals: the new point to add
             info: additional information about the point
             update_hypervolume: whether to update the hypervolume after adding the point
+        Returns:
+            True if the point was added, False if it was dominated by another point in the archive
+
+        >>> from moarchiving.get_archive import get_archive
+        >>> moa = get_archive(reference_point=[4, 4, 4])
+        >>> moa.add([2, 3, 4])
+        False
+        >>> moa.add([1, 2, 3])
+        True
+        >>> moa.points
+        [[1, 2, 3]]
+        >>> moa.add([3, 2, 1])
+        True
+        >>> moa.points
+        [[3, 2, 1], [1, 2, 3]]
+        >>> moa.add([2, 2, 2])
+        True
+        >>> moa.points
+        [[3, 2, 1], [2, 2, 2], [1, 2, 3]]
         """
         if len(f_vals) != self.n_dim:
             raise ValueError(f"argument `f_vals` must be of length {self.n_dim}, was ``{f_vals}``")
@@ -174,10 +218,23 @@ class MOArchive3d(MOArchiveParent):
 
     def remove(self, f_vals):
         """ Removes a point from the archive, and updates the hypervolume.
+        If the point is not found, it raises a ValueError.
+
         Args:
             f_vals: the point that should be removed
         Returns:
             The information of the removed point
+        >>> from moarchiving.get_archive import get_archive
+        >>> moa = get_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4],
+        ...                   infos=["A", "B", "C"])
+        >>> moa.remove([2, 2, 2])
+        'B'
+        >>> moa.points
+        [[3, 2, 1], [1, 2, 3]]
+        >>> moa.remove([1, 2, 3])
+        'A'
+        >>> moa.points
+        [[3, 2, 1]]
         """
 
         di = self.n_dim - 1  # Dimension index for sorting (z-axis in 3D)
@@ -235,7 +292,7 @@ class MOArchive3d(MOArchiveParent):
             self._set_HV()
             return remove_node.info
         else:
-            _warnings.warn(f"Point {f_vals} not found in the archive")
+            raise ValueError(f"Point {f_vals} not found in the archive")
 
     def add_list(self, list_of_f_vals, infos=None, add_method="compare"):
         """ Adds a list of points to the archive, and updates the hypervolume.
@@ -247,6 +304,18 @@ class MOArchive3d(MOArchiveParent):
             and uses the most efficient method based on that
             - one_by_one: adds the points one by one to the archive
             - reinit: reinitializes the archive with the new points
+
+        >>> from moarchiving.get_archive import get_archive
+        >>> moa = get_archive(reference_point=[4, 4, 4])
+        >>> moa.add_list([[2, 3, 3], [1, 2, 3]], infos=["A", "B"])
+        >>> moa.points, moa.infos
+        ([[1, 2, 3]], ['B'])
+        >>> moa.add_list([[3, 2, 1], [2, 2, 2], [3, 3, 3]], infos=["C", "D", "E"])
+        >>> moa.points, moa.infos
+        ([[3, 2, 1], [2, 2, 2], [1, 2, 3]], ['C', 'D', 'B'])
+        >>> moa.add_list([[1, 1, 1]])
+        >>> moa.points, moa.infos
+        ([[1, 1, 1]], [None])
         """
         s = len(list_of_f_vals)
         if add_method == "compare":
@@ -267,14 +336,36 @@ class MOArchive3d(MOArchiveParent):
                              f"should be one of: 'compare', 'one_by_one', 'reinit'")
 
     def copy(self):
-        """ Returns a copy of the archive """
+        """ Returns a copy of the archive
+
+        >>> from moarchiving.get_archive import get_archive
+        >>> moa = get_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4],
+        ...                   infos=["A", "B", "C"])
+        >>> moa2 = moa.copy()
+        >>> moa2.points, moa2.infos
+        ([[3, 2, 1], [2, 2, 2], [1, 2, 3]], ['C', 'B', 'A'])
+        >>> moa.remove([2, 2, 2])
+        'B'
+        >>> moa2.add([1.5, 1.5, 1.5], "D")
+        True
+        >>> moa2.points, moa2.infos
+        ([[3, 2, 1], [1.5, 1.5, 1.5], [1, 2, 3]], ['C', 'D', 'A'])
+        >>> moa.points, moa.infos
+        ([[3, 2, 1], [1, 2, 3]], ['C', 'A'])
+        """
         return MOArchive3d(self.points, self.reference_point, self.infos)
 
     def _get_kink_points(self):
         """ Function that returns the kink points of the archive.
          Kink point are calculated by making a sweep of the archive, where the state is one
          2D archive of all possible kink points found so far, and another 2D archive which stores
-         the non-dominated points so far in the sweep """
+         the non-dominated points so far in the sweep
+
+        >>> from moarchiving.get_archive import get_archive
+        >>> moa = get_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4])
+        >>> moa._get_kink_points()
+        [[4, 4, 1], [3, 4, 2], [2, 4, 3], [1, 4, 4], [4, 2, 4]]
+         """
         if self.reference_point is None:
             ref_point = [inf] * self.n_dim
         else:
@@ -314,7 +405,15 @@ class MOArchive3d(MOArchiveParent):
         return kink_points
 
     def hypervolume_improvement(self, f_vals):
-        """ Returns the hypervolume improvement of adding a point to the archive """
+        """ Returns the hypervolume improvement of adding a point to the archive
+
+        >>> from moarchiving.get_archive import get_archive
+        >>> moa = get_archive([[1, 2, 3], [3, 2, 1]], reference_point=[4, 4, 4])
+        >>> moa.hypervolume_improvement([2, 2, 2])
+        2.0
+        >>> moa.hypervolume_improvement([3, 3, 4])
+        -1.0
+        """
         if f_vals in self.points:
             return 0
         if self.dominates(f_vals):
@@ -324,7 +423,13 @@ class MOArchive3d(MOArchiveParent):
                                    self.hypervolume_computation_float_type)
 
     def compute_hypervolume(self):
-        """ Compute the hypervolume of the current state of archive """
+        """ Compute the hypervolume of the current state of archive
+
+        >>> from moarchiving.get_archive import get_archive
+        >>> moa = get_archive([[1, 2, 3], [3, 2, 1]], reference_point=[4, 4, 4])
+        >>> moa.compute_hypervolume()
+        10.0
+        """
         Fc = self.hypervolume_computation_float_type
         p = self.head
         area = Fc(0)
@@ -375,3 +480,9 @@ class MOArchive3d(MOArchiveParent):
             p = p.next[di]
 
         t.clear()
+
+
+if __name__ == "__main__":
+    import doctest
+    print('doctest.testmod() in moarchiving3d.py')
+    print(doctest.testmod())
