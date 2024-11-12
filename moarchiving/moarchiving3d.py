@@ -295,7 +295,7 @@ class MOArchive3d(MOArchiveParent):
                 removed = kink_candidates._removed.copy()
                 for removed_point in removed:
                     z = point_dict[tuple(removed_point)]
-                    if z < point[2]:
+                    if z < point[2] and point[0] < removed_point[0] and point[1] < removed_point[1]:
                         kink_points.append([removed_point[0], removed_point[1], point[2]])
                 kink_candidates._removed.clear()
                 kink_candidates.remove(point[:2])
