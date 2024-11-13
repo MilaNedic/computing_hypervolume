@@ -47,33 +47,6 @@ class MOArchiveParent:
             self.head = self.setup_cdllist(list_of_f_vals, [inf] * self.n_dim, infos)
         self._kink_points = None
 
-    def print_cdllist(self):
-        """ For debugging purposes: print the circular doubly linked list"""
-        di = self.n_dim - 1
-        print("Circular Doubly-Linked List:")
-        current = self.head.next[di]
-        print(f"(head) {self.head.x[:self.n_dim]} <-> ", end="")
-        while current is not None and current != self.head:
-            print(f"{current.x[:self.n_dim]} (dom: {current.ndomr}) <-> ", end="")
-            current = current.next[di] if current.next[di] != self.head else None
-        print("(head)")
-
-    def print_cxcy(self):
-        """ For debugging purposes: print the cx and cy values of the points in the archive"""
-        di = self.n_dim - 1
-        print("cx and cy values:")
-        current = self.head.next[di]
-        print(f"({self.head.info + ')':4} {str(self.head.x[:self.n_dim]):22} "
-              f"cx={'(' + self.head.closest[0].info + ')':4}, "
-              f"cy={'(' + self.head.closest[1].info + ')':4}, "
-              f"ndomr={self.head.ndomr}")
-        while current is not None and current != self.head:
-            print(f"({current.info + ')':4} {str(current.x[:self.n_dim]):22} "
-                  f"cx={'(' + current.closest[0].info + ')':4}, "
-                  f"cy={'(' + current.closest[1].info + ')':4}, "
-                  f"ndomr={current.ndomr}")
-            current = current.next[di] if current.next[di] != self.head else None
-
     def __len__(self):
         return len(self.points)
 
