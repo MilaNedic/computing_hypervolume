@@ -34,7 +34,7 @@ class MOArchiveParent:
                                  " as first element")
         else:
             list_of_f_vals = []
-        self.n_dim = n_obj
+        self.n_obj = n_obj
         self._length = 0
 
         if infos is None:
@@ -45,7 +45,7 @@ class MOArchiveParent:
             self.head = self.setup_cdllist(list_of_f_vals, self.reference_point, infos)
         else:
             self.reference_point = None
-            self.head = self.setup_cdllist(list_of_f_vals, [inf] * self.n_dim, infos)
+            self.head = self.setup_cdllist(list_of_f_vals, [inf] * self.n_obj, infos)
         self._kink_points = None
 
     def __len__(self):
@@ -81,7 +81,7 @@ class MOArchiveParent:
                 return True
             # points are sorted in lexicographic order, so we can return False
             # once we find a point that is lexicographically greater than f_val
-            elif f_val[self.n_dim - 1] < point.x[self.n_dim - 1]:
+            elif f_val[self.n_obj - 1] < point.x[self.n_obj - 1]:
                 return False
         return False
 
@@ -104,14 +104,14 @@ class MOArchiveParent:
         """
         dominators = [] if not number_only else 0
         for point in self._points_generator():
-            if all(point.x[i] <= f_val[i] for i in range(self.n_dim)):
+            if all(point.x[i] <= f_val[i] for i in range(self.n_obj)):
                 if number_only:
                     dominators += 1
                 else:
-                    dominators.append(point.x[:self.n_dim])
+                    dominators.append(point.x[:self.n_obj])
             # points are sorted in lexicographic order, so we can break the loop
             # once we find a point that is lexicographically greater than f_val
-            elif f_val[self.n_dim - 1] < point.x[self.n_dim - 1]:
+            elif f_val[self.n_obj - 1] < point.x[self.n_obj - 1]:
                 break
         return dominators
 
@@ -134,8 +134,8 @@ class MOArchiveParent:
         """
 
         try:
-            if len(f_vals) != self.n_dim:
-                raise ValueError(f"argument `f_vals` must be of length {self.n_dim}, "
+            if len(f_vals) != self.n_obj:
+                raise ValueError(f"argument `f_vals` must be of length {self.n_obj}, "
                                  f"was ``{f_vals}``")
         except TypeError:
             raise TypeError(f"argument `f_vals` must be a list, was ``{f_vals}``")
@@ -145,7 +145,7 @@ class MOArchiveParent:
         if reference_point is None:
             return True
 
-        if any(f_vals[i] >= reference_point[i] for i in range(self.n_dim)):
+        if any(f_vals[i] >= reference_point[i] for i in range(self.n_obj)):
             return False
         return True
 
@@ -153,7 +153,7 @@ class MOArchiveParent:
         """ returns the points in the archive in a form of a python generator
         instead of a circular doubly linked list """
         first_iter = True
-        di = self.n_dim - 1
+        di = self.n_obj - 1
         if include_head:
             curr = self.head
             stop = self.head
@@ -176,7 +176,7 @@ class MOArchiveParent:
         >>> moa.points
         [[3, 2, 1], [2, 2, 2], [1, 2, 3]]
         """
-        return [point.x[:self.n_dim] for point in self._points_generator()]
+        return [point.x[:self.n_obj] for point in self._points_generator()]
 
     @property
     def infos(self):
@@ -209,7 +209,7 @@ class MOArchiveParent:
     @property
     def contributing_hypervolumes(self):
         """`list` of hypervolume contributions of each point in the archive"""
-        return [self.contributing_hypervolume(point[:self.n_dim]) for point in self.points]
+        return [self.contributing_hypervolume(point[:self.n_obj]) for point in self.points]
 
     def contributing_hypervolume(self, f_vals):
         """ Returns the hypervolume contribution of a point in the archive
@@ -224,8 +224,8 @@ class MOArchiveParent:
         1.0
         """
         try:
-            if len(f_vals) != self.n_dim:
-                raise ValueError(f"argument `f_vals` must be of length {self.n_dim}, "
+            if len(f_vals) != self.n_obj:
+                raise ValueError(f"argument `f_vals` must be of length {self.n_obj}, "
                                  f"was ``{f_vals}``")
         except TypeError:
             raise TypeError(f"argument `f_vals` must be a list, was ``{f_vals}``")
@@ -260,14 +260,14 @@ class MOArchiveParent:
 
         if self.reference_point is not None:
             ref_di = [ref_factor * max((0, f_vals[i] - self.reference_point[i]))
-                      for i in range(self.n_dim)]
+                      for i in range(self.n_obj)]
         else:
-            ref_di = [0] * self.n_dim
+            ref_di = [0] * self.n_obj
 
         points = self.points
 
         if len(points) == 0:
-            return sum([ref_di[i] ** 2 for i in range(self.n_dim)]) ** 0.5
+            return sum([ref_di[i] ** 2 for i in range(self.n_obj)]) ** 0.5
 
         if self._kink_points is None:
             self._kink_points = self._get_kink_points()
@@ -275,7 +275,7 @@ class MOArchiveParent:
 
         for point in self._kink_points:
             distances_squared.append(sum([max((0, f_vals[i] - point[i])) ** 2
-                                          for i in range(self.n_dim)]))
+                                          for i in range(self.n_obj)]))
         return min(distances_squared) ** 0.5
 
     def distance_to_hypervolume_area(self, f_vals):
@@ -294,7 +294,7 @@ class MOArchiveParent:
         if self.reference_point is None:
             return 0
         return sum([max((0, f_vals[i] - self.reference_point[i])) ** 2
-                    for i in range(self.n_dim)])**0.5
+                    for i in range(self.n_obj)])**0.5
 
     def hypervolume_improvement(self, f_vals):
         raise NotImplementedError("This method should be implemented in the child class")
@@ -318,16 +318,16 @@ class MOArchiveParent:
 
         head = [DLNode(info=info) for info in ["s1", "s2", "s3"] + [None] * n]
         # init_sentinels_new accepts a list at the beginning, therefore we use head[0:3]
-        init_sentinels_new(head[0:3], ref, self.n_dim)
-        di = self.n_dim - 1  # Dimension index for sorting (z-axis in 3D)
+        init_sentinels_new(head[0:3], ref, self.n_obj)
+        di = self.n_obj - 1  # Dimension index for sorting (z-axis in 3D)
 
         if n > 0:
             # Convert data to a structured format suitable for sorting and linking
-            if self.n_dim == 3:
+            if self.n_obj == 3:
                 # Using lexsort to sort by z, y, x in ascending order
                 sorted_indices = my_lexsort(([p[0] for p in points], [p[1] for p in points],
                                              [p[2] for p in points]))
-            elif self.n_dim == 4:
+            elif self.n_obj == 4:
                 # Using lexsort to sort by w, z, y, x in ascending order
                 sorted_indices = my_lexsort(([p[0] for p in points], [p[1] for p in points],
                                              [p[2] for p in points], [p[3] for p in points]))
@@ -338,7 +338,7 @@ class MOArchiveParent:
             for i, index in enumerate(sorted_indices):
                 head[i + 3].x = points[index]
                 head[i + 3].info = infos[index]
-                if self.n_dim == 3:
+                if self.n_obj == 3:
                     # Add 0.0 for 3d points so that it matches the original C code
                     head[i + 3].x.append(0.0)
 
@@ -357,7 +357,7 @@ class MOArchiveParent:
 
         return head[0]
 
-    def weakly_dominates(self, a, b, n_dim=None):
+    def weakly_dominates(self, a, b, n_obj=None):
         """ Return True if a weakly dominates b, False otherwise
         >>> from moarchiving.get_archive import get_archive
         >>> moa = get_archive(n_obj=3)
@@ -368,11 +368,11 @@ class MOArchiveParent:
         >>> moa.weakly_dominates([1, 2, 3], [1, 2, 3])
         True
         """
-        if n_dim is None:
-            n_dim = self.n_dim
-        return all(a[i] <= b[i] for i in range(n_dim))
+        if n_obj is None:
+            n_obj = self.n_obj
+        return all(a[i] <= b[i] for i in range(n_obj))
 
-    def strictly_dominates(self, a, b, n_dim=None):
+    def strictly_dominates(self, a, b, n_obj=None):
         """ Return True if a strictly dominates b, False otherwise
         >>> from moarchiving.get_archive import get_archive
         >>> moa = get_archive(n_obj=3)
@@ -383,10 +383,10 @@ class MOArchiveParent:
         >>> moa.strictly_dominates([1, 2, 3], [1, 2, 3])
         False
         """
-        if n_dim is None:
-            n_dim = self.n_dim
-        return (all(a[i] <= b[i] for i in range(n_dim)) and
-                any(a[i] < b[i] for i in range(n_dim)))
+        if n_obj is None:
+            n_obj = self.n_obj
+        return (all(a[i] <= b[i] for i in range(n_obj)) and
+                any(a[i] < b[i] for i in range(n_obj)))
 
 
 if __name__ == "__main__":

@@ -114,8 +114,8 @@ class MOArchive4d(MOArchiveParent):
         >>> moa.points
         [[4, 3, 2, 1], [2, 2, 2, 2], [1, 2, 3, 4]]
         """
-        if len(new_point) != self.n_dim:
-            raise ValueError(f"argument `f_pair` must be of length {self.n_dim}, was ``{new_point}``")
+        if len(new_point) != self.n_obj:
+            raise ValueError(f"argument `f_pair` must be of length {self.n_obj}, was ``{new_point}``")
 
         if self.dominates(new_point):
             return False
@@ -212,7 +212,7 @@ class MOArchive4d(MOArchiveParent):
          """
         if self.reference_point is None:
             max_point = max([max([point[i] for point in self.points]) for i in range(3)]) + 1
-            ref_point = [max_point] * self.n_dim
+            ref_point = [max_point] * self.n_obj
         else:
             ref_point = self.reference_point
 
@@ -286,7 +286,7 @@ class MOArchive4d(MOArchiveParent):
 
     def remove_dominated(self):
         """ Preprocessing step to remove dominated points. """
-        di = self.n_dim - 1
+        di = self.n_obj - 1
         current = self.head.next[di]
         stop = self.head.prev[di]
 
@@ -307,7 +307,7 @@ class MOArchive4d(MOArchiveParent):
             current = current.next[di]
 
         for point in dominated_points:
-            remove_from_z(point, archive_dim=self.n_dim)
+            remove_from_z(point, archive_dim=self.n_obj)
 
 
 if __name__ == "__main__":

@@ -116,8 +116,8 @@ class MOArchive3d(MOArchiveParent):
         >>> moa.points
         [[3, 2, 1], [2, 2, 2], [1, 2, 3]]
         """
-        if len(f_vals) != self.n_dim:
-            raise ValueError(f"argument `f_vals` must be of length {self.n_dim}, was ``{f_vals}``")
+        if len(f_vals) != self.n_obj:
+            raise ValueError(f"argument `f_vals` must be of length {self.n_obj}, was ``{f_vals}``")
 
         if self.hypervolume_plus is not None:
             dist_to_hv_area = self.distance_to_hypervolume_area(f_vals)
@@ -132,10 +132,10 @@ class MOArchive3d(MOArchiveParent):
         first_iter = True
 
         # Add 0.0 for 3d points so that it matches the original C code and create a new node object
-        if self.n_dim == 3:
+        if self.n_obj == 3:
             f_vals = f_vals + [0.0]
         u = DLNode(x=f_vals, info=info)
-        di = self.n_dim - 1
+        di = self.n_obj - 1
 
         # loop over all the points in the archive and save the best candidates for cx and cy,
         # and check if the new point is dominated by any of the points in the archive
@@ -149,13 +149,13 @@ class MOArchive3d(MOArchiveParent):
             first_iter = False
 
             # check if the new point is dominated by the current point
-            if all(q.x[i] <= u.x[i] for i in range(self.n_dim)):
+            if all(q.x[i] <= u.x[i] for i in range(self.n_obj)):
                 dominated = True
                 break
             # check if the new point dominates the current point
-            if all(u.x[i] <= q.x[i] for i in range(self.n_dim)):
+            if all(u.x[i] <= q.x[i] for i in range(self.n_obj)):
                 q_next = q.next[di]
-                remove_from_z(q, archive_dim=self.n_dim)
+                remove_from_z(q, archive_dim=self.n_obj)
                 removed.append(q.x[:3])
                 q = q_next
                 continue
@@ -239,7 +239,7 @@ class MOArchive3d(MOArchiveParent):
         [[3, 2, 1]]
         """
 
-        di = self.n_dim - 1  # Dimension index for sorting (z-axis in 3D)
+        di = self.n_obj - 1  # Dimension index for sorting (z-axis in 3D)
         current = self.head.next[di]
         stop = self.head.prev[di]
 
@@ -260,7 +260,7 @@ class MOArchive3d(MOArchiveParent):
 
             # Remove nodes dominated by the current node
             nodes_to_remove = [node for node in T if node != current and
-                               self.strictly_dominates(current.x, node.x, n_dim=2)]
+                               self.strictly_dominates(current.x, node.x, n_obj=2)]
             for node in nodes_to_remove:
                 T.remove(node)
 
@@ -289,7 +289,7 @@ class MOArchive3d(MOArchiveParent):
             current = current.next[di]
 
         if remove_node is not None:
-            remove_from_z(remove_node, archive_dim=self.n_dim)
+            remove_from_z(remove_node, archive_dim=self.n_obj)
             self._kink_points = None
             self._set_HV()
             self._length -= 1
@@ -370,7 +370,7 @@ class MOArchive3d(MOArchiveParent):
         [[4, 4, 1], [3, 4, 2], [2, 4, 3], [1, 4, 4], [4, 2, 4]]
          """
         if self.reference_point is None:
-            ref_point = [inf] * self.n_dim
+            ref_point = [inf] * self.n_obj
         else:
             ref_point = self.reference_point
 
@@ -452,7 +452,7 @@ class MOArchive3d(MOArchiveParent):
                 p.cnext[0].cnext[1] = p
                 p.cnext[1].cnext[0] = p
             else:
-                remove_from_z(p, archive_dim=self.n_dim)
+                remove_from_z(p, archive_dim=self.n_obj)
 
             volume += area * (Fc(p.next[2].x[2]) - Fc(p.x[2]))
             p = p.next[2]
@@ -462,7 +462,7 @@ class MOArchive3d(MOArchiveParent):
     def preprocessing(self):
         """ Preprocessing step to determine the closest points in x and y directions,
         as described in the paper and implemented in the original C code. """
-        di = self.n_dim - 1
+        di = self.n_obj - 1
         t = MySortedList(iterable=[self.head, self.head.next[di]],
                          key=lambda node: (node.x[1], node.x[0]))
 
