@@ -35,6 +35,7 @@ class MOArchiveParent:
         else:
             list_of_f_vals = []
         self.n_dim = n_obj
+        self._length = 0
 
         if infos is None:
             infos = [None] * len(list_of_f_vals)
@@ -48,7 +49,7 @@ class MOArchiveParent:
         self._kink_points = None
 
     def __len__(self):
-        return len(self.points)
+        return self._length
 
     def add(self, new, info=None, update_hypervolume=True):
         raise NotImplementedError("This method should be implemented in the child class")
@@ -194,6 +195,10 @@ class MOArchiveParent:
             raise ValueError("to compute the hypervolume a reference"
                              " point is needed (must be given initially)")
         return self._hypervolume
+
+    @property
+    def length(self):
+        return self._length
 
     @property
     def hypervolume_plus(self):

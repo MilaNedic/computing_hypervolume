@@ -78,6 +78,7 @@ class MOArchive4d(MOArchiveParent):
         self._hypervolume_already_computed = False
         self.remove_dominated()
         hv = self._set_HV()
+        self._length = len(self.points)
         self._hypervolume_already_computed = True
         if hv is not None and hv > 0:
             self._hypervolume_plus = -self._hypervolume

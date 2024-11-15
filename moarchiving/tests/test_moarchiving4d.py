@@ -100,6 +100,28 @@ class MyTestCase(unittest.TestCase):
 
             self.assertAlmostEqual(moa_add.hypervolume, true_hv, places=6)
             self.assertAlmostEqual(moa_add_list.hypervolume, true_hv, places=6)
+            self.assertEqual(moa_add.length, len(moa_true.points))
+            self.assertEqual(moa_add_list.length, len(moa_true.points))
+
+    def test_length(self):
+        """ Test that the length of the archive is correct at all times """
+        ref_point = [1, 1, 1, 1]
+
+        n_points_add = 100
+        points = get_stacked_points(n_points_add,
+                                    ['random', 'random', 'random', 'random'])
+        moa = MOArchive4d([], ref_point)
+
+        # add points one by one
+        for point in points:
+            moa.add(point)
+            self.assertEqual(moa.length, len(moa.points))
+
+        # remove points one by one
+        points = moa.points
+        for point in points:
+            moa.remove(point)
+            self.assertEqual(moa.length, len(moa.points))
 
     def test_dominates(self):
         moa = get_small_test_archive()
@@ -247,6 +269,8 @@ class MyTestCase(unittest.TestCase):
         moa_remove = MOArchive4d(points, reference_point=[1, 1, 1, 1])
         for i in remove_idx:
             moa_remove.remove(points[i])
+            self.assertEqual(len(moa_remove.points), moa_remove.length)
+
         moa_add = MOArchive4d([], reference_point=[1, 1, 1, 1])
         for i in keep_idx:
             moa_add.add(points[i])

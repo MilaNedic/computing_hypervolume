@@ -80,6 +80,7 @@ class MOArchive3d(MOArchiveParent):
         self._removed = []
         self.preprocessing()
         hv = self._set_HV()
+        self._length = len(self.points)
         if hv is not None and hv > 0:
             self._hypervolume_plus = -self._hypervolume
         else:
@@ -207,6 +208,7 @@ class MOArchive3d(MOArchiveParent):
         if not dominated:
             u.closest[0] = best_cx_candidates
             u.closest[1] = best_cy_candidates
+            self._length += 1 - len(removed)
 
         self._removed = removed
         self._kink_points = None
@@ -290,6 +292,7 @@ class MOArchive3d(MOArchiveParent):
             remove_from_z(remove_node, archive_dim=self.n_dim)
             self._kink_points = None
             self._set_HV()
+            self._length -= 1
             return remove_node.info
         else:
             raise ValueError(f"Point {f_vals} not found in the archive")

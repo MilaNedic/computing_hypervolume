@@ -517,6 +517,11 @@ class BiobjectiveNondominatedSortedList(list):
         return self
 
     @property
+    def length(self):
+        """ return the number of elements in the archive """
+        return len(self)
+
+    @property
     def hypervolume(self):
         """hypervolume of the entire list w.r.t. the "initial" reference point.
 
