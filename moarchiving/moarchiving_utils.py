@@ -155,8 +155,6 @@ def init_sentinels_new(list_nodes, ref, dim):
     return s1
 
 
-# --------------------- Updating Data Structures --------------------------
-
 def add_to_z(new):
     new.next[2] = new.prev[2].next[2]
     new.next[2].prev[2] = new
@@ -194,8 +192,6 @@ def setup_z_and_closest(head, new):
     new.next[2] = q
 
 
-# ------------------- Update Links --------------------
-
 def update_links(head, new, p):
     stop = head.prev[2]
     ndom = 0
@@ -222,14 +218,14 @@ def update_links(head, new, p):
     return ndom
 
 
-# ------------------------- Hypervolume Indicator Algorithms ---------------------------------------
 def restart_list_y(head):
-    # resets the cnext pointers for the y-dimension.
+    """ Resets the cnext pointers for the y-dimension."""
     head.next[2].cnext[1] = head
     head.cnext[0] = head.next[2]
 
 
 def compute_area_simple(p, di, s, u, Fc):
+    """ Computes the area as described in the paper """
     dj = 1 - di
     area = Fc(0)
     q = s
@@ -277,9 +273,8 @@ def restart_base_setup_z_and_closest(head, new):
     new.next[2] = p
 
 
-# --------------- one contribution 3d ------------------
-
 def one_contribution_3d(head, new, Fc):
+    """ Computes the contribution of adding a new point to the archive in three dimensions """
     restart_base_setup_z_and_closest(head, new)
     if new.ndomr > 0:
         return 0
