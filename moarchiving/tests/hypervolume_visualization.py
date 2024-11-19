@@ -24,7 +24,7 @@ def draw_point(point, ref_point, fig):
 
 def draw_hypervolume_with_kink_points(points, ref_point):
     moa = MOArchive3d(points, ref_point)
-    points = moa.points
+    points = list(moa)
 
     fig = make_subplots(rows=1, cols=1,
                         specs=[[{'type': 'surface'}]])

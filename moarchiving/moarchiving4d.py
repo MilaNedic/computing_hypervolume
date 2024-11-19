@@ -21,7 +21,7 @@ class MOArchive4d(MOArchiveParent):
     coordinate using function points_list.
     >>> from moarchiving.get_archive import get_archive
     >>> moa = get_archive([[1, 2, 3, 4], [4, 3, 2, 1]])
-    >>> moa.points # returns the list of points in the archive sorted by the third coordinate
+    >>> list(moa) # returns the list of points in the archive sorted by the third coordinate
     [[4, 3, 2, 1], [1, 2, 3, 4]]
     >>> moa.add([2, 2, 2, 2]) # add a new point to the archive
     True
@@ -78,7 +78,7 @@ class MOArchive4d(MOArchiveParent):
         self._hypervolume_already_computed = False
         self.remove_dominated()
         hv = self._set_HV()
-        self._length = len(self.points)
+        self._length = len(list(self))
         self._hypervolume_already_computed = True
         if hv is not None and hv > 0:
             self._hypervolume_plus = -self._hypervolume
@@ -103,15 +103,15 @@ class MOArchive4d(MOArchiveParent):
         False
         >>> moa.add([1, 2, 3, 4])
         True
-        >>> moa.points
+        >>> list(moa)
         [[1, 2, 3, 4]]
         >>> moa.add([4, 3, 2, 1])
         True
-        >>> moa.points
+        >>> list(moa)
         [[4, 3, 2, 1], [1, 2, 3, 4]]
         >>> moa.add([2, 2, 2, 2])
         True
-        >>> moa.points
+        >>> list(moa)
         [[4, 3, 2, 1], [2, 2, 2, 2], [1, 2, 3, 4]]
         """
         if len(new_point) != self.n_obj:
@@ -126,7 +126,7 @@ class MOArchive4d(MOArchiveParent):
                 self._hypervolume_plus = dist_to_hv_area
             return False
 
-        self.__init__(self.points + [new_point], self.reference_point, self.infos + [info])
+        self.__init__(list(self) + [new_point], self.reference_point, self.infos + [info])
         return True
 
     def remove(self, remove_point):
@@ -140,14 +140,14 @@ class MOArchive4d(MOArchiveParent):
         ...                   reference_point=[5, 5, 5, 5], infos=["A", "B", "C"])
         >>> moa.remove([2, 2, 2, 2])
         'B'
-        >>> moa.points
+        >>> list(moa)
         [[4, 3, 2, 1], [1, 2, 3, 4]]
         >>> moa.remove([1, 2, 3, 4])
         'A'
-        >>> moa.points
+        >>> list(moa)
         [[4, 3, 2, 1]]
         """
-        points_list = self.points
+        points_list = list(self)
         if remove_point not in points_list:
             return False
         point_idx = points_list.index(remove_point)
@@ -165,19 +165,19 @@ class MOArchive4d(MOArchiveParent):
         >>> from moarchiving.get_archive import get_archive
         >>> moa = get_archive(reference_point=[5, 5, 5, 5])
         >>> moa.add_list([[1, 2, 4, 4], [1, 2, 3, 4]], infos=["A", "B"])
-        >>> moa.points, moa.infos
+        >>> list(moa), moa.infos
         ([[1, 2, 3, 4]], ['B'])
         >>> moa.add_list([[4, 3, 2, 1], [2, 2, 2, 2], [3, 3, 3, 3]], infos=["C", "D", "E"])
-        >>> moa.points, moa.infos
+        >>> list(moa), moa.infos
         ([[4, 3, 2, 1], [2, 2, 2, 2], [1, 2, 3, 4]], ['C', 'D', 'B'])
         >>> moa.add_list([[1, 1, 1, 1]])
-        >>> moa.points, moa.infos
+        >>> list(moa), moa.infos
         ([[1, 1, 1, 1]], [None])
         """
         if infos is None:
             infos = [None] * len(list_of_f_vals)
 
-        self.__init__(self.points + list_of_f_vals, self.reference_point, self.infos + infos)
+        self.__init__(list(self) + list_of_f_vals, self.reference_point, self.infos + infos)
 
     def copy(self):
         """ Return a copy of the archive.
@@ -186,18 +186,18 @@ class MOArchive4d(MOArchiveParent):
         >>> moa = get_archive([[1, 2, 3, 4], [2, 2, 2, 2], [4, 3, 2, 1]],
         ...                   reference_point=[5, 5, 5, 5], infos=["A", "B", "C"])
         >>> moa2 = moa.copy()
-        >>> moa2.points, moa2.infos
+        >>> list(moa2), moa2.infos
         ([[4, 3, 2, 1], [2, 2, 2, 2], [1, 2, 3, 4]], ['C', 'B', 'A'])
         >>> moa.remove([2, 2, 2, 2])
         'B'
         >>> moa2.add([0, 1, 3, 1.5], "D")
         True
-        >>> moa2.points, moa2.infos
+        >>> list(moa2), moa2.infos
         ([[4, 3, 2, 1], [0, 1, 3, 1.5], [2, 2, 2, 2]], ['C', 'D', 'B'])
-        >>> moa.points, moa.infos
+        >>> list(moa), moa.infos
         ([[4, 3, 2, 1], [1, 2, 3, 4]], ['C', 'A'])
         """
-        return MOArchive4d(self.points, self.reference_point, self.infos)
+        return MOArchive4d(list(self), self.reference_point, self.infos)
 
     def _get_kink_points(self):
         """ Function that returns the kink points of the archive.
@@ -211,7 +211,7 @@ class MOArchive4d(MOArchiveParent):
         [[5, 5, 5, 1], [5, 3, 5, 4], [4, 5, 5, 4], [5, 5, 2, 5], [5, 3, 3, 5], [4, 5, 3, 5], [5, 2, 5, 5], [1, 5, 5, 5]]
          """
         if self.reference_point is None:
-            max_point = max([max([point[i] for point in self.points]) for i in range(3)]) + 1
+            max_point = max([max([point[i] for point in self]) for i in range(3)]) + 1
             ref_point = [max_point] * self.n_obj
         else:
             ref_point = self.reference_point
@@ -226,7 +226,7 @@ class MOArchive4d(MOArchiveParent):
         }
         kink_points = []
 
-        for point in self.points:
+        for point in self:
             # add the point to the kink state to get the dominated kink points, then take it out
             if kink_candidates.add(point[:3]):
                 removed = kink_candidates._removed.copy()
@@ -247,7 +247,7 @@ class MOArchive4d(MOArchiveParent):
                 point_dict[tuple(p)] = point[3]
                 kink_candidates.add(p)
 
-        for point in kink_candidates.points:
+        for point in kink_candidates:
             kink_points.append([point[0], point[1], point[2], ref_point[3]])
 
         return kink_points
@@ -262,7 +262,7 @@ class MOArchive4d(MOArchiveParent):
         >>> moa.hypervolume_improvement([3, 3, 4, 5])
         -1.0
         """
-        if f_vals in self.points:
+        if f_vals in list(self):
             return 0
         if self.dominates(f_vals):
             return -1 * self.distance_to_pareto_front(f_vals)

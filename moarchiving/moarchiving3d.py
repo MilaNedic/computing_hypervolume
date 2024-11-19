@@ -24,7 +24,7 @@ class MOArchive3d(MOArchiveParent):
 
     >>> from moarchiving.get_archive import get_archive
     >>> moa = get_archive([[1, 2, 3], [3, 2, 1]])
-    >>> moa.points # returns the list of points in the archive sorted by the third coordinate
+    >>> list(moa) # returns the list of points in the archive sorted by the third coordinate
     [[3, 2, 1], [1, 2, 3]]
     >>> moa.add([2, 2, 2]) # add a new point to the archive
     True
@@ -48,7 +48,6 @@ class MOArchive3d(MOArchiveParent):
     except:
         hypervolume_final_float_type = float
         hypervolume_computation_float_type = float
-
 
     def __init__(self, list_of_f_vals=None, reference_point=None, infos=None,
                  hypervolume_final_float_type=None,
@@ -80,7 +79,7 @@ class MOArchive3d(MOArchiveParent):
         self._removed = []
         self.preprocessing()
         hv = self._set_HV()
-        self._length = len(self.points)
+        self._length = len(list(self))
         if hv is not None and hv > 0:
             self._hypervolume_plus = -self._hypervolume
         else:
@@ -105,15 +104,15 @@ class MOArchive3d(MOArchiveParent):
         False
         >>> moa.add([1, 2, 3])
         True
-        >>> moa.points
+        >>> list(moa)
         [[1, 2, 3]]
         >>> moa.add([3, 2, 1])
         True
-        >>> moa.points
+        >>> list(moa)
         [[3, 2, 1], [1, 2, 3]]
         >>> moa.add([2, 2, 2])
         True
-        >>> moa.points
+        >>> list(moa)
         [[3, 2, 1], [2, 2, 2], [1, 2, 3]]
         """
         if len(f_vals) != self.n_obj:
@@ -231,11 +230,11 @@ class MOArchive3d(MOArchiveParent):
         ...                   infos=["A", "B", "C"])
         >>> moa.remove([2, 2, 2])
         'B'
-        >>> moa.points
+        >>> list(moa)
         [[3, 2, 1], [1, 2, 3]]
         >>> moa.remove([1, 2, 3])
         'A'
-        >>> moa.points
+        >>> list(moa)
         [[3, 2, 1]]
         """
 
@@ -311,13 +310,13 @@ class MOArchive3d(MOArchiveParent):
         >>> from moarchiving.get_archive import get_archive
         >>> moa = get_archive(reference_point=[4, 4, 4])
         >>> moa.add_list([[2, 3, 3], [1, 2, 3]], infos=["A", "B"])
-        >>> moa.points, moa.infos
+        >>> list(moa), moa.infos
         ([[1, 2, 3]], ['B'])
         >>> moa.add_list([[3, 2, 1], [2, 2, 2], [3, 3, 3]], infos=["C", "D", "E"])
-        >>> moa.points, moa.infos
+        >>> list(moa), moa.infos
         ([[3, 2, 1], [2, 2, 2], [1, 2, 3]], ['C', 'D', 'B'])
         >>> moa.add_list([[1, 1, 1]])
-        >>> moa.points, moa.infos
+        >>> list(moa), moa.infos
         ([[1, 1, 1]], [None])
         """
         s = len(list_of_f_vals)
@@ -333,7 +332,7 @@ class MOArchive3d(MOArchiveParent):
                 self.add(f_val, info=info, update_hypervolume=False)
             self._set_HV()
         elif add_method == "reinit":
-            self.__init__(self.points + list_of_f_vals, self.reference_point, self.infos + infos)
+            self.__init__(list(self) + list_of_f_vals, self.reference_point, self.infos + infos)
         else:
             raise ValueError(f"Unknown add method: {add_method}, "
                              f"should be one of: 'compare', 'one_by_one', 'reinit'")
@@ -345,18 +344,18 @@ class MOArchive3d(MOArchiveParent):
         >>> moa = get_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4],
         ...                   infos=["A", "B", "C"])
         >>> moa2 = moa.copy()
-        >>> moa2.points, moa2.infos
+        >>> list(moa2), moa2.infos
         ([[3, 2, 1], [2, 2, 2], [1, 2, 3]], ['C', 'B', 'A'])
         >>> moa.remove([2, 2, 2])
         'B'
         >>> moa2.add([1.5, 1.5, 1.5], "D")
         True
-        >>> moa2.points, moa2.infos
+        >>> list(moa2), moa2.infos
         ([[3, 2, 1], [1.5, 1.5, 1.5], [1, 2, 3]], ['C', 'D', 'A'])
-        >>> moa.points, moa.infos
+        >>> list(moa), moa.infos
         ([[3, 2, 1], [1, 2, 3]], ['C', 'A'])
         """
-        return MOArchive3d(self.points, self.reference_point, self.infos)
+        return MOArchive3d(list(self), self.reference_point, self.infos)
 
     def _get_kink_points(self):
         """ Function that returns the kink points of the archive.
@@ -383,7 +382,7 @@ class MOArchive3d(MOArchiveParent):
         }
         kink_points = []
 
-        for point in self.points:
+        for point in self:
             # add the point to the kink state to get the dominated kink points, then take it out
             if kink_candidates.add(point[:2]) is not None:
                 removed = kink_candidates._removed.copy()
@@ -417,7 +416,7 @@ class MOArchive3d(MOArchiveParent):
         >>> moa.hypervolume_improvement([3, 3, 4])
         -1.0
         """
-        if f_vals in self.points:
+        if f_vals in self:
             return 0
         if self.dominates(f_vals):
             return -1 * self.distance_to_pareto_front(f_vals)

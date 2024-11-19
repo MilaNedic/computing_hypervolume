@@ -51,6 +51,13 @@ class MOArchiveParent:
     def __len__(self):
         return self._length
 
+    def __iter__(self):
+        pg = self._points_generator()
+        el = next(pg, None)
+        while el is not None:
+            yield el.x[:self.n_obj]
+            el = next(pg, None)
+
     def add(self, new, info=None, update_hypervolume=True):
         raise NotImplementedError("This method should be implemented in the child class")
 
@@ -168,17 +175,6 @@ class MOArchiveParent:
             curr = curr.next[di]
 
     @property
-    def points(self):
-        """`list` of coordinates of the non-dominated points in the archive, sorted by the last
-        coordinate in lexicographic order
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive([[1, 2, 3], [3, 2, 1], [2, 2, 2]])
-        >>> moa.points
-        [[3, 2, 1], [2, 2, 2], [1, 2, 3]]
-        """
-        return [point.x[:self.n_obj] for point in self._points_generator()]
-
-    @property
     def infos(self):
         """`list` of complementary information corresponding to each archive entry,
         corresponding to each of the points in the archive
@@ -197,10 +193,6 @@ class MOArchiveParent:
         return self._hypervolume
 
     @property
-    def length(self):
-        return self._length
-
-    @property
     def hypervolume_plus(self):
         if self.reference_point is None:
             return None
@@ -209,7 +201,7 @@ class MOArchiveParent:
     @property
     def contributing_hypervolumes(self):
         """`list` of hypervolume contributions of each point in the archive"""
-        return [self.contributing_hypervolume(point[:self.n_obj]) for point in self.points]
+        return [self.contributing_hypervolume(point[:self.n_obj]) for point in self]
 
     def contributing_hypervolume(self, f_vals):
         """ Returns the hypervolume contribution of a point in the archive
@@ -230,7 +222,7 @@ class MOArchiveParent:
         except TypeError:
             raise TypeError(f"argument `f_vals` must be a list, was ``{f_vals}``")
 
-        if f_vals in self.points:
+        if f_vals in self:
             hv_before = self._hypervolume
             removed_info = self.remove(f_vals)
             hv_after = self._hypervolume
@@ -264,9 +256,7 @@ class MOArchiveParent:
         else:
             ref_di = [0] * self.n_obj
 
-        points = self.points
-
-        if len(points) == 0:
+        if len(self) == 0:
             return sum([ref_di[i] ** 2 for i in range(self.n_obj)]) ** 0.5
 
         if self._kink_points is None:
