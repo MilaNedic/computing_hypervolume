@@ -400,26 +400,26 @@ class MyTestCase(unittest.TestCase):
     def test_hypervolume_plus(self):
         """ test the hypervolume_plus indicator """
         moa = MOArchive3d(reference_point=[1, 1, 1])
-        self.assertEqual(moa.hypervolume_plus, float('inf'))
+        self.assertEqual(moa.hypervolume_plus, -float('inf'))
 
         moa.add([2, 2, 2])
-        self.assertEqual(moa.hypervolume_plus, math.sqrt(3))
+        self.assertEqual(moa.hypervolume_plus, -math.sqrt(3))
 
         moa.add_list([[0, 0, 5], [1, 2, 1], [3, 3, 2]])
-        self.assertEqual(moa.hypervolume_plus, 1)
+        self.assertEqual(moa.hypervolume_plus, -1)
 
         moa.add([1, 1, 1])
         self.assertEqual(moa.hypervolume_plus, 0)
 
         moa.add([0.5, 0.5, 0.5])
-        self.assertEqual(moa.hypervolume_plus, -moa.hypervolume)
+        self.assertEqual(moa.hypervolume_plus, moa.hypervolume)
 
         moa = MOArchive3d(reference_point=[1, 1, 1])
         prev_hv_plus = moa.hypervolume_plus
         for i in range(1000):
             point = [10 * random.random(), 10 * random.random(), 10 * random.random()]
             moa.add(point)
-            self.assertLessEqual(moa.hypervolume_plus, prev_hv_plus)
+            self.assertLessEqual(prev_hv_plus, moa.hypervolume_plus)
             prev_hv_plus = moa.hypervolume_plus
 
     def test_hypervolume(self):
@@ -439,7 +439,7 @@ class MyTestCase(unittest.TestCase):
         ]
         moa = MOArchive3d(points, reference_point=[1, 1, 1])
         self.assertAlmostEqual(moa.hypervolume, 0.318694, places=6)
-        self.assertEqual(moa.hypervolume_plus, -moa.hypervolume)
+        self.assertEqual(moa.hypervolume_plus, moa.hypervolume)
 
         points = [
             [0.6394267984578837, 0.025010755222666936, 0.27502931836911926],
@@ -455,7 +455,7 @@ class MyTestCase(unittest.TestCase):
         ]
         moa = MOArchive3d(points, reference_point=[1, 1, 1])
         self.assertAlmostEqual(moa.hypervolume, 0.52192086148367, places=6)
-        self.assertEqual(moa.hypervolume_plus, -moa.hypervolume)
+        self.assertEqual(moa.hypervolume_plus, moa.hypervolume)
 
         points = [
             [0.6394267984578837, 0.025010755222666936, 0.27502931836911926],
@@ -561,7 +561,7 @@ class MyTestCase(unittest.TestCase):
         ]
         moa = MOArchive3d(points, reference_point=[1, 1, 1])
         self.assertAlmostEqual(moa.hypervolume, 0.812479094965706, places=6)
-        self.assertEqual(moa.hypervolume_plus, -moa.hypervolume)
+        self.assertEqual(moa.hypervolume_plus, moa.hypervolume)
 
 
 if __name__ == '__main__':

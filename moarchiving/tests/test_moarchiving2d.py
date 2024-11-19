@@ -100,26 +100,26 @@ class MyTestCase(unittest.TestCase):
     def test_hypervolume_plus(self):
         """ test the hypervolume_plus indicator """
         moa = MOArchive2d(reference_point=[1, 1])
-        self.assertEqual(moa.hypervolume_plus, inf)
+        self.assertEqual(moa.hypervolume_plus, -inf)
 
         moa.add([2, 2])
-        self.assertEqual(moa.hypervolume_plus, math.sqrt(2))
+        self.assertEqual(moa.hypervolume_plus, -math.sqrt(2))
 
         moa.add_list([[0, 5], [1, 2], [3, 2]])
-        self.assertEqual(moa.hypervolume_plus, 1)
+        self.assertEqual(moa.hypervolume_plus, -1)
 
         moa.add([1, 1])
         self.assertEqual(moa.hypervolume_plus, 0)
 
         moa.add([0.5, 0.5])
-        self.assertEqual(moa.hypervolume_plus, -moa.hypervolume)
+        self.assertEqual(moa.hypervolume_plus, moa.hypervolume)
 
         moa = MOArchive2d(reference_point=[1, 1])
         prev_hv_plus = moa.hypervolume_plus
         for i in range(1000):
             point = [10 * random.random(), 10 * random.random()]
             moa.add(point)
-            self.assertLessEqual(moa.hypervolume_plus, prev_hv_plus)
+            self.assertLessEqual(prev_hv_plus, moa.hypervolume_plus)
             prev_hv_plus = moa.hypervolume_plus
 
 

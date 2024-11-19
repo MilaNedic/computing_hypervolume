@@ -81,13 +81,13 @@ class MOArchive4d(MOArchiveParent):
         self._length = len(list(self))
         self._hypervolume_already_computed = True
         if hv is not None and hv > 0:
-            self._hypervolume_plus = -self._hypervolume
+            self._hypervolume_plus = self._hypervolume
         else:
             if list_of_f_vals is None or len(list_of_f_vals) == 0:
-                self._hypervolume_plus = inf
+                self._hypervolume_plus = -inf
             else:
-                self._hypervolume_plus = min([self.distance_to_hypervolume_area(f)
-                                              for f in list_of_f_vals])
+                self._hypervolume_plus = -min([self.distance_to_hypervolume_area(f)
+                                               for f in list_of_f_vals])
 
     def add(self, new_point, info=None, update_hypervolume=True):
         """ Add a new point to the archive.
@@ -122,8 +122,8 @@ class MOArchive4d(MOArchiveParent):
 
         if not self.in_domain(new_point):
             dist_to_hv_area = self.distance_to_hypervolume_area(new_point)
-            if dist_to_hv_area < self.hypervolume_plus:
-                self._hypervolume_plus = dist_to_hv_area
+            if -dist_to_hv_area > self._hypervolume_plus:
+                self._hypervolume_plus = -dist_to_hv_area
             return False
 
         self.__init__(list(self) + [new_point], self.reference_point, self.infos + [info])
@@ -271,7 +271,7 @@ class MOArchive4d(MOArchiveParent):
         moa_copy.add(f_vals)
         return self.hypervolume_final_float_type(moa_copy.hypervolume - self.hypervolume)
 
-    def compute_hypervolume(self):
+    def compute_hypervolume(self, reference_point=None):
         """ Compute the hypervolume of the archive.
 
         >>> from moarchiving.get_archive import get_archive
@@ -279,6 +279,10 @@ class MOArchive4d(MOArchiveParent):
         >>> moa.compute_hypervolume()
         44.0
         """
+        if reference_point is not None:
+            _warnings.warn("Reference point given at the initialization is used "
+                           "in 3D hypervolume computation")
+
         if self._hypervolume_already_computed:
             return self._hypervolume
         return self.hypervolume_final_float_type(

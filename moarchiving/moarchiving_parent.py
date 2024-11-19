@@ -295,7 +295,7 @@ class MOArchiveParent:
             return None
         self._hypervolume = self.hypervolume_final_float_type(self.compute_hypervolume())
         if self._hypervolume > 0:
-            self._hypervolume_plus = -self._hypervolume
+            self._hypervolume_plus = self._hypervolume
         return self._hypervolume
 
     def compute_hypervolume(self):
