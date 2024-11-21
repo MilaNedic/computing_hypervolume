@@ -74,8 +74,8 @@ class MOArchiveParent:
         """ return `True` if any element of `points` dominates or is equal to `f_val`.
         Otherwise return `False`.
 
-        >>> from moarchiving.get_archive import get_archive
-        >>> archive = get_archive([[1, 2, 3], [3, 2, 1]])
+        >>> from moarchiving.get_archive import new_archive
+        >>> archive = new_archive([[1, 2, 3], [3, 2, 1]])
         >>> archive.dominates([2, 2, 2])
         False
         >>> archive.dominates([1, 2, 3])
@@ -98,8 +98,8 @@ class MOArchiveParent:
         hence the number of dominating elements which can also be obtained
         without creating the list with ``number_only=True``.
 
-        >>> from moarchiving.get_archive import get_archive
-        >>> archive = get_archive([[1, 2, 3], [3, 2, 1], [2, 2, 2], [3, 0, 3]])
+        >>> from moarchiving.get_archive import new_archive
+        >>> archive = new_archive([[1, 2, 3], [3, 2, 1], [2, 2, 2], [3, 0, 3]])
         >>> archive.dominators([1, 1, 1])
         []
         >>> archive.dominators([3, 3, 3])
@@ -127,13 +127,13 @@ class MOArchiveParent:
         `False` otherwise. `True` means that `f_vals` contributes to
         the hypervolume if not dominated by other elements.
 
-        >>> from moarchiving.get_archive import get_archive
-        >>> archive3d = get_archive(reference_point=[3, 3, 3])
+        >>> from moarchiving.get_archive import new_archive
+        >>> archive3d = new_archive(reference_point=[3, 3, 3])
         >>> archive3d.in_domain([2, 2, 2])
         True
         >>> archive3d.in_domain([0, 0, 3])
         False
-        >>> archive4d = get_archive(reference_point=[3, 3, 3, 3])
+        >>> archive4d = new_archive(reference_point=[3, 3, 3, 3])
         >>> archive4d.in_domain([2, 2, 2, 2])
         True
         >>> archive4d.in_domain([0, 0, 0, 3])
@@ -178,8 +178,8 @@ class MOArchiveParent:
     def infos(self):
         """`list` of complementary information corresponding to each archive entry,
         corresponding to each of the points in the archive
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive([[1, 2, 3], [3, 2, 1], [2, 2, 2]], infos=["a", "b", "c"])
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive([[1, 2, 3], [3, 2, 1], [2, 2, 2]], infos=["a", "b", "c"])
         >>> moa.infos
         ['b', 'c', 'a']
         """
@@ -205,9 +205,9 @@ class MOArchiveParent:
 
     def contributing_hypervolume(self, f_vals):
         """ Returns the hypervolume contribution of a point in the archive
-        >>> from moarchiving.get_archive import get_archive
-        >>> get_archive.hypervolume_final_float_type = float
-        >>> moa = get_archive([[1, 2, 3], [3, 2, 1], [2, 3, 2]], reference_point=[4, 4, 4])
+        >>> from moarchiving.get_archive import new_archive
+        >>> new_archive.hypervolume_final_float_type = float
+        >>> moa = new_archive([[1, 2, 3], [3, 2, 1], [2, 3, 2]], reference_point=[4, 4, 4])
         >>> moa.contributing_hypervolume([1, 2, 3])
         3.0
         >>> moa.contributing_hypervolume([3, 2, 1])
@@ -237,8 +237,8 @@ class MOArchiveParent:
     def distance_to_pareto_front(self, f_vals, ref_factor=1):
         """ Returns the distance to the Pareto front of the archive,
         by calculating the distances to the kink points
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive([[1, 2, 3], [3, 2, 1], [2, 2, 2]], reference_point=[5, 5, 5])
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive([[1, 2, 3], [3, 2, 1], [2, 2, 2]], reference_point=[5, 5, 5])
         >>> moa.distance_to_pareto_front([1, 2, 3])
         0.0
         >>> moa.distance_to_pareto_front([3, 2, 3])
@@ -270,8 +270,8 @@ class MOArchiveParent:
 
     def distance_to_hypervolume_area(self, f_vals):
         """ Returns the distance to the hypervolume area of the archive
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive(reference_point=[1, 1, 1])
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive(reference_point=[1, 1, 1])
         >>> moa.distance_to_hypervolume_area([1, 2, 1])
         1.0
         >>> moa.distance_to_hypervolume_area([1, 1, 1])
@@ -349,8 +349,8 @@ class MOArchiveParent:
 
     def weakly_dominates(self, a, b, n_obj=None):
         """ Return True if a weakly dominates b, False otherwise
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive(n_obj=3)
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive(n_obj=3)
         >>> moa.weakly_dominates([1, 2, 3], [2, 3, 3])
         True
         >>> moa.weakly_dominates([1, 2, 3], [2, 2, 2])
@@ -364,8 +364,8 @@ class MOArchiveParent:
 
     def strictly_dominates(self, a, b, n_obj=None):
         """ Return True if a strictly dominates b, False otherwise
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive(n_obj=3)
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive(n_obj=3)
         >>> moa.strictly_dominates([1, 2, 3], [2, 3, 3])
         True
         >>> moa.strictly_dominates([1, 2, 3], [2, 2, 2])

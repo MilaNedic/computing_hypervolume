@@ -9,7 +9,7 @@ except ImportError:
     _warnings.warn('`fractions` module not installed, arbitrary precision hypervolume computation not available')
 
 
-def get_archive(list_of_f_vals=None, reference_point=None, infos=None, n_obj=None):
+def new_archive(list_of_f_vals=None, reference_point=None, infos=None, n_obj=None):
     """
     Factory function for creating MOArchive objects of the appropriate dimensionality.
     Args:
@@ -21,16 +21,16 @@ def get_archive(list_of_f_vals=None, reference_point=None, infos=None, n_obj=Non
     Returns:
         MOArchive object of the appropriate dimensionality, based on the number of objectives
     """
-    if not hasattr(get_archive, "hypervolume_final_float_type"):
+    if not hasattr(new_archive, "hypervolume_final_float_type"):
         try:
-            get_archive.hypervolume_final_float_type = fractions.Fraction
+            new_archive.hypervolume_final_float_type = fractions.Fraction
         except:
-            get_archive.hypervolume_final_float_type = float
-    if not hasattr(get_archive, "hypervolume_computation_float_type"):
+            new_archive.hypervolume_final_float_type = float
+    if not hasattr(new_archive, "hypervolume_computation_float_type"):
         try:
-            get_archive.hypervolume_computation_float_type = fractions.Fraction
+            new_archive.hypervolume_computation_float_type = fractions.Fraction
         except:
-            get_archive.hypervolume_computation_float_type = float
+            new_archive.hypervolume_computation_float_type = float
 
     assert list_of_f_vals is not None or n_obj is not None or reference_point is not None, \
         "At least one of `list_of_f_vals`, `reference_point` or `n_obj` must be provided"
@@ -50,16 +50,16 @@ def get_archive(list_of_f_vals=None, reference_point=None, infos=None, n_obj=Non
 
     if n_obj == 2:
         return MOArchive2d(list_of_f_vals, reference_point=reference_point, infos=infos,
-                           hypervolume_final_float_type=get_archive.hypervolume_final_float_type,
-                           hypervolume_computation_float_type=get_archive.hypervolume_computation_float_type)
+                           hypervolume_final_float_type=new_archive.hypervolume_final_float_type,
+                           hypervolume_computation_float_type=new_archive.hypervolume_computation_float_type)
     elif n_obj == 3:
         return MOArchive3d(list_of_f_vals, reference_point=reference_point, infos=infos,
-                           hypervolume_final_float_type=get_archive.hypervolume_final_float_type,
-                           hypervolume_computation_float_type=get_archive.hypervolume_computation_float_type)
+                           hypervolume_final_float_type=new_archive.hypervolume_final_float_type,
+                           hypervolume_computation_float_type=new_archive.hypervolume_computation_float_type)
     elif n_obj == 4:
         return MOArchive4d(list_of_f_vals, reference_point=reference_point, infos=infos,
-                           hypervolume_final_float_type=get_archive.hypervolume_final_float_type,
-                           hypervolume_computation_float_type=get_archive.hypervolume_computation_float_type)
+                           hypervolume_final_float_type=new_archive.hypervolume_final_float_type,
+                           hypervolume_computation_float_type=new_archive.hypervolume_computation_float_type)
     else:
         raise ValueError(f"Unsupported number of objectives: {n_obj}")
 

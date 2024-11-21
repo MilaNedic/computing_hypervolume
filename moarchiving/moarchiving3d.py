@@ -22,23 +22,23 @@ class MOArchive3d(MOArchiveParent):
     add and remove. Points of the archive can be accessed as a list of points order by the third
     coordinate using function points_list.
 
-    >>> from moarchiving.get_archive import get_archive
-    >>> moa = get_archive([[1, 2, 3], [3, 2, 1]])
+    >>> from moarchiving.get_archive import new_archive
+    >>> moa = new_archive([[1, 2, 3], [3, 2, 1]])
     >>> list(moa) # returns the list of points in the archive sorted by the third coordinate
     [[3, 2, 1], [1, 2, 3]]
     >>> moa.add([2, 2, 2]) # add a new point to the archive
     True
     >>> moa.add([3, 3, 3])
     False
-    >>> moa = get_archive([[1, 2, 3], [2, 3, 4], [3, 2, 1]],
+    >>> moa = new_archive([[1, 2, 3], [2, 3, 4], [3, 2, 1]],
     ...                   reference_point=[4, 4, 4], infos=["A", "B", "C"])
     >>> moa.infos # returns the list of infos for each point in the archive
     ['C', 'A']
     >>> moa.hypervolume
     Fraction(10, 1)
-    >>> get_archive.hypervolume_final_float_type = float
-    >>> get_archive.hypervolume_computation_float_type = float
-    >>> moa2 = get_archive([[1, 2, 3], [2, 3, 4], [3, 2, 1]], reference_point=[4, 4, 4])
+    >>> new_archive.hypervolume_final_float_type = float
+    >>> new_archive.hypervolume_computation_float_type = float
+    >>> moa2 = new_archive([[1, 2, 3], [2, 3, 4], [3, 2, 1]], reference_point=[4, 4, 4])
     >>> moa2.hypervolume
     10.0
     """
@@ -98,8 +98,8 @@ class MOArchive3d(MOArchiveParent):
         Returns:
             True if the point was added, False if it was dominated by another point in the archive
 
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive(reference_point=[4, 4, 4])
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive(reference_point=[4, 4, 4])
         >>> moa.add([2, 3, 4])
         False
         >>> moa.add([1, 2, 3])
@@ -225,8 +225,8 @@ class MOArchive3d(MOArchiveParent):
             f_vals: the point that should be removed
         Returns:
             The information of the removed point
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4],
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4],
         ...                   infos=["A", "B", "C"])
         >>> moa.remove([2, 2, 2])
         'B'
@@ -307,8 +307,8 @@ class MOArchive3d(MOArchiveParent):
             - one_by_one: adds the points one by one to the archive
             - reinit: reinitializes the archive with the new points
 
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive(reference_point=[4, 4, 4])
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive(reference_point=[4, 4, 4])
         >>> moa.add_list([[2, 3, 3], [1, 2, 3]], infos=["A", "B"])
         >>> list(moa), moa.infos
         ([[1, 2, 3]], ['B'])
@@ -340,8 +340,8 @@ class MOArchive3d(MOArchiveParent):
     def copy(self):
         """ Returns a copy of the archive
 
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4],
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4],
         ...                   infos=["A", "B", "C"])
         >>> moa2 = moa.copy()
         >>> list(moa2), moa2.infos
@@ -363,8 +363,8 @@ class MOArchive3d(MOArchiveParent):
          2D archive of all possible kink points found so far, and another 2D archive which stores
          the non-dominated points so far in the sweep
 
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4])
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4])
         >>> moa._get_kink_points()
         [[4, 4, 1], [3, 4, 2], [2, 4, 3], [1, 4, 4], [4, 2, 4]]
          """
@@ -409,8 +409,8 @@ class MOArchive3d(MOArchiveParent):
     def hypervolume_improvement(self, f_vals):
         """ Returns the hypervolume improvement of adding a point to the archive
 
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive([[1, 2, 3], [3, 2, 1]], reference_point=[4, 4, 4])
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive([[1, 2, 3], [3, 2, 1]], reference_point=[4, 4, 4])
         >>> moa.hypervolume_improvement([2, 2, 2])
         2.0
         >>> moa.hypervolume_improvement([3, 3, 4])
@@ -427,8 +427,8 @@ class MOArchive3d(MOArchiveParent):
     def compute_hypervolume(self, reference_point=None):
         """ Compute the hypervolume of the current state of archive
 
-        >>> from moarchiving.get_archive import get_archive
-        >>> moa = get_archive([[1, 2, 3], [3, 2, 1]], reference_point=[4, 4, 4])
+        >>> from moarchiving.get_archive import new_archive
+        >>> moa = new_archive([[1, 2, 3], [3, 2, 1]], reference_point=[4, 4, 4])
         >>> moa.compute_hypervolume()
         10.0
         """
