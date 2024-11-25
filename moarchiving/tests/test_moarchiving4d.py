@@ -396,7 +396,7 @@ class MyTestCase(unittest.TestCase):
             [0.8294046642529949, 0.6185197523642461, 0.8617069003107772, 0.577352145256762]
         ]
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
-        self.assertAlmostEqual(0.37037902191204, float(moa.hypervolume), places=6)
+        self.assertAlmostEqual(0.37037902191204, float(moa.hypervolume), places=8)
         self.assertEqual(moa.hypervolume_plus, moa.hypervolume)
 
         points = [
@@ -503,7 +503,12 @@ class MyTestCase(unittest.TestCase):
         ]
 
         moa = MOArchive4d(points, reference_point=[1, 1, 1, 1])
-        self.assertAlmostEqual(0.666453313693048, float(moa.hypervolume), places=6)
+        self.assertAlmostEqual(0.666453313693048, float(moa.hypervolume), places=8)
+        moa = MOArchive4d([[p[0]-1, p[1]-1, p[2]-1, p[3]-1] for p in points],
+                          reference_point=[0, 0, 0, 0])
+        self.assertAlmostEqual(0.666453313693048, float(moa.hypervolume), places=8)
+        moa = MOArchive4d(points, reference_point=[1, 2, 3, 4])
+        self.assertAlmostEqual(22.4083467226742, float(moa.hypervolume), places=8)
         self.assertEqual(moa.hypervolume_plus, moa.hypervolume)
 
 

@@ -560,7 +560,11 @@ class MyTestCase(unittest.TestCase):
             [0.009669699608339966, 0.07524386007376704, 0.883106393300143]
         ]
         moa = MOArchive3d(points, reference_point=[1, 1, 1])
-        self.assertAlmostEqual(moa.hypervolume, 0.812479094965706, places=6)
+        self.assertAlmostEqual(moa.hypervolume, 0.812479094965706, places=8)
+        moa = MOArchive3d([[p[0]-1, p[1]-1, p[2]-1] for p in points], reference_point=[0, 0, 0])
+        self.assertAlmostEqual(moa.hypervolume, 0.812479094965706, places=8)
+        moa = MOArchive3d(points, reference_point=[1, 2, 3])
+        self.assertAlmostEqual(moa.hypervolume, 5.61969774713577, places=8)
         self.assertEqual(moa.hypervolume_plus, moa.hypervolume)
 
 
