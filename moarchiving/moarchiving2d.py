@@ -304,7 +304,8 @@ class BiobjectiveNondominatedSortedList(list):
         """
         idx = self.index(f_pair)
         self._subtract_HV(idx)
-        self._hypervolume_plus = self._hypervolume if self.hypervolume > 0 else -inf
+        if hasattr(self, '_hypervolume'):  # necessary for calculating kink points in 3d
+            self._hypervolume_plus = self._hypervolume if self._hypervolume > 0 else -inf
         self._removed = [self[idx]]
         del self[idx]  # == list.remove(self, f_pair)
         if self._infos: del self._infos[idx]
