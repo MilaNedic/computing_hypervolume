@@ -107,8 +107,10 @@ class MyTestCase(unittest.TestCase):
         for i in range(1000):
             f_vals = [10 * random.random(), 5 * random.random(), random.random()]
             g_vals = max(random.random() - 0.3, 0)
+            icmop_improvement = moa.icmop_improvement(f_vals, g_vals)
             moa.add(f_vals, g_vals)
             self.assertLessEqual(prev_icmop, moa.icmop)
+            self.assertEqual(icmop_improvement, moa.icmop - prev_icmop)
             prev_icmop = moa.icmop
 
 
