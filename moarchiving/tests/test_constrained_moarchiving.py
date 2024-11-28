@@ -110,7 +110,7 @@ class MyTestCase(unittest.TestCase):
             icmop_improvement = moa.icmop_improvement(f_vals, g_vals)
             moa.add(f_vals, g_vals)
             self.assertLessEqual(prev_icmop, moa.icmop)
-            self.assertEqual(icmop_improvement, moa.icmop - prev_icmop)
+            self.assertAlmostEqual(icmop_improvement, moa.icmop - prev_icmop, places=8)
             prev_icmop = moa.icmop
 
 

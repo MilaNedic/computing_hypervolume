@@ -431,7 +431,6 @@ class BiobjectiveNondominatedSortedList(list):
 
     def copy(self):
         """return a "deep" copy of `self`"""
-        _warnings.warn('BiobjectiveNondominatedSortedList.copy has never been tested')
         nda = BiobjectiveNondominatedSortedList()
         for d in self.__dict__:
             setattr(nda, d, getattr(self, d))

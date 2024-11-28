@@ -27,6 +27,7 @@ class MOArchive4d(MOArchiveParent):
     True
     >>> moa.add([3, 3, 3, 3])
     False
+    >>> get_mo_archive.hypervolume_final_float_type = fractions.Fraction
     >>> moa = get_mo_archive([[1, 2, 3, 4], [2, 3, 4, 5], [4, 3, 2, 1]],
     ...                   reference_point=[5, 5, 5, 5], infos=["A", "B", "C"])
     >>> moa.infos # returns the list of infos for each point in the archive

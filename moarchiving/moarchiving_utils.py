@@ -28,6 +28,9 @@ class MySortedList(SortedKeyList):
     def __init__(self, iterable=None, key=lambda node: node.x[1]):
         super().__init__(iterable=iterable, key=key)
 
+    def __str__(self):
+        return str([node.x for node in self])
+
     def head_y(self):
         """ Return the point q from the list, with the smallest q_y """
         return self[0]
