@@ -201,7 +201,6 @@ class BiobjectiveNondominatedSortedList(list):
         else:
             self._contributing_hypervolumes = []
         self._set_HV()
-        self.make_expensive_asserts and self._asserts()
 
         if reference_point is not None:
             if self._hypervolume > 0:
@@ -214,7 +213,7 @@ class BiobjectiveNondominatedSortedList(list):
                                                    for f in list_of_f_pairs])
         else:
             self._hypervolume_plus = None
-
+        self.make_expensive_asserts and self._asserts()
 
     def _debug_info(self):
         """return debug info as a list of (key, value) tuples"""
@@ -783,6 +782,8 @@ class BiobjectiveNondominatedSortedList(list):
         Overall this amounts to the uncrowded hypervolume improvement,
         see https://arxiv.org/abs/1904.08823
         """
+        save_infos = self._infos.copy() if self._infos is not None else None
+        save_hypervolume_plus = self._hypervolume_plus
         dist = self.distance_to_pareto_front(f_pair)
         if dist:
             return -dist
@@ -806,6 +807,8 @@ class BiobjectiveNondominatedSortedList(list):
         if hv0 != self.hypervolume:
             _warnings.warn("HV changed from %f to %f while computing hypervolume_improvement" %
                            (hv0, self.hypervolume))
+        self._infos = save_infos
+        self._hypervolume_plus = save_hypervolume_plus
         return self.hypervolume_computation_float_type(hv1) - self.hypervolume
 
     def hypervolume_improvement(self, f_pair):

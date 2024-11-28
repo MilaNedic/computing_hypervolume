@@ -52,7 +52,6 @@ class MyTestCase(unittest.TestCase):
 
         moa = BiobjectiveNondominatedSortedList(points, [6, 6], infos=infos)
         # assert that only points A and D are stored in the archive
-        print("ASSERTING:", {"A", "D"}, set(moa.infos))
         self.assertSetEqual({"A", "D"}, set(moa.infos))
 
         moa_add = BiobjectiveNondominatedSortedList(reference_point=[6, 6])
@@ -107,7 +106,6 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(moa.hypervolume_plus, -math.sqrt(2))
 
         moa.add_list([[0, 5], [1, 2], [3, 2]])
-        print("ASSERTING:", moa.hypervolume_plus, -math.sqrt(2))
         self.assertEqual(moa.hypervolume_plus, -1)
 
         moa.add([1, 1])
