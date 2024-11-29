@@ -1,3 +1,5 @@
+""" Run all doctests and unit tests in the moarchiving package. """
+
 import doctest
 import unittest
 

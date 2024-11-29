@@ -1,3 +1,5 @@
+""" Test the CMOArchive class """
+
 from moarchiving.get_archive import get_cmo_archive
 
 import unittest
@@ -8,7 +10,7 @@ def list_to_set(lst):
     return set([tuple(p) for p in lst])
 
 
-class MyTestCase(unittest.TestCase):
+class TestCMOArchiving(unittest.TestCase):
     def test_hypervolume_easy(self):
         """ test the hypervolume calculation for a simple case """
         f_vals = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]

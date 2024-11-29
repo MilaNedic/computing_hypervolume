@@ -1,3 +1,5 @@
+""" This module provides functions to generate non-dominated points for testing purposes """
+
 import math
 import random
 

@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+This module contains a parent class to MOArchiving3d and MOArchiving4d,
+to avoid code duplication.
+"""
+
 
 from moarchiving.moarchiving_utils import DLNode, my_lexsort, init_sentinels_new
 

@@ -1,3 +1,5 @@
+""" Test the BiobjectiveNondominatedSortedList class """
+
 from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList
 
 import unittest
@@ -11,7 +13,7 @@ def list_to_set(lst):
     return set([tuple(p) for p in lst])
 
 
-class MyTestCase(unittest.TestCase):
+class TestMOArchiving2d(unittest.TestCase):
     def test_hypervolume_easy(self):
         """ test the hypervolume calculation for a simple case """
         points = [[1, 2], [2, 1]]

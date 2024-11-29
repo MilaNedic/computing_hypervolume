@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+""" Module for the CMOArchive class, which provides additional functionality for constrained
+multi-objective optimization to the MOArchive classes, while keeping the same interface. """
+
 from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2d
 from moarchiving.moarchiving3d import MOArchive3d
 from moarchiving.moarchiving4d import MOArchive4d

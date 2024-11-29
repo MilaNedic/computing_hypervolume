@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+This module contains a MOArchiving3d class for storing a set of non-dominated points in 3D space
+and efficiently calculating hypervolume with respect to the given reference point.
+"""
+
+
 from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
 from moarchiving.moarchiving_utils import (DLNode, MySortedList, compute_area_simple, remove_from_z,
                                            restart_list_y, lexicographic_less, one_contribution_3d)

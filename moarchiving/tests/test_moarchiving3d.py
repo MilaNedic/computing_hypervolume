@@ -1,3 +1,5 @@
+""" Test the MOArchive3d class """
+
 from moarchiving.moarchiving3d import MOArchive3d
 from moarchiving.moarchiving_utils import DLNode, my_lexsort
 from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
@@ -13,7 +15,7 @@ def list_to_set(lst):
     return set([tuple(p) for p in lst])
 
 
-class MyTestCase(unittest.TestCase):
+class TestMOArchiving3d(unittest.TestCase):
     def test_hypervolume_easy(self):
         """ test the hypervolume calculation for a simple case """
         points = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]

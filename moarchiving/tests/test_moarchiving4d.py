@@ -1,3 +1,5 @@
+""" Test the MOArchive4d class """
+
 from moarchiving.moarchiving3d import MOArchive3d
 from moarchiving.moarchiving4d import MOArchive4d
 from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2D
@@ -19,7 +21,7 @@ def get_small_test_archive():
     return MOArchive4d(points, [6, 6, 6, 6], infos)
 
 
-class MyTestCase(unittest.TestCase):
+class TestMOArchiving4d(unittest.TestCase):
     def test_hypervolume_easy(self):
         """ test the hypervolume calculation for a 'simple' case """
         points = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 0, 1], [3, 0, 1, 2]]

@@ -1,8 +1,11 @@
+""" Test the MySortedList class. """
+
+
 import unittest
 from moarchiving.moarchiving_utils import MySortedList, DLNode
 
 
-class MyTestCase(unittest.TestCase):
+class TestSortedList(unittest.TestCase):
     def test_init(self):
         sl = MySortedList()
         self.assertEqual(str(sl), "[]")

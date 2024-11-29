@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+This module contains a MOArchiving4d class for storing a set of non-dominated points in 4D space
+and calculating hypervolume with respect to the given reference point.
+"""
+
+
 from moarchiving.moarchiving_utils import hv4dplusR, remove_from_z
 from moarchiving.moarchiving3d import MOArchive3d
 from moarchiving.moarchiving_parent import MOArchiveParent

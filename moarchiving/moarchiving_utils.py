@@ -1,3 +1,6 @@
+"""This module contains various utility functions and classes for the MOArchiving package."""
+
+
 from sortedcontainers import SortedKeyList
 
 

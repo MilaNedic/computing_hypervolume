@@ -1,3 +1,6 @@
+""" This module contains the factory functions for creating MOArchive objects
+of the appropriate dimensionality, for both constrained and unconstrained problems. """
+
 from moarchiving.moarchiving2d import BiobjectiveNondominatedSortedList as MOArchive2d
 from moarchiving.moarchiving3d import MOArchive3d
 from moarchiving.moarchiving4d import MOArchive4d
@@ -13,6 +16,7 @@ except ImportError:
 def get_mo_archive(list_of_f_vals=None, reference_point=None, infos=None, n_obj=None):
     """
     Factory function for creating MOArchive objects of the appropriate dimensionality.
+
     Args:
         list_of_f_vals: list of objective vectors, can be None if n_obj is provided
         reference_point: reference point for the archive
@@ -69,6 +73,7 @@ def get_cmo_archive(list_of_f_vals=None, list_of_g_vals=None, reference_point=No
                     infos=None, n_obj=None, tau=1):
     """
     Factory function for creating MOArchive objects of the appropriate dimensionality.
+
     Args:
         list_of_f_vals: list of objective vectors, can be None if n_obj is provided
         list_of_g_vals: list of constraint vectors, must be the same length as list_of_f_vals

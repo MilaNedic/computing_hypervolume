@@ -19,6 +19,7 @@ except ImportError: _warnings.warn(
     '`fractions` module not installed, arbitrary precision hypervolume computation not available')
 inf = float('inf')
 
+
 def _debug_trace(*args, **kwargs):
     """return a string like printing the calling trace stack"""
     try:
@@ -28,6 +29,7 @@ def _debug_trace(*args, **kwargs):
     else:
         s = ''.join(traceback.format_stack(*args, **kwargs))
     return s
+
 
 def true_fraction(val, copy=False):
     """return a `fractions.Fraction` object from `val`.
@@ -46,6 +48,7 @@ def true_fraction(val, copy=False):
     if not isinstance(val, (int, float)):
         val = float(val)
     return fractions.Fraction(val)
+
 
 class BiobjectiveNondominatedSortedList(list):
     """A sorted list of non-dominated unique objective-pairs.
