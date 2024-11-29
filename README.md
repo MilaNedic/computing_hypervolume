@@ -16,8 +16,6 @@ or simply via
 ```
 pip install moarchiving
 ```
-The single file [`moarchiving.py`](https://github.com/CMA-ES/moarchiving/moarchiving/moarchiving.py) (from the `moarchiving/` folder) can also be directly used by itself when copied in the current folder or in a path visible to Python (e.g. a path contained in `sys.path`).
-
 
 ## Testing
 
