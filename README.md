@@ -17,6 +17,7 @@ or simply via
 pip install moarchiving
 ```
 
+
 ## Testing
 
 ```
@@ -37,6 +38,7 @@ unittest.TextTestRunner().run(unittest.TestLoader().loadTestsFromModule(<module 
 ----------------------------------------------------------------------
 Ran 7 tests in 0.001s
 ```
+
 
 ## Details
 
@@ -323,5 +325,180 @@ for point in points_list:
     [5, 5, 0] |         0 |         1 |                 2 | [[3, 2, 0], [1, 3, 0]]
     [2, 2, 2] |         1 |         1 |                 1 | [[1, 1, 1]]
     [0, 2, 3] |         1 |         0 |                 0 | []
+    
+
+### Visualization of Hypervolume, Hypervolume_plus and ICMOP indicators
+By saving the values of indicators for each point added to the archive, we can visualize the behavior of the archive over time.
+
+
+```python
+import matplotlib.pyplot as plt
+import random
+
+get_cmo_archive.hypervolume_final_float_type = float
+get_mo_archive.hypervolume_final_float_type = float
+
+n_obj = 3
+
+indicators_cmoa = []
+indicators_moa = []
+cmoa = get_cmo_archive(reference_point=[0.5] * n_obj, n_obj=n_obj, tau=0.2)
+moa = get_mo_archive(reference_point=[0.1] * n_obj, n_obj=n_obj)
+
+for i in range(2000):
+    objectives = [random.random() for _ in range(n_obj)]
+    constraints = [max(random.random() - 0.1, 0), max(random.random() - 0.1, 0)]
+    
+    cmoa.add(objectives, constraints, info=f"point_{i}")
+    moa.add(objectives, info=f"point_{i}")
+    
+    indicators_cmoa.append((cmoa.icmop, cmoa.hypervolume_plus, cmoa.hypervolume))
+    indicators_moa.append((moa.hypervolume_plus, moa.hypervolume))
+    
+```
+
+
+```python
+fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+axs[0].plot([x[2] for x in indicators_cmoa], label="hypervolume")
+axs[0].plot([x[1] for x in indicators_cmoa], label="hypervolume_plus")
+axs[0].plot([x[0] for x in indicators_cmoa], label="icmop")
+axs[0].axhline(0, color="black", linestyle="--", zorder=0)
+axs[0].axhline(-cmoa.tau, color="black", linestyle="--", zorder=0)
+axs[0].set_title("Constrained MOArchive")
+axs[0].legend()
+
+axs[1].plot([x[1] for x in indicators_moa], label="hypervolume")
+axs[1].plot([x[0] for x in indicators_moa], label="hypervolume_plus")
+axs[1].set_title("MOArchive")
+axs[1].axhline(0, color="black", linestyle="--", zorder=0)
+axs[1].legend()
+plt.show()
+```
+
+
+    
+![png](moarchiving_demo_files/moarchiving_demo_30_0.png)
+    
+
+
+## Some performance tests
+
+
+```python
+import time
+import numpy as np
+from moarchiving.tests.point_sampling import get_non_dominated_points
+import matplotlib.pyplot as plt
+test_archive_sizes = [2 ** i for i in range(21)]
+```
+
+### Initialization of the archive
+
+
+```python
+n_repeats = 100
+time_limit = 10
+
+for n_obj in [2, 3, 4]:
+    print(f"Testing {n_obj} objectives")
+    times = []
+    archive_sizes = []
+    
+    for archive_size in test_archive_sizes:
+        points = get_non_dominated_points(archive_size, n_dim=n_obj)
+        t0 = time.time()
+        moa = [get_mo_archive(points, [1] * n_obj, n_obj=n_obj)
+               for _ in range(n_repeats)]
+        hv = [m.hypervolume for m in moa]
+        t1 = time.time()
+        
+        times.append(max((t1 - t0) / n_repeats, 10e-4))
+        print(".", end="")
+        archive_sizes.append(archive_size)
+        
+        if t1 - t0 > time_limit:
+            break
+    print()
+    
+    plt.plot(archive_sizes, times, '-o', label=f"{n_obj} objectives")
+
+plt.title("Initialization and hypervolume computation")
+plt.xlabel("Archive size")
+plt.ylabel("Time [s]")
+plt.yscale("log")
+plt.xscale("log")
+plt.grid(True)
+plt.legend()
+plt.show()
+```
+
+    Testing 2 objectives
+    ..............
+    Testing 3 objectives
+    ............
+    Testing 4 objectives
+    ........
+    
+
+
+    
+![png](moarchiving_demo_files/moarchiving_demo_34_1.png)
+    
+
+
+### Adding a point to the archive
+
+
+```python
+n_repeats = 10
+time_limit = 10
+
+for n_obj in [2, 3, 4]:
+    print(f"Testing {n_obj} objectives")
+    times = []
+    archive_sizes = []
+
+    for archive_size in test_archive_sizes:
+        
+        points = get_non_dominated_points(archive_size, n_dim=n_obj)
+        add_points = get_non_dominated_points(n_repeats, n_dim=n_obj)
+        moa = [get_mo_archive(points, [1] * n_obj, n_obj=n_obj) for _ in range(n_repeats)]
+        
+        t0 = time.time()
+        for i, m in enumerate(moa):
+            m.add(add_points[i])
+        t1 = time.time()
+
+        times.append(max((t1 - t0) / n_repeats, 10e-4))
+        print(".", end="")
+        archive_sizes.append(archive_size)
+
+        if t1 - t0 > time_limit:
+            break
+    print()
+    time.sleep(1)
+
+    plt.plot(archive_sizes, times, '-o', label=f"{n_obj} objectives")
+
+plt.title("Adding a point to the archive")
+plt.xlabel("Archive size")
+plt.ylabel("Time [s]")
+plt.yscale("log")
+plt.xscale("log")
+plt.grid(True)
+plt.legend()
+plt.show()
+```
+
+    Testing 2 objectives
+    .....................
+    Testing 3 objectives
+    ................
+    Testing 4 objectives
+    ..........
+
+    
+![png](moarchiving_demo_files/moarchiving_demo_36_1.png)
     
 
