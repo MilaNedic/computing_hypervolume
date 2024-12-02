@@ -162,18 +162,21 @@ def init_sentinels_new(list_nodes, ref, dim):
 
 
 def add_to_z(new):
+    """ Add a new node to the list sorted by z """
     new.next[2] = new.prev[2].next[2]
     new.next[2].prev[2] = new
     new.prev[2].next[2] = new
 
 
 def remove_from_z(old, archive_dim):
+    """ Remove a node from the list sorted by z """
     di = archive_dim - 1
     old.prev[di].next[di] = old.next[di]
     old.next[di].prev[di] = old.prev[di]
 
 
 def setup_z_and_closest(head, new):
+    """ Sets up the closest[0] and closest[1] pointers for the new node """
     closest1 = head
     closest0 = head.next[2]
 

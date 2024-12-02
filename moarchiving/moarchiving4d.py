@@ -59,6 +59,7 @@ class MOArchive4d(MOArchiveParent):
                  hypervolume_final_float_type=None,
                  hypervolume_computation_float_type=None):
         """ Create a new 4D archive object.
+
         Args:
             list_of_f_vals: list of objective vectors
             reference_point: reference point for the hypervolume calculation
@@ -98,6 +99,7 @@ class MOArchive4d(MOArchiveParent):
 
     def add(self, new_point, info=None, update_hypervolume=True):
         """ Add a new point to the archive.
+
         Args:
             new_point: new point to be added
             info: additional information for the new point
@@ -138,6 +140,7 @@ class MOArchive4d(MOArchiveParent):
 
     def remove(self, remove_point):
         """ Remove a point from the archive.
+
         Args:
             remove_point: point to be removed
         Returns:
@@ -165,6 +168,7 @@ class MOArchive4d(MOArchiveParent):
 
     def add_list(self, list_of_f_vals, infos=None):
         """ Add a list of points to the archive.
+
         Args:
             list_of_f_vals: list of points to be added
             infos: list of additional information for each point
@@ -208,6 +212,7 @@ class MOArchive4d(MOArchiveParent):
 
     def _get_kink_points(self):
         """ Function that returns the kink points of the archive.
+
          Kink point are calculated by making a sweep of the archive, where the state is one
          3D archive of all possible kink points found so far, and another 3D archive which stores
          the non-dominated points so far in the sweep

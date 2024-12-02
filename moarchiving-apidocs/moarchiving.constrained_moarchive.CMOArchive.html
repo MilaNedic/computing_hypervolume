@@ -523,22 +523,22 @@
     
     <td>Method</td>
     <td><code><a href="#__init__" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.__init__">__init__</a></code></td>
-    <td>Initialize a CMOArchive object. Args:</td>
+    <td>Initialize a CMOArchive object.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__iter__" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.__iter__">__iter__</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
+    <td>Return an iterator over the objective vectors in the archive.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#__len__" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.__len__">__len__</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
+    <td>Return the number of objective vectors in the archive.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#add" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.add">add</a></code></td>
-    <td>Add the objective vector f_vals with corresponding constraints to the archive if it is feasible. If no feasible solution was found yet, also update the indicator. &gt;&gt;&gt; from moarchiving.get_archive import get_cmo_archive &gt;&gt;&gt; moa = get_cmo_archive(reference_point=[5, 5], tau=10) &gt;&gt;&gt; moa...</td>
+    <td>Add the objective vector f_vals with corresponding constraints to the archive if it is feasible. If no feasible solution was found yet, also update the indicator.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -588,7 +588,7 @@
     
     <td>Method</td>
     <td><code><a href="#icmop_improvement" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.icmop_improvement">icmop<wbr></wbr>_improvement</a></code></td>
-    <td>Compute the improvement of the indicator if the objective vector f_vals is added. &gt;&gt;&gt; from moarchiving.get_archive import get_cmo_archive &gt;&gt;&gt; get_cmo_archive.hypervolume_final_float_type = float &gt;&gt;&gt; moa = get_cmo_archive(reference_point=[5, 5], tau=4) # icmop = -inf &gt;&gt;&gt; moa...</td>
+    <td>Compute the improvement of the indicator if the objective vector f_vals is added.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -598,7 +598,7 @@
     
     <td>Method</td>
     <td><code><a href="#remove" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.remove">remove</a></code></td>
-    <td>Remove a feasible point with objective vector f_vals from the archive. &gt;&gt;&gt; from moarchiving.get_archive import get_cmo_archive &gt;&gt;&gt; moa = get_cmo_archive([[2, 3], [1, 4], [4, 1]], [0, 0, 0], reference_point=[5, 5]) &gt;&gt;&gt; list(moa) [[1, 4], [2, 3], [4, 1]] &gt;&gt;&gt; moa...</td>
+    <td>Remove a feasible point with objective vector f_vals from the archive.</td>
   </tr><tr class="instancevariable">
     
     <td>Instance Variable</td>
@@ -618,27 +618,27 @@
     
     <td>Property</td>
     <td><code><a href="#contributing_hypervolumes" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.contributing_hypervolumes">contributing<wbr></wbr>_hypervolumes</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
+    <td>Return the hypervolume contributions of each point in the archive.</td>
   </tr><tr class="property">
     
     <td>Property</td>
     <td><code><a href="#hypervolume" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.hypervolume">hypervolume</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
+    <td>Return the hypervolume indicator.</td>
   </tr><tr class="property">
     
     <td>Property</td>
     <td><code><a href="#hypervolume_plus" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.hypervolume_plus">hypervolume<wbr></wbr>_plus</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
+    <td>Return the hypervolume_plus indicator.</td>
   </tr><tr class="property">
     
     <td>Property</td>
     <td><code><a href="#icmop" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.icmop">icmop</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
+    <td>Return the icmop indicator.</td>
   </tr><tr class="property">
     
     <td>Property</td>
     <td><code><a href="#infos" class="internal-link" title="moarchiving.constrained_moarchive.CMOArchive.infos">infos</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
+    <td>Return the list of additional information for each point in the archive.</td>
   </tr><tr class="instancevariable private">
     
     <td>Instance Variable</td>
@@ -674,7 +674,8 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Initialize a CMOArchive object. Args:</p>
+    <div><p>Initialize a CMOArchive object.</p>
+<p>Args:</p>
 <ul class="rst-simple">
 <li>list_of_f_vals: list of objective vectors</li>
 <li>list_of_g_vals: list of constraint vectors, must be the same length as list_of_f_vals</li>
@@ -709,7 +710,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Return an iterator over the objective vectors in the archive.</p></div>
   </div>
 </div><div class="basemethod">
   
@@ -733,7 +734,7 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Return the number of objective vectors in the archive.</p></div>
   </div>
 </div><div class="basemethod">
   
@@ -757,7 +758,20 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Add the objective vector f_vals with corresponding constraints to the archive if it is feasible. If no feasible solution was found yet, also update the indicator. &gt;&gt;&gt; from moarchiving.get_archive import get_cmo_archive &gt;&gt;&gt; moa = get_cmo_archive(reference_point=[5, 5], tau=10) &gt;&gt;&gt; moa.add([4, 4], 0) &gt;&gt;&gt; list(moa) [[4, 4]] &gt;&gt;&gt; moa.add([3, 4], 1) &gt;&gt;&gt; list(moa) [[4, 4]] &gt;&gt;&gt; moa.add([2, 2], 0) &gt;&gt;&gt; list(moa) [[2, 2]]</p></div>
+    <div><p>Add the objective vector f_vals with corresponding constraints to the archive if it is feasible. If no feasible solution was found yet, also update the indicator.</p>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-keyword">from</span> moarchiving.get_archive <span class="py-keyword">import</span> get_cmo_archive
+<span class="py-prompt">&gt;&gt;&gt; </span>moa = get_cmo_archive(reference_point=[5, 5], tau=10)
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.add([4, 4], 0)
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">list</span>(moa)
+<span class="py-output">[[4, 4]]</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.add([3, 4], 1)
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">list</span>(moa)
+<span class="py-output">[[4, 4]]</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.add([2, 2], 0)
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">list</span>(moa)
+<span class="py-output">[[2, 2]]</span>
+</pre></div>
   </div>
 </div><div class="basemethod">
   
@@ -1008,7 +1022,32 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Compute the improvement of the indicator if the objective vector f_vals is added. &gt;&gt;&gt; from moarchiving.get_archive import get_cmo_archive &gt;&gt;&gt; get_cmo_archive.hypervolume_final_float_type = float &gt;&gt;&gt; moa = get_cmo_archive(reference_point=[5, 5], tau=4) # icmop = -inf &gt;&gt;&gt; moa.icmop_improvement([1, 1], 10) inf &gt;&gt;&gt; moa.add([1, 1], 10) # icmop = -14 &gt;&gt;&gt; int(moa.icmop_improvement([2, 2], 4)) 6 &gt;&gt;&gt; moa.add([2, 2], 4) # icmop = -8 &gt;&gt;&gt; int(moa.icmop_improvement([8, 9], 0)) 4 &gt;&gt;&gt; moa.add([8, 9], 0) # icmop = -4 &gt;&gt;&gt; int(moa.icmop_improvement([8, 5], 0)) 1 &gt;&gt;&gt; moa.add([8, 5], 0) # icmop = -3 &gt;&gt;&gt; int(moa.icmop_improvement([0, 0], 1)) 0 &gt;&gt;&gt; moa.add([0, 0], 1) # icmop = -3 &gt;&gt;&gt; int(moa.icmop_improvement([4, 4], 0)) 4 &gt;&gt;&gt; moa.add([4, 4], 0) # icmop = 1 &gt;&gt;&gt; int(moa.icmop_improvement([3, 3], 0)) 3</p></div>
+    <div><p>Compute the improvement of the indicator if the objective vector f_vals is added.</p>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-keyword">from</span> moarchiving.get_archive <span class="py-keyword">import</span> get_cmo_archive
+<span class="py-prompt">&gt;&gt;&gt; </span>get_cmo_archive.hypervolume_final_float_type = <span class="py-builtin">float</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa = get_cmo_archive(reference_point=[5, 5], tau=4) <span class="py-comment"># icmop = -inf</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.icmop_improvement([1, 1], 10)
+<span class="py-output">inf</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.add([1, 1], 10) <span class="py-comment"># icmop = -14</span>
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">int</span>(moa.icmop_improvement([2, 2], 4))
+<span class="py-output">6</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.add([2, 2], 4) <span class="py-comment"># icmop = -8</span>
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">int</span>(moa.icmop_improvement([8, 9], 0))
+<span class="py-output">4</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.add([8, 9], 0) <span class="py-comment"># icmop = -4</span>
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">int</span>(moa.icmop_improvement([8, 5], 0))
+<span class="py-output">1</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.add([8, 5], 0) <span class="py-comment"># icmop = -3</span>
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">int</span>(moa.icmop_improvement([0, 0], 1))
+<span class="py-output">0</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.add([0, 0], 1) <span class="py-comment"># icmop = -3</span>
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">int</span>(moa.icmop_improvement([4, 4], 0))
+<span class="py-output">4</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.add([4, 4], 0) <span class="py-comment"># icmop = 1</span>
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">int</span>(moa.icmop_improvement([3, 3], 0))
+<span class="py-output">3</span>
+</pre></div>
   </div>
 </div><div class="basemethod">
   
@@ -1056,7 +1095,16 @@
   </div>
   <div class="docstring functionBody">
     
-    <div><p>Remove a feasible point with objective vector f_vals from the archive. &gt;&gt;&gt; from moarchiving.get_archive import get_cmo_archive &gt;&gt;&gt; moa = get_cmo_archive([[2, 3], [1, 4], [4, 1]], [0, 0, 0], reference_point=[5, 5]) &gt;&gt;&gt; list(moa) [[1, 4], [2, 3], [4, 1]] &gt;&gt;&gt; moa.remove([2, 3]) &gt;&gt;&gt; list(moa) [[1, 4], [4, 1]]</p></div>
+    <div><p>Remove a feasible point with objective vector f_vals from the archive.</p>
+<pre class="py-doctest">
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-keyword">from</span> moarchiving.get_archive <span class="py-keyword">import</span> get_cmo_archive
+<span class="py-prompt">&gt;&gt;&gt; </span>moa = get_cmo_archive([[2, 3], [1, 4], [4, 1]], [0, 0, 0], reference_point=[5, 5])
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">list</span>(moa)
+<span class="py-output">[[1, 4], [2, 3], [4, 1]]</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>moa.remove([2, 3])
+<span class="py-prompt">&gt;&gt;&gt; </span><span class="py-builtin">list</span>(moa)
+<span class="py-output">[[1, 4], [4, 1]]</span>
+</pre></div>
   </div>
 </div><div class="baseinstancevariable">
   
@@ -1151,7 +1199,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Return the hypervolume contributions of each point in the archive.</p></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1175,7 +1223,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Return the hypervolume indicator.</p></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1199,7 +1247,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Return the hypervolume_plus indicator.</p></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1223,7 +1271,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Return the icmop indicator.</p></div>
     
   </div>
 </div><div class="baseproperty">
@@ -1247,7 +1295,7 @@
   </div>
   <div class="functionBody">
     
-    <div><p class="undocumented">Undocumented</p></div>
+    <div><p>Return the list of additional information for each point in the archive.</p></div>
     
   </div>
 </div><div class="baseinstancevariable private">
@@ -1286,7 +1334,7 @@
   <div class="container">
     <a href="index.html">API Documentation</a> for moarchiving,
   generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-    24.3.3 at 2024-11-29 17:05:49.
+    24.3.3 at 2024-12-02 11:44:05.
   </div>
 
   <!-- Search related scripts needs to be loaded at the end of HTML 

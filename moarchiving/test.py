@@ -6,7 +6,8 @@ import unittest
 import moarchiving
 
 
-def main():
+def run_all_tests():
+    """ Run all doctests and unit tests in the moarchiving package. """
     tmp = moarchiving.BiobjectiveNondominatedSortedList.make_expensive_asserts
     moarchiving.BiobjectiveNondominatedSortedList.make_expensive_asserts = True
     # print(moarchiving.moarchiving.BiobjectiveNondominatedSortedList.make_expensive_asserts)
@@ -27,4 +28,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    run_all_tests()

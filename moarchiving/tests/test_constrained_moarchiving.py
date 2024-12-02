@@ -7,10 +7,13 @@ import random
 
 
 def list_to_set(lst):
+    """ Converts a list of lists to a set of tuples """
     return set([tuple(p) for p in lst])
 
 
 class TestCMOArchiving(unittest.TestCase):
+    """ Tests for the CMOArchive class """
+
     def test_hypervolume_easy(self):
         """ test the hypervolume calculation for a simple case """
         f_vals = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
@@ -58,19 +61,19 @@ class TestCMOArchiving(unittest.TestCase):
         self.assertEqual([[1, 5], [3, 3], [5, 1]], list(moa))
 
     def test_copy_CMOArchive(self):
-        """ Test the copy function of the MOArchive3d class """
+        """ Test the copy function of the CMOArchive class """
         f_vals = [[1, 2, 3], [2, 3, 1], [3, 1, 2]]
         g_vals = [0, 0, 0]
         moa = get_cmo_archive(f_vals, g_vals, reference_point=[6, 6, 6])
         moa_copy = moa.copy()
 
-        self.assertEqual(moa.hypervolume, moa_copy.hypervolume)
+        self.assertEqual(moa.icmop, moa_copy.icmop)
 
         moa.add([2, 2, 2], 0)
 
         self.assertEqual(len(moa), 4)
         self.assertEqual(len(moa_copy), 3)
-        self.assertFalse(moa.hypervolume == moa_copy.hypervolume)
+        self.assertFalse(moa.icmop == moa_copy.icmop)
 
     def test_remove(self, n_points=100, n_points_remove=50):
         """ Test the remove function, by comparing the archive with 100 points added and then

@@ -59,6 +59,7 @@ class MOArchive3d(MOArchiveParent):
                  hypervolume_final_float_type=None,
                  hypervolume_computation_float_type=None):
         """Create a new 3D archive object.
+
         Args:
             list_of_f_vals: list of objective vectors
             reference_point: reference point for the archive
@@ -97,6 +98,7 @@ class MOArchive3d(MOArchiveParent):
 
     def add(self, f_vals, info=None, update_hypervolume=True):
         """ Adds a new point to the archive, and updates the hypervolume if needed.
+
         Args:
             f_vals: the new point to add
             info: additional information about the point
@@ -304,6 +306,7 @@ class MOArchive3d(MOArchiveParent):
 
     def add_list(self, list_of_f_vals, infos=None, add_method="compare"):
         """ Adds a list of points to the archive, and updates the hypervolume.
+
         Args:
             list_of_f_vals: list of points to add
             infos: additional information about the points
@@ -365,9 +368,10 @@ class MOArchive3d(MOArchiveParent):
 
     def _get_kink_points(self):
         """ Function that returns the kink points of the archive.
-         Kink point are calculated by making a sweep of the archive, where the state is one
-         2D archive of all possible kink points found so far, and another 2D archive which stores
-         the non-dominated points so far in the sweep
+
+        Kink point are calculated by making a sweep of the archive, where the state is one
+        2D archive of all possible kink points found so far, and another 2D archive which stores
+        the non-dominated points so far in the sweep
 
         >>> from moarchiving.get_archive import get_mo_archive
         >>> moa = get_mo_archive([[1, 2, 3], [2, 2, 2], [3, 2, 1]], reference_point=[4, 4, 4])

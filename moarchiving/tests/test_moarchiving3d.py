@@ -24,7 +24,7 @@ class TestMOArchiving3d(unittest.TestCase):
 
     def test_infos_non_dominated(self):
         """ test if the infos are stored correctly - if the points are non dominated,
-        the infos should be the same"""
+        the infos should be the same """
         points = [
             [1, 2, 3],
             [3, 2, 1],
@@ -114,7 +114,7 @@ class TestMOArchiving3d(unittest.TestCase):
             self.assertEqual(len(moa_add_gen), len(moa_true))
 
     def test_length(self):
-        """ Test that the length of the archive is correct at all times """
+        """ Test that the length of the archive is correct after adding and removing points """
         ref_point = [1, 1, 1]
 
         n_points_add = 100

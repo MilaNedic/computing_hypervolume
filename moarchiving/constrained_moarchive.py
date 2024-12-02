@@ -28,7 +28,9 @@ class CMOArchive:
     def __init__(self, list_of_f_vals=None, list_of_g_vals=None, reference_point=None,
                  infos=None, n_obj=None, tau=1, hypervolume_final_float_type=None,
                  hypervolume_computation_float_type=None):
-        """ Initialize a CMOArchive object. Args:
+        """ Initialize a CMOArchive object.
+
+        Args:
             - list_of_f_vals: list of objective vectors
             - list_of_g_vals: list of constraint vectors, must be the same length as list_of_f_vals
             - reference_point: reference point for the archive
@@ -92,14 +94,17 @@ class CMOArchive:
             self.add_list(list_of_f_vals, list_of_g_vals, infos)
 
     def __iter__(self):
+        """ Return an iterator over the objective vectors in the archive. """
         return iter(self.archive)
 
     def __len__(self):
+        """ Return the number of objective vectors in the archive. """
         return len(self.archive)
 
     def add(self, f_vals, g_vals, info=None):
         """ Add the objective vector f_vals with corresponding constraints to the archive
         if it is feasible. If no feasible solution was found yet, also update the indicator.
+
         >>> from moarchiving.get_archive import get_cmo_archive
         >>> moa = get_cmo_archive(reference_point=[5, 5], tau=10)
         >>> moa.add([4, 4], 0)
@@ -159,6 +164,7 @@ class CMOArchive:
 
     def remove(self, f_vals):
         """ Remove a feasible point with objective vector f_vals from the archive.
+
         >>> from moarchiving.get_archive import get_cmo_archive
         >>> moa = get_cmo_archive([[2, 3], [1, 4], [4, 1]], [0, 0, 0], reference_point=[5, 5])
         >>> list(moa)
@@ -173,22 +179,27 @@ class CMOArchive:
 
     @property
     def hypervolume(self):
+        """ Return the hypervolume indicator. """
         return self.archive.hypervolume
 
     @property
     def hypervolume_plus(self):
+        """ Return the hypervolume_plus indicator. """
         return self.archive.hypervolume_plus
 
     @property
     def icmop(self):
+        """ Return the icmop indicator. """
         return self._icmop
 
     @property
     def contributing_hypervolumes(self):
+        """ Return the hypervolume contributions of each point in the archive. """
         return self.archive.contributing_hypervolumes
 
     @property
     def infos(self):
+        """ Return the list of additional information for each point in the archive. """
         return self.archive.infos
 
     def compute_hypervolume(self, reference_point=None):
@@ -233,6 +244,7 @@ class CMOArchive:
 
     def icmop_improvement(self, f_vals, g_vals):
         """ Compute the improvement of the indicator if the objective vector f_vals is added.
+
         >>> from moarchiving.get_archive import get_cmo_archive
         >>> get_cmo_archive.hypervolume_final_float_type = float
         >>> moa = get_cmo_archive(reference_point=[5, 5], tau=4) # icmop = -inf

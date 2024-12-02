@@ -72,7 +72,7 @@ def get_mo_archive(list_of_f_vals=None, reference_point=None, infos=None, n_obj=
 def get_cmo_archive(list_of_f_vals=None, list_of_g_vals=None, reference_point=None,
                     infos=None, n_obj=None, tau=1):
     """
-    Factory function for creating MOArchive objects of the appropriate dimensionality.
+    Function for creating CMOArchive objects, with similar interface as get_mo_archive.
 
     Args:
         list_of_f_vals: list of objective vectors, can be None if n_obj is provided

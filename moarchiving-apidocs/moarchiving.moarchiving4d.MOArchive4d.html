@@ -639,17 +639,17 @@
     
     <td>Method</td>
     <td><code><a href="#__init__" class="internal-link" title="moarchiving.moarchiving4d.MOArchive4d.__init__">__init__</a></code></td>
-    <td>Create a new 4D archive object. Args:     list_of_f_vals: list of objective vectors     reference_point: reference point for the hypervolume calculation     infos: list of additional information for each objective vector, of the same length as         list_of_f_vals     hypervolume_final_float_type: type of the final hypervolume value,         defaults to fractions...</td>
+    <td>Create a new 4D archive object.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#add" class="internal-link" title="moarchiving.moarchiving4d.MOArchive4d.add">add</a></code></td>
-    <td>Add a new point to the archive. Args:     new_point: new point to be added     info: additional information for the new point     update_hypervolume: should be set to True, unless adding multiple points at once,     in which case it is slightly more efficient to set it to True only for last point...</td>
+    <td>Add a new point to the archive.</td>
   </tr><tr class="method">
     
     <td>Method</td>
     <td><code><a href="#add_list" class="internal-link" title="moarchiving.moarchiving4d.MOArchive4d.add_list">add<wbr></wbr>_list</a></code></td>
-    <td>Add a list of points to the archive. Args:     list_of_f_vals: list of points to be added     infos: list of additional information for each point</td>
+    <td>Add a list of points to the archive.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -669,7 +669,7 @@
     
     <td>Method</td>
     <td><code><a href="#remove" class="internal-link" title="moarchiving.moarchiving4d.MOArchive4d.remove">remove</a></code></td>
-    <td>Remove a point from the archive. Args:     remove_point: point to be removed Returns:     False if the point is not in the archive and Info if the point is removed &gt;&gt;&gt; from moarchiving.get_archive import get_mo_archive &gt;&gt;&gt; moa = get_mo_archive([[1, 2, 3, 4], [2, 2, 2, 2], [4, 3, 2, 1]],...</td>
+    <td>Remove a point from the archive.</td>
   </tr><tr class="method">
     
     <td>Method</td>
@@ -679,7 +679,7 @@
     
     <td>Method</td>
     <td><code><a href="#_get_kink_points" class="internal-link" title="moarchiving.moarchiving4d.MOArchive4d._get_kink_points">_get<wbr></wbr>_kink<wbr></wbr>_points</a></code></td>
-    <td>Function that returns the kink points of the archive.  Kink point are calculated by making a sweep of the archive, where the state is one  3D archive of all possible kink points found so far, and another 3D archive which stores  the non-dominated points so far in the sweep...</td>
+    <td>Function that returns the kink points of the archive.</td>
   </tr><tr class="instancevariable private">
     
     <td>Instance Variable</td>
@@ -793,12 +793,12 @@
     
     <td>Property</td>
     <td><code><a href="moarchiving.moarchiving_parent.MOArchiveParent.html#hypervolume" class="internal-link" title="moarchiving.moarchiving_parent.MOArchiveParent.hypervolume">hypervolume</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
+    <td>Returns the hypervolume of the archive</td>
   </tr><tr class="baseproperty">
     
     <td>Property</td>
     <td><code><a href="moarchiving.moarchiving_parent.MOArchiveParent.html#hypervolume_plus" class="internal-link" title="moarchiving.moarchiving_parent.MOArchiveParent.hypervolume_plus">hypervolume<wbr></wbr>_plus</a></code></td>
-    <td><span class="undocumented">Undocumented</span></td>
+    <td>Returns the hypervolume_plus of the archive</td>
   </tr><tr class="baseproperty">
     
     <td>Property</td>
@@ -855,6 +855,7 @@
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="moarchiving.moarchiving_parent.MOArchiveParent.html#__init__" class="internal-link">moarchiving.moarchiving_parent.MOArchiveParent.__init__</a></code></div>
     <div><p class="pre">Create a new 4D archive object.
+
 Args:
     list_of_f_vals: list of objective vectors
     reference_point: reference point for the hypervolume calculation
@@ -888,6 +889,7 @@ Args:
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="moarchiving.moarchiving_parent.MOArchiveParent.html#add" class="internal-link">moarchiving.moarchiving_parent.MOArchiveParent.add</a></code></div>
     <div><p class="pre">Add a new point to the archive.
+
 Args:
     new_point: new point to be added
     info: additional information for the new point
@@ -934,6 +936,7 @@ True
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="moarchiving.moarchiving_parent.MOArchiveParent.html#add_list" class="internal-link">moarchiving.moarchiving_parent.MOArchiveParent.add_list</a></code></div>
     <div><p class="pre">Add a list of points to the archive.
+
 Args:
     list_of_f_vals: list of points to be added
     infos: list of additional information for each point
@@ -1075,6 +1078,7 @@ Args:
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="moarchiving.moarchiving_parent.MOArchiveParent.html#remove" class="internal-link">moarchiving.moarchiving_parent.MOArchiveParent.remove</a></code></div>
     <div><p class="pre">Remove a point from the archive.
+
 Args:
     remove_point: point to be removed
 Returns:
@@ -1138,6 +1142,7 @@ Returns:
   <div class="docstring functionBody">
     <div class="interfaceinfo">overrides <code><a href="moarchiving.moarchiving_parent.MOArchiveParent.html#_get_kink_points" class="internal-link">moarchiving.moarchiving_parent.MOArchiveParent._get_kink_points</a></code></div>
     <div><p class="pre">Function that returns the kink points of the archive.
+
  Kink point are calculated by making a sweep of the archive, where the state is one
  3D archive of all possible kink points found so far, and another 3D archive which stores
  the non-dominated points so far in the sweep
@@ -1232,7 +1237,7 @@ Returns:
   <div class="container">
     <a href="index.html">API Documentation</a> for moarchiving,
   generated by <a href="https://github.com/twisted/pydoctor/">pydoctor</a>
-    24.3.3 at 2024-11-29 17:05:49.
+    24.3.3 at 2024-12-02 11:44:05.
   </div>
 
   <!-- Search related scripts needs to be loaded at the end of HTML 

@@ -192,6 +192,7 @@ class MOArchiveParent:
 
     @property
     def hypervolume(self):
+        """ Returns the hypervolume of the archive """
         if self.reference_point is None:
             raise ValueError("to compute the hypervolume a reference"
                              " point is needed (must be given initially)")
@@ -199,6 +200,7 @@ class MOArchiveParent:
 
     @property
     def hypervolume_plus(self):
+        """ Returns the hypervolume_plus of the archive """
         if self.reference_point is None:
             return None
         return self._hypervolume_plus

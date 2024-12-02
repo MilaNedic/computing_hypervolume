@@ -6,7 +6,9 @@ from moarchiving.moarchiving_utils import MySortedList, DLNode
 
 
 class TestSortedList(unittest.TestCase):
+    """ Tests for the MySortedList class """
     def test_init(self):
+        """ test the initialization of the MySortedList """
         sl = MySortedList()
         self.assertEqual(str(sl), "[]")
 
@@ -14,6 +16,7 @@ class TestSortedList(unittest.TestCase):
         self.assertEqual(str(sl), "[[3, 0], [2, 1], [1, 2], [0, 3]]")
 
     def test_add(self):
+        """ test the add method of the MySortedList """
         sl = MySortedList()
         self.assertEqual(str(sl), "[]")
         sl.add(DLNode([3, 0]))
@@ -26,6 +29,7 @@ class TestSortedList(unittest.TestCase):
         self.assertEqual(str(sl), "[[3, 0], [2, 1], [1, 2], [0, 3]]")
 
     def test_remove(self):
+        """ test the remove method of the MySortedList """
         n1 = DLNode([3, 0])
         n2 = DLNode([1, 2])
         n3 = DLNode([0, 3])
@@ -42,11 +46,13 @@ class TestSortedList(unittest.TestCase):
         self.assertEqual(str(sl), "[]")
 
     def test_head(self):
+        """ test the head_x and head_y methods of the MySortedList """
         sl = MySortedList([DLNode([3, 0]), DLNode([1, 2]), DLNode([0, 3]), DLNode([2, 1])])
         self.assertEqual(sl.head_y().x, [3, 0])
         self.assertEqual(sl.head_x().x, [0, 3])
 
     def test_next(self):
+        """ test the next_x and next_y methods of the MySortedList """
         n1 = DLNode([3, 0])
         n2 = DLNode([1, 2])
         n3 = DLNode([0, 3])
@@ -62,6 +68,7 @@ class TestSortedList(unittest.TestCase):
         self.assertEqual(sl.next_x(n4), n1)
 
     def test_outer_delimiter(self):
+        """ test the outer_delimiter_x and outer_delimiter_y methods of the MySortedList """
         n1 = DLNode([3, 0])
         n2 = DLNode([1, 2])
         n3 = DLNode([0, 3])
@@ -78,6 +85,7 @@ class TestSortedList(unittest.TestCase):
         self.assertEqual(sl.outer_delimiter_x(DLNode([-1, 4])), n3)
 
     def test_remove_dominated(self):
+        """ test the remove_dominated_x and remove_dominated_y methods of the MySortedList """
         n1 = DLNode([3, 0])
         n2 = DLNode([1, 2])
         n3 = DLNode([0, 3])

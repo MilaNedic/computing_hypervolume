@@ -883,7 +883,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Add a new node to the list sorted by z</div>
           </li><li id="moarchiving.moarchiving_utils.remove_from_z">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving<wbr></wbr>_utils<wbr></wbr>.remove<wbr></wbr>_from<wbr></wbr>_z</div>
@@ -891,7 +891,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Remove a node from the list sorted by z</div>
           </li><li id="moarchiving.moarchiving_utils.setup_z_and_closest">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving<wbr></wbr>_utils<wbr></wbr>.setup<wbr></wbr>_z<wbr></wbr>_and<wbr></wbr>_closest</div>
@@ -899,7 +899,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Sets up the closest[0] and closest[1] pointers for the new node</div>
           </li><li id="moarchiving.moarchiving_utils.update_links">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving<wbr></wbr>_utils<wbr></wbr>.update<wbr></wbr>_links</div>
@@ -1139,7 +1139,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Property</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Returns the hypervolume of the archive</div>
           </li><li id="moarchiving.moarchiving_parent.MOArchiveParent.hypervolume_plus">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving<wbr></wbr>_parent<wbr></wbr>.<wbr></wbr>MOArchive<wbr></wbr>Parent<wbr></wbr>.hypervolume<wbr></wbr>_plus</div>
@@ -1147,7 +1147,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Property</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Returns the hypervolume_plus of the archive</div>
           </li><li id="moarchiving.moarchiving_parent.MOArchiveParent.contributing_hypervolumes">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving<wbr></wbr>_parent<wbr></wbr>.<wbr></wbr>MOArchive<wbr></wbr>Parent<wbr></wbr>.contributing<wbr></wbr>_hypervolumes</div>
@@ -1275,7 +1275,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Create a new 3D archive object. Args:     list_of_f_vals: list of objective vectors     reference_point: reference point for the archive     infos: list of additional information for each objective vector,         must be the same length as list_of_f_vals     hypervolume_final_float_type: type of the final hypervolume value,         defaults to fractions...</div>
+            <div class="summary">Create a new 3D archive object.</div>
           </li><li id="moarchiving.moarchiving3d.MOArchive3d._removed">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving3d<wbr></wbr>.<wbr></wbr>MOArchive3d<wbr></wbr>._removed</div>
@@ -1307,7 +1307,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Adds a new point to the archive, and updates the hypervolume if needed. Args:     f_vals: the new point to add     info: additional information about the point     update_hypervolume: whether to update the hypervolume after adding the point Returns:     True if the point was added, False if it was dominated by another point in the archive...</div>
+            <div class="summary">Adds a new point to the archive, and updates the hypervolume if needed.</div>
           </li><li id="moarchiving.moarchiving3d.MOArchive3d._kink_points">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving3d<wbr></wbr>.<wbr></wbr>MOArchive3d<wbr></wbr>._kink<wbr></wbr>_points</div>
@@ -1331,7 +1331,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Adds a list of points to the archive, and updates the hypervolume. Args:     list_of_f_vals: list of points to add     infos: additional information about the points     add_method: method to use for adding the points, possible values:     - compare: compares the number of points to add with the number of points in the archive     and uses the most efficient method based on that     - one_by_one: adds the points one by one to the archive     - reinit: reinitializes the archive with the new points...</div>
+            <div class="summary">Adds a list of points to the archive, and updates the hypervolume.</div>
           </li><li id="moarchiving.moarchiving3d.MOArchive3d.copy">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving3d<wbr></wbr>.<wbr></wbr>MOArchive3d<wbr></wbr>.copy</div>
@@ -1347,7 +1347,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PRIVATE</div>
-            <div class="summary">Function that returns the kink points of the archive.  Kink point are calculated by making a sweep of the archive, where the state is one  2D archive of all possible kink points found so far, and another 2D archive which stores  the non-dominated points so far in the sweep...</div>
+            <div class="summary">Function that returns the kink points of the archive.</div>
           </li><li id="moarchiving.moarchiving3d.MOArchive3d.hypervolume_improvement">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving3d<wbr></wbr>.<wbr></wbr>MOArchive3d<wbr></wbr>.hypervolume<wbr></wbr>_improvement</div>
@@ -1395,7 +1395,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Create a new 4D archive object. Args:     list_of_f_vals: list of objective vectors     reference_point: reference point for the hypervolume calculation     infos: list of additional information for each objective vector, of the same length as         list_of_f_vals     hypervolume_final_float_type: type of the final hypervolume value,         defaults to fractions...</div>
+            <div class="summary">Create a new 4D archive object.</div>
           </li><li id="moarchiving.moarchiving4d.MOArchive4d._hypervolume_already_computed">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving4d<wbr></wbr>.<wbr></wbr>MOArchive4d<wbr></wbr>._hypervolume<wbr></wbr>_already<wbr></wbr>_computed</div>
@@ -1427,7 +1427,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Add a new point to the archive. Args:     new_point: new point to be added     info: additional information for the new point     update_hypervolume: should be set to True, unless adding multiple points at once,     in which case it is slightly more efficient to set it to True only for last point...</div>
+            <div class="summary">Add a new point to the archive.</div>
           </li><li id="moarchiving.moarchiving4d.MOArchive4d.remove">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving4d<wbr></wbr>.<wbr></wbr>MOArchive4d<wbr></wbr>.remove</div>
@@ -1435,7 +1435,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Remove a point from the archive. Args:     remove_point: point to be removed Returns:     False if the point is not in the archive and Info if the point is removed &gt;&gt;&gt; from moarchiving.get_archive import get_mo_archive &gt;&gt;&gt; moa = get_mo_archive([[1, 2, 3, 4], [2, 2, 2, 2], [4, 3, 2, 1]],...</div>
+            <div class="summary">Remove a point from the archive.</div>
           </li><li id="moarchiving.moarchiving4d.MOArchive4d.add_list">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving4d<wbr></wbr>.<wbr></wbr>MOArchive4d<wbr></wbr>.add<wbr></wbr>_list</div>
@@ -1443,7 +1443,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Add a list of points to the archive. Args:     list_of_f_vals: list of points to be added     infos: list of additional information for each point</div>
+            <div class="summary">Add a list of points to the archive.</div>
           </li><li id="moarchiving.moarchiving4d.MOArchive4d.copy">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving4d<wbr></wbr>.<wbr></wbr>MOArchive4d<wbr></wbr>.copy</div>
@@ -1459,7 +1459,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PRIVATE</div>
-            <div class="summary">Function that returns the kink points of the archive.  Kink point are calculated by making a sweep of the archive, where the state is one  3D archive of all possible kink points found so far, and another 3D archive which stores  the non-dominated points so far in the sweep...</div>
+            <div class="summary">Function that returns the kink points of the archive.</div>
           </li><li id="moarchiving.moarchiving4d.MOArchive4d.hypervolume_improvement">
             
             <div class="fullName">moarchiving<wbr></wbr>.moarchiving4d<wbr></wbr>.<wbr></wbr>MOArchive4d<wbr></wbr>.hypervolume<wbr></wbr>_improvement</div>
@@ -1507,7 +1507,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Initialize a CMOArchive object. Args:</div>
+            <div class="summary">Initialize a CMOArchive object.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.archive">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.archive</div>
@@ -1547,7 +1547,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Return an iterator over the objective vectors in the archive.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.__len__">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.__len__</div>
@@ -1555,7 +1555,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Return the number of objective vectors in the archive.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.add">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.add</div>
@@ -1563,7 +1563,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Add the objective vector f_vals with corresponding constraints to the archive if it is feasible. If no feasible solution was found yet, also update the indicator. &gt;&gt;&gt; from moarchiving.get_archive import get_cmo_archive &gt;&gt;&gt; moa = get_cmo_archive(reference_point=[5, 5], tau=10) &gt;&gt;&gt; moa...</div>
+            <div class="summary">Add the objective vector f_vals with corresponding constraints to the archive if it is feasible. If no feasible solution was found yet, also update the indicator.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.add_list">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.add<wbr></wbr>_list</div>
@@ -1579,7 +1579,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Remove a feasible point with objective vector f_vals from the archive. &gt;&gt;&gt; from moarchiving.get_archive import get_cmo_archive &gt;&gt;&gt; moa = get_cmo_archive([[2, 3], [1, 4], [4, 1]], [0, 0, 0], reference_point=[5, 5]) &gt;&gt;&gt; list(moa) [[1, 4], [2, 3], [4, 1]] &gt;&gt;&gt; moa...</div>
+            <div class="summary">Remove a feasible point with objective vector f_vals from the archive.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.hypervolume">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.hypervolume</div>
@@ -1587,7 +1587,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Property</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Return the hypervolume indicator.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.hypervolume_plus">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.hypervolume<wbr></wbr>_plus</div>
@@ -1595,7 +1595,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Property</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Return the hypervolume_plus indicator.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.icmop">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.icmop</div>
@@ -1603,7 +1603,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Property</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Return the icmop indicator.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.contributing_hypervolumes">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.contributing<wbr></wbr>_hypervolumes</div>
@@ -1611,7 +1611,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Property</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Return the hypervolume contributions of each point in the archive.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.infos">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.infos</div>
@@ -1619,7 +1619,7 @@
             <div class="type">Attribute</div>
             <div class="kind">Property</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Return the list of additional information for each point in the archive.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.compute_hypervolume">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.compute<wbr></wbr>_hypervolume</div>
@@ -1691,7 +1691,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Compute the improvement of the indicator if the objective vector f_vals is added. &gt;&gt;&gt; from moarchiving.get_archive import get_cmo_archive &gt;&gt;&gt; get_cmo_archive.hypervolume_final_float_type = float &gt;&gt;&gt; moa = get_cmo_archive(reference_point=[5, 5], tau=4) # icmop = -inf &gt;&gt;&gt; moa...</div>
+            <div class="summary">Compute the improvement of the indicator if the objective vector f_vals is added.</div>
           </li><li id="moarchiving.constrained_moarchive.CMOArchive.in_domain">
             
             <div class="fullName">moarchiving<wbr></wbr>.constrained<wbr></wbr>_moarchive<wbr></wbr>.<wbr></wbr>CMOArchive<wbr></wbr>.in<wbr></wbr>_domain</div>
@@ -1715,7 +1715,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Converts a list of lists to a set of tuples</div>
           </li><li id="moarchiving.tests.test_moarchiving2d.TestMOArchiving2d">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving2d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving2d</div>
@@ -1723,7 +1723,7 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No class docstring; 6/6 methods documented</span></div>
+            <div class="summary">Tests for the BiobjectiveNondominatedSortedList class</div>
           </li><li id="moarchiving.tests.test_moarchiving2d.TestMOArchiving2d.test_hypervolume_easy">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving2d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving2d<wbr></wbr>.test<wbr></wbr>_hypervolume<wbr></wbr>_easy</div>
@@ -1915,7 +1915,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Test that the length of the archive is correct at all times</div>
+            <div class="summary">Test that the length of the archive is correct after adding and removing points</div>
           </li><li id="moarchiving.tests.test_moarchiving3d.TestMOArchiving3d.test_dominates">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving3d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving3d<wbr></wbr>.test<wbr></wbr>_dominates</div>
@@ -2035,7 +2035,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Converts a list of lists to a set of tuples</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.get_small_test_archive">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.get<wbr></wbr>_small<wbr></wbr>_test<wbr></wbr>_archive</div>
@@ -2043,7 +2043,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Returns a small test archive</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d</div>
@@ -2051,7 +2051,7 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No class docstring; 8/18 methods documented</span></div>
+            <div class="summary">Tests for the MOArchive4d class</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_hypervolume_easy">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_hypervolume<wbr></wbr>_easy</div>
@@ -2099,7 +2099,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test if the hypervolume is calculated correctly after adding points</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_length">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_length</div>
@@ -2107,7 +2107,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Test that the length of the archive is correct at all times</div>
+            <div class="summary">Test that the length of the archive is correct after adding and removing points</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_dominates">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_dominates</div>
@@ -2115,7 +2115,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the dominates function</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_dominators">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_dominators</div>
@@ -2123,7 +2123,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the dominators function</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_distance_to_hypervolume_area">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_distance<wbr></wbr>_to<wbr></wbr>_hypervolume<wbr></wbr>_area</div>
@@ -2131,7 +2131,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the distance_to_hypervolume_area function</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_distance_to_pareto_front_compare_2d">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_distance<wbr></wbr>_to<wbr></wbr>_pareto<wbr></wbr>_front<wbr></wbr>_compare<wbr></wbr>_2d</div>
@@ -2139,7 +2139,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the distance_to_pareto_front function, by comparing it to the 2D pareto front</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_distance_to_pareto_front_compare_3d">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_distance<wbr></wbr>_to<wbr></wbr>_pareto<wbr></wbr>_front<wbr></wbr>_compare<wbr></wbr>_3d</div>
@@ -2147,7 +2147,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the distance_to_pareto_front function, by comparing it to the 3D pareto front</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_distance_to_pareto_front">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_distance<wbr></wbr>_to<wbr></wbr>_pareto<wbr></wbr>_front</div>
@@ -2155,7 +2155,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the distance_to_pareto_front function, by randomly sampling points and computing the distance to the selected point</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_remove">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_remove</div>
@@ -2163,7 +2163,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Test the remove function, by comparing the archive with 100 non-dominated points added and then 50 removed, to the one with only the other 50 points added</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_contributing_hypervolume">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_contributing<wbr></wbr>_hypervolume</div>
@@ -2171,7 +2171,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the contributing_hypervolume function, by comparing it to the 3D result</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_hypervolume_improvement">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_hypervolume<wbr></wbr>_improvement</div>
@@ -2179,7 +2179,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the hypervolume_improvement function, by comparing it to the 3D result</div>
           </li><li id="moarchiving.tests.test_moarchiving4d.TestMOArchiving4d.test_hypervolume_plus">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_moarchiving4d<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>MOArchiving4d<wbr></wbr>.test<wbr></wbr>_hypervolume<wbr></wbr>_plus</div>
@@ -2211,7 +2211,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Factory function for creating MOArchive objects of the appropriate dimensionality.</div>
+            <div class="summary">Function for creating CMOArchive objects, with similar interface as get_mo_archive.</div>
           </li><li id="moarchiving.tests.test_constrained_moarchiving.list_to_set">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_constrained<wbr></wbr>_moarchiving<wbr></wbr>.list<wbr></wbr>_to<wbr></wbr>_set</div>
@@ -2219,7 +2219,7 @@
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Converts a list of lists to a set of tuples</div>
           </li><li id="moarchiving.tests.test_constrained_moarchiving.TestCMOArchiving">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_constrained<wbr></wbr>_moarchiving<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>CMOArchiving</div>
@@ -2227,7 +2227,7 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">No class docstring; 6/6 methods documented</span></div>
+            <div class="summary">Tests for the CMOArchive class</div>
           </li><li id="moarchiving.tests.test_constrained_moarchiving.TestCMOArchiving.test_hypervolume_easy">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_constrained<wbr></wbr>_moarchiving<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>CMOArchiving<wbr></wbr>.test<wbr></wbr>_hypervolume<wbr></wbr>_easy</div>
@@ -2259,7 +2259,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary">Test the copy function of the MOArchive3d class</div>
+            <div class="summary">Test the copy function of the CMOArchive class</div>
           </li><li id="moarchiving.tests.test_constrained_moarchiving.TestCMOArchiving.test_remove">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_constrained<wbr></wbr>_moarchiving<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>CMOArchiving<wbr></wbr>.test<wbr></wbr>_remove</div>
@@ -2283,7 +2283,7 @@
             <div class="type">Class</div>
             <div class="kind">Class</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Tests for the MySortedList class</div>
           </li><li id="moarchiving.tests.test_sorted_list.TestSortedList.test_init">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_sorted<wbr></wbr>_list<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>Sorted<wbr></wbr>List<wbr></wbr>.test<wbr></wbr>_init</div>
@@ -2291,7 +2291,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the initialization of the MySortedList</div>
           </li><li id="moarchiving.tests.test_sorted_list.TestSortedList.test_add">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_sorted<wbr></wbr>_list<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>Sorted<wbr></wbr>List<wbr></wbr>.test<wbr></wbr>_add</div>
@@ -2299,7 +2299,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the add method of the MySortedList</div>
           </li><li id="moarchiving.tests.test_sorted_list.TestSortedList.test_remove">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_sorted<wbr></wbr>_list<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>Sorted<wbr></wbr>List<wbr></wbr>.test<wbr></wbr>_remove</div>
@@ -2307,7 +2307,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the remove method of the MySortedList</div>
           </li><li id="moarchiving.tests.test_sorted_list.TestSortedList.test_head">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_sorted<wbr></wbr>_list<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>Sorted<wbr></wbr>List<wbr></wbr>.test<wbr></wbr>_head</div>
@@ -2315,7 +2315,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the head_x and head_y methods of the MySortedList</div>
           </li><li id="moarchiving.tests.test_sorted_list.TestSortedList.test_next">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_sorted<wbr></wbr>_list<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>Sorted<wbr></wbr>List<wbr></wbr>.test<wbr></wbr>_next</div>
@@ -2323,7 +2323,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the next_x and next_y methods of the MySortedList</div>
           </li><li id="moarchiving.tests.test_sorted_list.TestSortedList.test_outer_delimiter">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_sorted<wbr></wbr>_list<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>Sorted<wbr></wbr>List<wbr></wbr>.test<wbr></wbr>_outer<wbr></wbr>_delimiter</div>
@@ -2331,7 +2331,7 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">test the outer_delimiter_x and outer_delimiter_y methods of the MySortedList</div>
           </li><li id="moarchiving.tests.test_sorted_list.TestSortedList.test_remove_dominated">
             
             <div class="fullName">moarchiving<wbr></wbr>.tests<wbr></wbr>.test<wbr></wbr>_sorted<wbr></wbr>_list<wbr></wbr>.<wbr></wbr>Test<wbr></wbr>Sorted<wbr></wbr>List<wbr></wbr>.test<wbr></wbr>_remove<wbr></wbr>_dominated</div>
@@ -2339,15 +2339,15 @@
             <div class="type">Function</div>
             <div class="kind">Method</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
-          </li><li id="moarchiving.test.main">
+            <div class="summary">test the remove_dominated_x and remove_dominated_y methods of the MySortedList</div>
+          </li><li id="moarchiving.test.run_all_tests">
             
-            <div class="fullName">moarchiving<wbr></wbr>.test<wbr></wbr>.main</div>
-            <div class="url">moarchiving.test.html#main</div>
+            <div class="fullName">moarchiving<wbr></wbr>.test<wbr></wbr>.run<wbr></wbr>_all<wbr></wbr>_tests</div>
+            <div class="url">moarchiving.test.html#run_all_tests</div>
             <div class="type">Function</div>
             <div class="kind">Function</div>
             <div class="privacy">PUBLIC</div>
-            <div class="summary"><span class="undocumented">Undocumented</span></div>
+            <div class="summary">Run all doctests and unit tests in the moarchiving package.</div>
           </li>
        </ul>
     </div>

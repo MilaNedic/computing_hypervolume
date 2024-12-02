@@ -10,10 +10,12 @@ inf = float('inf')
 
 
 def list_to_set(lst):
+    """ Converts a list of lists to a set of tuples """
     return set([tuple(p) for p in lst])
 
 
 class TestMOArchiving2d(unittest.TestCase):
+    """ Tests for the BiobjectiveNondominatedSortedList class """
     def test_hypervolume_easy(self):
         """ test the hypervolume calculation for a simple case """
         points = [[1, 2], [2, 1]]

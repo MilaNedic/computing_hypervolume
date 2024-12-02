@@ -12,16 +12,19 @@ import math
 
 
 def list_to_set(lst):
+    """ Converts a list of lists to a set of tuples """
     return set([tuple(p) for p in lst])
 
 
 def get_small_test_archive():
+    """ Returns a small test archive """
     points = [[1, 2, 3, 4], [4, 1, 2, 3], [3, 4, 1, 2], [2, 3, 4, 1]]
     infos = [str(p) for p in points]
     return MOArchive4d(points, [6, 6, 6, 6], infos)
 
 
 class TestMOArchiving4d(unittest.TestCase):
+    """ Tests for the MOArchive4d class """
     def test_hypervolume_easy(self):
         """ test the hypervolume calculation for a 'simple' case """
         points = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 0, 1], [3, 0, 1, 2]]
@@ -82,6 +85,7 @@ class TestMOArchiving4d(unittest.TestCase):
         self.assertSetEqual(list_to_set(start_points[:2] + [u1, u3]), list_to_set(list(moa)))
 
     def test_hypervolume_after_add(self):
+        """ test if the hypervolume is calculated correctly after adding points """
         ref_point = [1, 1, 1, 1]
 
         pop_size = 20
@@ -106,12 +110,11 @@ class TestMOArchiving4d(unittest.TestCase):
             self.assertEqual(len(moa_add_list), len(moa_true))
 
     def test_length(self):
-        """ Test that the length of the archive is correct at all times """
+        """ Test that the length of the archive is correct after adding and removing points """
         ref_point = [1, 1, 1, 1]
 
         n_points_add = 100
-        points = get_stacked_points(n_points_add,
-                                    ['random', 'random', 'random', 'random'])
+        points = get_stacked_points(n_points_add, ['random', 'random', 'random', 'random'])
         moa = MOArchive4d([], ref_point)
 
         # add points one by one
@@ -126,6 +129,7 @@ class TestMOArchiving4d(unittest.TestCase):
             self.assertEqual(len(moa), len(list(moa)))
 
     def test_dominates(self):
+        """ test the dominates function """
         moa = get_small_test_archive()
 
         # test that the points that are already in the archive are dominated
@@ -143,6 +147,7 @@ class TestMOArchiving4d(unittest.TestCase):
         self.assertFalse(moa.dominates([0, 5, 5, 5]))
 
     def test_dominators(self):
+        """ test the dominators function """
         moa = get_small_test_archive()
 
         # test that the points that are already in the archive are dominated by itself
@@ -154,6 +159,7 @@ class TestMOArchiving4d(unittest.TestCase):
         pass
 
     def test_distance_to_hypervolume_area(self):
+        """ test the distance_to_hypervolume_area function """
         moa = MOArchive4d()
         self.assertEqual(0, moa.distance_to_hypervolume_area([1, 1, 1, 1]))
 
@@ -180,6 +186,7 @@ class TestMOArchiving4d(unittest.TestCase):
                                moa.distance_to_hypervolume_area([9, 9, 9, 9]), places=6)
 
     def test_distance_to_pareto_front_compare_2d(self):
+        """ test the distance_to_pareto_front function, by comparing it to the 2D pareto front """
         # first make a pseudo 4D pareto front and compare it to 2D pareto front
         n_points = 100
         n_test_points = 100
@@ -204,6 +211,7 @@ class TestMOArchiving4d(unittest.TestCase):
                 self.assertAlmostEqual(d4, d4_perm, places=8)
 
     def test_distance_to_pareto_front_compare_3d(self):
+        """ test the distance_to_pareto_front function, by comparing it to the 3D pareto front """
         # first make a pseudo 4D pareto front and compare it to 3D pareto front
         n_points = 100
         n_test_points = 10
@@ -228,7 +236,8 @@ class TestMOArchiving4d(unittest.TestCase):
                 self.assertAlmostEqual(d4, d4_perm, places=8)
 
     def test_distance_to_pareto_front(self):
-        # first make a pseudo 4D pareto front and compare it to 3D pareto front
+        """ test the distance_to_pareto_front function, by randomly sampling points and
+        computing the distance to the selected point """
         n_points_archive = 100
         n_test_points = 50
         n_points_sampled = 1000
@@ -254,6 +263,8 @@ class TestMOArchiving4d(unittest.TestCase):
                 self.assertTrue(distance <= dist)
 
     def test_remove(self, n_points=100, n_points_remove=50):
+        """ Test the remove function, by comparing the archive with 100 non-dominated points added
+        and then 50 removed, to the one with only the other 50 points added """
         points = [[1, 2, 3, 4], [2, 3, 4, 1], [3, 4, 1, 2]]
         moa_remove = MOArchive4d(points, reference_point=[6, 6, 6, 6])
         moa_remove.remove([1, 2, 3, 4])
@@ -294,6 +305,7 @@ class TestMOArchiving4d(unittest.TestCase):
         self.assertEqual(len(list(moa)), 0)
 
     def test_contributing_hypervolume(self):
+        """ test the contributing_hypervolume function, by comparing it to the 3D result """
         points = [[1, 2, 3, 4], [1, 2, 4, 3], [1, 3, 2, 4], [1, 3, 4, 2], [1, 4, 2, 3],
                   [1, 4, 3, 2], [2, 1, 3, 4], [2, 1, 4, 3], [2, 3, 1, 4], [2, 3, 4, 1],
                   [2, 4, 1, 3], [2, 4, 3, 1], [3, 1, 2, 4], [3, 1, 4, 2], [3, 2, 1, 4],
@@ -312,6 +324,7 @@ class TestMOArchiving4d(unittest.TestCase):
                                    moa3d.contributing_hypervolume(p), places=8)
 
     def test_hypervolume_improvement(self):
+        """ test the hypervolume_improvement function, by comparing it to the 3D result """
         points = [[1, 2, 3, 4], [1, 2, 4, 3], [1, 3, 2, 4], [1, 3, 4, 2], [1, 4, 2, 3],
                   [1, 4, 3, 2], [2, 1, 3, 4], [2, 1, 4, 3], [2, 3, 1, 4], [2, 3, 4, 1],
                   [2, 4, 1, 3], [2, 4, 3, 1], [3, 1, 2, 4], [3, 1, 4, 2], [3, 2, 1, 4],
