@@ -9,6 +9,11 @@ def get_non_dominated_points(n_points, n_dim=3, mode='spherical'):
      - n_points: number of points
      - n_dim: number of dimensions
      - mode: 'spherical' or 'linear' """
+    if n_dim == 2:
+        if mode == 'spherical':
+            return spherical_front_2d(1, n_points, normalized=False)
+        elif mode == 'linear':
+            return linear_front_2d(1, n_points, normalized=False)
     if n_dim == 3:
         if mode == 'spherical':
             return spherical_front_3d(1, n_points, normalized=False)
@@ -51,6 +56,38 @@ def permute_points(points, permutation):
     """ takes a list of points (n x dim) and a permutation (dim)
     and returns the points with the permutation applied """
     return [[point[permutation[i]] for i in range(len(permutation))] for point in points]
+
+
+def spherical_front_2d(distance, num_points, normalized):
+    """ Returns a list of non-dominated points on the 2D spherical front """
+    vectors = []
+
+    if normalized:
+        v1 = [0, distance]
+        v2 = [distance, 0]
+        vectors = [v1, v2]
+
+    while len(vectors) < num_points:
+        phi = random.random() * math.pi / 2
+        vectors.append([distance * math.cos(phi), distance * math.sin(phi)])
+
+    return vectors
+
+
+def linear_front_2d(distance, num_points, normalized=True):
+    """ Returns a list of non-dominated points on the 2D linear front """
+    vectors = []
+
+    if normalized:
+        v1 = [1, 1 - distance]
+        v2 = [1 - distance, 1]
+        vectors = [v1, v2]
+
+    while len(vectors) < num_points:
+        x = random.random()
+        vectors.append([x, 1 - x])
+
+    return vectors
 
 
 def spherical_front_3d(distance, num_points, normalized=True):
