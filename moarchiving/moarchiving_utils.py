@@ -7,6 +7,7 @@ from sortedcontainers import SortedKeyList
 class DLNode:
     """ A class to represent a node in a doubly linked list. """
     def __init__(self, x=None, info=None):
+        """ Initialize a node with the given x-coordinate and info. """
         self.x = x if x else [None, None, None, None]
         self.closest = [None, None]  # closest in x coordinate, closest in y coordinate
         self.cnext = [None, None]  # current next
@@ -16,6 +17,7 @@ class DLNode:
         self.info = info
 
     def copy(self):
+        """ copy the node """
         new_node = DLNode()
         for var in self.__dict__:
             if isinstance(getattr(self, var), list):
@@ -29,9 +31,11 @@ class MySortedList(SortedKeyList):
     """ A class to represent a sorted list of nodes, together with additional methods that
      follow the definition in the paper."""
     def __init__(self, iterable=None, key=lambda node: node.x[1]):
+        """ Initialize the sorted list with the given iterable and key function. """
         super().__init__(iterable=iterable, key=key)
 
     def __str__(self):
+        """ Return a string representation of the sorted list. """
         return str([node.x for node in self])
 
     def head_y(self):

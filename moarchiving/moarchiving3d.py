@@ -24,6 +24,7 @@ inf = float('inf')
 class MOArchive3d(MOArchiveParent):
     """ Class for storing a set of non-dominated points in 3D space and efficiently calculating
     hypervolume with respect to the given reference point.
+
     The archive is implemented as a doubly linked list, and can be modified using functions
     add and remove. Points of the archive can be accessed as a list of points order by the third
     coordinate using function points_list.

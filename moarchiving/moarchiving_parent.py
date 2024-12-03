@@ -18,6 +18,7 @@ class MOArchiveParent:
                  hypervolume_final_float_type=None,
                  hypervolume_computation_float_type=None):
         """ Create a new archive object.
+
         Args:
             list_of_f_vals: list of objective vectors
             reference_point: reference point for the hypervolume calculation
@@ -183,6 +184,7 @@ class MOArchiveParent:
     def infos(self):
         """`list` of complementary information corresponding to each archive entry,
         corresponding to each of the points in the archive
+
         >>> from moarchiving.get_archive import get_mo_archive
         >>> moa = get_mo_archive([[1, 2, 3], [3, 2, 1], [2, 2, 2]], infos=["a", "b", "c"])
         >>> moa.infos
@@ -212,6 +214,7 @@ class MOArchiveParent:
 
     def contributing_hypervolume(self, f_vals):
         """ Returns the hypervolume contribution of a point in the archive
+
         >>> from moarchiving.get_archive import get_mo_archive
         >>> get_mo_archive.hypervolume_final_float_type = float
         >>> moa = get_mo_archive([[1, 2, 3], [3, 2, 1], [2, 3, 2]], reference_point=[4, 4, 4])
@@ -244,6 +247,7 @@ class MOArchiveParent:
     def distance_to_pareto_front(self, f_vals, ref_factor=1):
         """ Returns the distance to the Pareto front of the archive,
         by calculating the distances to the kink points
+
         >>> from moarchiving.get_archive import get_mo_archive
         >>> moa = get_mo_archive([[1, 2, 3], [3, 2, 1], [2, 2, 2]], reference_point=[5, 5, 5])
         >>> moa.distance_to_pareto_front([1, 2, 3])
@@ -277,6 +281,7 @@ class MOArchiveParent:
 
     def distance_to_hypervolume_area(self, f_vals):
         """ Returns the distance to the hypervolume area of the archive
+
         >>> from moarchiving.get_archive import get_mo_archive
         >>> moa = get_mo_archive(reference_point=[1, 1, 1])
         >>> moa.distance_to_hypervolume_area([1, 2, 1])
@@ -356,6 +361,7 @@ class MOArchiveParent:
 
     def weakly_dominates(self, a, b, n_obj=None):
         """ Return True if a weakly dominates b, False otherwise
+
         >>> from moarchiving.get_archive import get_mo_archive
         >>> moa = get_mo_archive(n_obj=3)
         >>> moa.weakly_dominates([1, 2, 3], [2, 3, 3])
@@ -371,6 +377,7 @@ class MOArchiveParent:
 
     def strictly_dominates(self, a, b, n_obj=None):
         """ Return True if a strictly dominates b, False otherwise
+
         >>> from moarchiving.get_archive import get_mo_archive
         >>> moa = get_mo_archive(n_obj=3)
         >>> moa.strictly_dominates([1, 2, 3], [2, 3, 3])
