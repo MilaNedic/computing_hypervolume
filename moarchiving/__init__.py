@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
-"""This module contains, for the time being, a single MOO archive class.
+""" This package implements a multi-objective (2, 3 and 4 objectives are supported)
+non-dominated archive.
 
-A bi-objective nondominated archive as sorted list with incremental update
-in logarithmic time, providing computations of overall hypervolume,
-contributing hypervolumes and uncrowded hypervolume improvements.
+It provides easy and fast access to the hypervolume and hypervolume plus indicators,
+the contributing hypervolume of each element, and to the uncrowded hypervolume improvement
+of any given point in objective space.
+Additionally, it provides a constrained version of the archive, which allows to store points
+with constraints and to compute the ICMOP indicator.
 
-:Author: Nikolaus Hansen, 2018
+
+:Authors: Nikolaus Hansen, Nace Sever, Mila Nedić, Tea Tušar, 2024
 
 :License: BSD 3-Clause, see LICENSE file.
 
