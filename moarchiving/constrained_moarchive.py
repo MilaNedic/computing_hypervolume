@@ -161,6 +161,7 @@ class CMOArchive:
                                                if g_vals == 0]))
 
             self.archive.add_list(list(list_of_f_vals), list(infos))
+            self._icmop = self.archive.hypervolume_plus
 
     def remove(self, f_vals):
         """ Remove a feasible point with objective vector f_vals from the archive.
