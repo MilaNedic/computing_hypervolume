@@ -1,8 +1,8 @@
 # Introduction
 
-This library implements a multi-objective (2, 3 and 4 objectives are supported) non-dominated archive. It provides easy and fast access to the hypervolume and hypervolume plus indicators, the contributing hypervolume of each element, and to the [uncrowded hypervolume improvement](https://arxiv.org/abs/1904.08823) of any given point in objective space.
+This library implements a multi-objective (2, 3 and 4 objectives are supported) non-dominated archive. It provides easy and fast access to the hypervolume and [hypervolume plus](https://doi.org/10.1109/TEVC.2022.3210897) indicators, the contributing hypervolume of each element, and to the [uncrowded hypervolume improvement](https://arxiv.org/abs/1904.08823) of any given point in objective space.
 
-Additionally, it provides a constrained version of the archive, which allows to store points with constraints and to compute the [ICMOP](https://arxiv.org/abs/2302.02170) indicator. 
+Additionally, it provides a constrained version of the archive, which allows to store points with constraints and to compute the [ICMOP](https://doi.org/10.1016/j.ins.2022.05.106) indicator. 
 
 ## Installation
 
@@ -53,115 +53,122 @@ Ran 7 tests in 0.001s
   - [epydocs format](https://cma-es.github.io/moarchiving/moarchiving-epydocs/index.html)
 
 ## Releases
-- TODO: what is the current version?
+- 0.8.0 addition of MOArchive classes for 3 and 4 dimensions, as well as a class for handling constrained problems
 - 0.7.0 reimplementation of `BiobjectiveNondominatedSortedList.hypervolume_improvement` by extracting a sublist first.
 - 0.6.0 the `infos` attribute is a `list` with corresponding (arbitrary) information, e.g. for keeping the respective solutions.
 - 0.5.3 fixed assertion error when not using `fractions.Fraction`
 - 0.5.2 first published version
 
-# Usage examples:
+# Usage examples
+1. [Initialization](#1-initialization)
+2. [Constrained archive](#2-constrained-moarchive)
+3. [Infos](#3-accessing-infos-of-the-archive)
+4. [Adding points](#4-adding-points)
+5. [Archive size](#5-size-of-the-archive)
+6. [Performance indicators](#6-performance-indicators)
+7. [Contributing hypervolume](#7-contributing-hypervolumes)
+8. [Hypervolume improvement](#8-hypervolume-improvement)
+9. [Distance to pareto front](#9-distance-to-pareto-front)
+10. [Fractions](#10-turning-fractions-on-and-off)
+11. [Additional functions](#11-additional-functionalities)
+12. [Indicator visualizations](#12-visualization-of-indicators)
+13. [Performance tests](#13-performance-tests)
 
-### Initialization of `MOArchive` for 2, 3 and 4 objectives
+### 1. Initialization
 MOArchive object can be created using `get_archive` function providing a list of objective values, reference point or at least the number of objectives. Note that additional points can always be added using `add` or `add_list` functions, but reference point can not be changed once the object is initialized. A list of information strings can be provided for each point, which will be stored as long as the corresponding point stays in the archive (e.g. the x values used to generate the objective values). At any point the list of non-dominated points and their corresponding infos can be accessed. 
 
 
 ```python
-from moarchiving.get_archive import get_mo_archive, get_cmo_archive
-```
+from moarchiving.get_archive import get_mo_archive
 
-
-```python
-# Creating a 2-objective archive
 moa2d = get_mo_archive([[1, 5], [2, 3], [4, 5], [5, 0]], reference_point=[10, 10], infos=["a", "b", "c", "d"])
-print("points in the archive:", list(moa2d))
-print("infos of the corresponding points:", moa2d.infos)
-```
-
-    points in the archive: [[1, 5], [2, 3], [5, 0]]
-    infos of the corresponding points: ['a', 'b', 'd']
-    
-
-
-```python
-# Creating a 3-objective archive
 moa3d = get_mo_archive([[1, 2, 3], [3, 2, 1], [3, 3, 0], [2, 2, 1]], [10, 10, 10], ["a", "b", "c", "d"])
-print("points in the archive:", list(moa3d))
-print("infos of the corresponding points:", moa3d.infos)
+moa4d = get_mo_archive([[1, 2, 3, 4], [1, 3, 4, 5], [4, 3, 2, 1], [1, 3, 0, 1]], reference_point=[10, 10, 10, 10], infos=["a", "b", "c", "d"])
+
+print("points in the 2d archive:", list(moa2d))
+print("points in the 3d archive:", list(moa3d))
+print("points in the 4d archive:", list(moa4d))
 ```
 
-    points in the archive: [[3, 3, 0], [2, 2, 1], [1, 2, 3]]
-    infos of the corresponding points: ['c', 'd', 'a']
+    points in the 2d archive: [[1, 5], [2, 3], [5, 0]]
+    points in the 3d archive: [[3, 3, 0], [2, 2, 1], [1, 2, 3]]
+    points in the 4d archive: [[1, 3, 0, 1], [1, 2, 3, 4]]
     
 
-
-```python
-# creating a 4-objective archive
-moa4d = get_mo_archive([[1, 2, 3, 4], [1, 3, 4, 5], [4, 3, 2, 1], [1, 3, 0, 1]], 
-                       reference_point=[10, 10, 10, 10], infos=["a", "b", "c", "d"])
-print("points in the archive:", list(moa4d))
-print("infos of the corresponding points:", moa4d.infos)
-```
-
-    points in the archive: [[1, 3, 0, 1], [1, 2, 3, 4]]
-    infos of the corresponding points: ['d', 'a']
-    
-
-### Constrained MOArchive
-Constrained MOArchive supports all the functionalities of a non-constrained MOArchive, with the additional handling of constraints when adding or initializing the archive (next to the objectives of a point we need to add the constraints in form of a list or a number). 
-
-
-```python
-# creating 3-objective archive with constraints
-cmoa = get_cmo_archive([[1, 2, 3], [1, 3, 4], [4, 3, 2], [1, 3, 0]], [[3, 0], [0, 0], [0, 0], [0, 1]], 
-                         reference_point=[5, 5, 5], infos=["a", "b", "c", "d"])
-print("points in the archive:", list(cmoa))
-print("infos of the corresponding points:", cmoa.infos)
-```
-
-    points in the archive: [[4, 3, 2], [1, 3, 4]]
-    infos of the corresponding points: ['c', 'b']
-    
-
-### Initializing empty archive and adding points
-MoArchive can also be initialized empty, but at minimum the reference point or the number of objectives should be provided.
+MOArchive objects can also be initialized empty.
 
 
 ```python
 moa = get_mo_archive(reference_point=[4, 4, 4])
-print("points in the archive:", list(moa))
+print("points in the empty archive:", list(moa))
+```
 
-# add one point
+    points in the empty archive: []
+    
+
+### 2. Constrained MOArchive
+Constrained MOArchive supports all the functionalities of a non-constrained MOArchive, with the additional handling of constraints when adding or initializing the archive (next to the objectives of a point we need to add the constraints in form of a list or a number). 
+
+
+```python
+from moarchiving.get_archive import get_cmo_archive
+
+cmoa = get_cmo_archive([[1, 2, 3], [1, 3, 4], [4, 3, 2], [1, 3, 0]], [[3, 0], [0, 0], [0, 0], [0, 1]], 
+                       reference_point=[5, 5, 5], infos=["a", "b", "c", "d"])
+print("points in the archive:", list(cmoa))
+```
+
+    points in the archive: [[4, 3, 2], [1, 3, 4]]
+    
+
+### 3. Accessing infos of the archive
+`archive.infos` is used to get the infos of the archive
+
+
+```python
+# infos of the previously defined empty archive
+print("infos of the empty archive", moa.infos)
+print("infos of the constrained archive", cmoa.infos)
+```
+
+    infos of the empty archive []
+    infos of the constrained archive ['c', 'b']
+    
+
+### 4. Adding points
+Points can be added to MOArchive at any time, using `add` (for one point) and `add_list` (for multiple points) functions.
+
+
+```python
 moa.add([1, 2, 3], "a")
 print("points:", list(moa))
 print("infos:", moa.infos)
 
-# add another point
-moa.add([3, 2, 1], "b")
-print("points:", list(moa))
-print("infos:", moa.infos)
-
-# add a dominated point (should not be added)
-moa.add([3, 3, 3], "c")
-print("points:", list(moa))
-print("infos:", moa.infos)
-
-moa.add_list([[2, 1, 3], [1, 3, 2], [3, 2, 0], [2, 2, 4]], ["d", "e", "f", "g"])
+moa.add_list([[3, 2, 1], [2, 3, 2], [2, 2, 2]], ["b", "c", "d"])
 print("points:", list(moa))
 print("infos:", moa.infos)
 ```
 
-    points in the archive: []
     points: [[1, 2, 3]]
     infos: ['a']
-    points: [[3, 2, 1], [1, 2, 3]]
-    infos: ['b', 'a']
-    points: [[3, 2, 1], [1, 2, 3]]
-    infos: ['b', 'a']
-    points: [[3, 2, 0], [1, 3, 2], [2, 1, 3], [1, 2, 3]]
-    infos: ['f', 'e', 'd', 'a']
+    points: [[3, 2, 1], [2, 2, 2], [1, 2, 3]]
+    infos: ['b', 'd', 'a']
     
 
-### List like interface
+When adding to constrained archive, constraint violations must be added as well
+
+
+```python
+cmoa.add_list([[3, 3, 3], [1, 1, 1]], [[0, 0], [42, 0]], ["e", "f"])
+print("points:", list(cmoa))
+print("infos:", cmoa.infos)
+```
+
+    points: [[4, 3, 2], [3, 3, 3], [1, 3, 4]]
+    infos: ['c', 'e', 'b']
+    
+
+### 5. Size of the archive
 The MOArchive implements some functionality of a list (In 2D case it actually extends the list class, but this is not the case in 3 and 4D), in particular the `len` method to get the number of points in the archive as well as the `in` keyword to check if a point is in the archive.
 
 
@@ -172,14 +179,14 @@ print("[2, 2, 2] in moa:", [2, 2, 2] in moa)
 print("[3, 2, 0] in moa:", [3, 2, 0] in moa)
 ```
 
-    Points in the archive: [[3, 2, 0], [1, 3, 2], [2, 1, 3], [1, 2, 3]]
-    Length of the archive: 4
-    [2, 2, 2] in moa: False
-    [3, 2, 0] in moa: True
+    Points in the archive: [[3, 2, 1], [2, 2, 2], [1, 2, 3]]
+    Length of the archive: 3
+    [2, 2, 2] in moa: True
+    [3, 2, 0] in moa: False
     
 
-### Performance indicators
-In order that all the performance indicators are easily comparable, we define all of them as a maximization indicators (by multiplying hypervolume plus and icmop indicators with -1). In that case when the archive is not empty, all the indicators are positive and have the same value. 
+### 6. Performance indicators
+In order that all the performance indicators are easily comparable, we define all of them as a maximization indicators (by multiplying hypervolume plus and ICMOP indicators with -1). In that case when the archive is not empty, all the indicators are positive and have the same value. 
 
 Accessing the hypervolume of the archive is done using the `hypervolume` attribute or the `hypervolume_plus` attribute for the hypervolume plus indicator. 
 
@@ -189,8 +196,8 @@ print("Hypervolume of the archive:", moa.hypervolume)
 print("Hypervolume plus of the archive:", moa.hypervolume_plus)
 ```
 
-    Hypervolume of the archive: 16
-    Hypervolume plus of the archive: 16
+    Hypervolume of the archive: 12
+    Hypervolume plus of the archive: 12
     
 
 In case of a constrained MOArchive the `icmop` attribute can be accessed as well. 
@@ -199,37 +206,15 @@ In case of a constrained MOArchive the `icmop` attribute can be accessed as well
 ```python
 print("Hyperolume of the constrained archive:", cmoa.hypervolume)
 print("Hypervolume plus of the constrained archive:", cmoa.hypervolume_plus)
-print("Icmop of the constrained archive:", cmoa.icmop)
+print("ICMOP of the constrained archive:", cmoa.icmop)
 ```
 
-    Hyperolume of the constrained archive: 12
-    Hypervolume plus of the constrained archive: 12
-    Icmop of the constrained archive: 12.0
+    Hyperolume of the constrained archive: 14
+    Hypervolume plus of the constrained archive: 14
+    ICMOP of the constrained archive: 14
     
 
-### Copying an archive
-
-
-```python
-moa_copy = moa.copy()
-print("moa     ", list(moa))
-print("moa_copy", list(moa_copy))
-
-moa.add([1, 1, 1])
-print("\nafter adding to the original archive:")
-print("moa     ", list(moa))
-print("moa_copy", list(moa_copy))
-```
-
-    moa      [[3, 2, 0], [1, 3, 2], [2, 1, 3], [1, 2, 3]]
-    moa_copy [[3, 2, 0], [1, 3, 2], [2, 1, 3], [1, 2, 3]]
-    
-    after adding to the original archive:
-    moa      [[3, 2, 0], [1, 1, 1]]
-    moa_copy [[3, 2, 0], [1, 3, 2], [2, 1, 3], [1, 2, 3]]
-    
-
-### Contributing hypervolumes
+### 7. Contributing hypervolumes
 Returns a list of contributions for each point of the archive. Alternatively can also be computed for a single point using `contributing_hypervolume(point)` method.
 
 
@@ -241,12 +226,13 @@ for i, objectives in enumerate(moa):
 print("All contributing hypervolumes:", moa.contributing_hypervolumes)
 ```
 
-    contributing hv of point [3, 2, 0] is 2
-    contributing hv of point [1, 1, 1] is 21
-    All contributing hypervolumes: [Fraction(2, 1), Fraction(21, 1)]
+    contributing hv of point [3, 2, 1] is 2
+    contributing hv of point [2, 2, 2] is 2
+    contributing hv of point [1, 2, 3] is 2
+    All contributing hypervolumes: [Fraction(2, 1), Fraction(2, 1), Fraction(2, 1)]
     
 
-### Hypervolume improvement
+### 8. Hypervolume improvement
 Returns the improvement of the hypervolume if we would add the point to the archive.
 
 
@@ -258,27 +244,27 @@ moa.add(point)
 print(f"hypervolume after adding {point}: {moa.hypervolume}")
 ```
 
-    hypervolume before adding [1, 3, 0]: 29
-    hypervolume improvement of point [1, 3, 0]: 2
-    hypervolume after adding [1, 3, 0]: 31
+    hypervolume before adding [1, 3, 0]: 12
+    hypervolume improvement of point [1, 3, 0]: 6
+    hypervolume after adding [1, 3, 0]: 18
     
 
-### Distance to pareto front
+### 9. Distance to pareto front
 Returns the distance between a dominated point and the pareto front.
 
 
 ```python
 print(f"Current archive: {list(moa)}")
 print("Distance of [3, 2, 1] to pareto front:", moa.distance_to_pareto_front([3, 2, 1]))
-print("Distance of [3, 2, 2] to pareto front:", moa.distance_to_pareto_front([3, 2, 2]))
+print("Distance of [3, 2, 2] to pareto front:", moa.distance_to_pareto_front([3, 3, 3]))
 ```
 
-    Current archive: [[3, 2, 0], [1, 3, 0], [1, 1, 1]]
+    Current archive: [[1, 3, 0], [3, 2, 1], [2, 2, 2], [1, 2, 3]]
     Distance of [3, 2, 1] to pareto front: 0.0
     Distance of [3, 2, 2] to pareto front: 1.0
     
 
-### Turning fractions on and off
+### 10. Turning fractions on and off
 To avoid the loss of precision, fractions are used by default. Changing this to float can be done by setting function attributes `hypervolume_final_float_type` and `hypervolume_computation_float_type`.
 
 
@@ -301,7 +287,7 @@ print(moa3_nofr.hypervolume)
     15.899999999999999
     
 
-### Additional functionalities:
+### 11. Additional functionalities:
 MOArchive also implements additional functions to check for the given point not in the archive:
 - `in_domain`: point is in domain?
 - `dominates`: point is dominated by the archive?
@@ -309,7 +295,7 @@ MOArchive also implements additional functions to check for the given point not 
 
 
 ```python
-points_list = [[5, 5, 0], [2, 2, 2], [0, 2, 3]]
+points_list = [[5, 5, 0], [2, 2, 3], [0, 2, 3]]
 print("archive:", list(moa), "\n")
 print("point     | in domain | dominates | num of dominators | dominators")
 print("----------|-----------|-----------|-------------------|-----------")
@@ -318,25 +304,22 @@ for point in points_list:
           f"{moa.dominators(point, number_only=True):17} | {moa.dominators(point)}")
 ```
 
-    archive: [[3, 2, 0], [1, 3, 0], [1, 1, 1]] 
+    archive: [[1, 3, 0], [3, 2, 1], [2, 2, 2], [1, 2, 3]] 
     
     point     | in domain | dominates | num of dominators | dominators
     ----------|-----------|-----------|-------------------|-----------
-    [5, 5, 0] |         0 |         1 |                 2 | [[3, 2, 0], [1, 3, 0]]
-    [2, 2, 2] |         1 |         1 |                 1 | [[1, 1, 1]]
+    [5, 5, 0] |         0 |         1 |                 1 | [[1, 3, 0]]
+    [2, 2, 3] |         1 |         1 |                 2 | [[2, 2, 2], [1, 2, 3]]
     [0, 2, 3] |         1 |         0 |                 0 | []
     
 
-### Visualization of Hypervolume, Hypervolume_plus and ICMOP indicators
+### 12. Visualization of indicators
 By saving the values of indicators for each point added to the archive, we can visualize the behavior of the archive over time.
 
 
 ```python
 import matplotlib.pyplot as plt
 import random
-
-get_cmo_archive.hypervolume_final_float_type = float
-get_mo_archive.hypervolume_final_float_type = float
 
 n_obj = 3
 
@@ -362,7 +345,7 @@ for i in range(2000):
 fig, axs = plt.subplots(1, 2, figsize=(10, 5))
 axs[0].plot([x[2] for x in indicators_cmoa], label="hypervolume")
 axs[0].plot([x[1] for x in indicators_cmoa], label="hypervolume_plus")
-axs[0].plot([x[0] for x in indicators_cmoa], label="icmop")
+axs[0].plot([x[0] for x in indicators_cmoa], label="ICMOP")
 axs[0].axhline(0, color="black", linestyle="--", zorder=0)
 axs[0].axhline(-cmoa.tau, color="black", linestyle="--", zorder=0)
 axs[0].set_title("Constrained MOArchive")
@@ -378,22 +361,24 @@ plt.show()
 
 
     
-![png](moarchiving_demo_files/moarchiving_demo_30_0.png)
+![png](moarchiving_files/moarchiving_31_0.png)
     
 
 
-## Some performance tests
+### 13. performance tests
 
 
 ```python
 import time
-import numpy as np
 from moarchiving.tests.point_sampling import get_non_dominated_points
 import matplotlib.pyplot as plt
-test_archive_sizes = [2 ** i for i in range(21)]
+test_archive_sizes = [0] + [2 ** i for i in range(21)]
+
+get_mo_archive.hypervolume_computation_float_type = fractions.Fraction
+get_mo_archive.hypervolume_final_float_type = fractions.Fraction
 ```
 
-### Initialization of the archive
+#### 13.1. Initializing archive
 
 
 ```python
@@ -434,20 +419,20 @@ plt.show()
 ```
 
     Testing 2 objectives
-    ..............
+    ...............
     Testing 3 objectives
     ............
     Testing 4 objectives
-    ........
+    .........
     
 
 
     
-![png](moarchiving_demo_files/moarchiving_demo_34_1.png)
+![png](moarchiving_files/moarchiving_35_1.png)
     
 
 
-### Adding a point to the archive
+#### 13.2. Adding a point to existing archive
 
 
 ```python
@@ -492,13 +477,15 @@ plt.show()
 ```
 
     Testing 2 objectives
-    .....................
+    ......................
     Testing 3 objectives
-    ................
+    .................
     Testing 4 objectives
-    ..........
+    ...........
+    
+
 
     
-![png](moarchiving_demo_files/moarchiving_demo_36_1.png)
+![png](moarchiving_files/moarchiving_37_1.png)
     
 
