@@ -7516,8 +7516,8 @@ a.anchor-link {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">¶</a></h1><p>This library implements a multi-objective (2, 3 and 4 objectives are supported) non-dominated archive. It provides easy and fast access to the hypervolume and <a href="https://doi.org/10.1109/TEVC.2022.3210897">hypervolume plus</a> indicators, the contributing hypervolume of each element, and to the <a href="https://arxiv.org/abs/1904.08823">uncrowded hypervolume improvement</a> of any given point in objective space.</p>
-<p>Additionally, it provides a constrained version of the archive, which allows to store points with constraints and to compute the <a href="https://doi.org/10.1016/j.ins.2022.05.106">ICMOP</a> indicator.</p>
+<h1 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">¶</a></h1><p>This library implements a multi-objective archive of non-dominated solutions  (currently supporting only 2, 3 and 4 objectives). It provides easy and fast access to the hypervolume and <a href="https://doi.org/10.1109/TEVC.2022.3210897">hypervolume plus</a> indicators, the contributing hypervolume of each solution, and to the <a href="https://arxiv.org/abs/1904.08823">uncrowded hypervolume improvement</a> of any given point in the objective space.</p>
+<p>Additionally, the library offers a constrained version of the archive, which allows the storage of solutions to constrained multi-objective problems and the computation of their <a href="https://doi.org/10.1016/j.ins.2022.05.106">ICMOP</a> indicator.</p>
 <h2 id="Installation">Installation<a class="anchor-link" href="#Installation">¶</a></h2><p>Either via</p>
 <pre><code>pip install git+https://github.com/CMA-ES/moarchiving.git@master
 </code></pre>
@@ -7549,7 +7549,7 @@ Ran 7 tests in 0.001s
 </li>
 </ul>
 <h2 id="Releases">Releases<a class="anchor-link" href="#Releases">¶</a></h2><ul>
-<li>0.8.0 addition of MOArchive classes for 3 and 4 dimensions, as well as a class for handling constrained problems</li>
+<li>0.8.0 addition of MOArchive classes for 3 and 4 dimensions, as well as a class for handling solutions to constrained problems</li>
 <li>0.7.0 reimplementation of <code>BiobjectiveNondominatedSortedList.hypervolume_improvement</code> by extracting a sublist first.</li>
 <li>0.6.0 the <code>infos</code> attribute is a <code>list</code> with corresponding (arbitrary) information, e.g. for keeping the respective solutions.</li>
 <li>0.5.3 fixed assertion error when not using <code>fractions.Fraction</code></li>
@@ -7557,17 +7557,17 @@ Ran 7 tests in 0.001s
 </ul>
 <h1 id="Usage-examples">Usage examples<a class="anchor-link" href="#Usage-examples">¶</a></h1><ol>
 <li><a href="#1-initialization">Initialization</a></li>
-<li><a href="#2-constrained-moarchive">Constrained archive</a></li>
-<li><a href="#3-accessing-infos-of-the-archive">Infos</a></li>
-<li><a href="#4-adding-points">Adding points</a></li>
-<li><a href="#5-size-of-the-archive">Archive size</a></li>
+<li><a href="#2-constrained-moarchive">Constrained MOArchive</a></li>
+<li><a href="#3-accessing-solution-information">Accessing solution information</a></li>
+<li><a href="#4-adding-solutions">Adding solutions</a></li>
+<li><a href="#5-archive-size">Archive size</a></li>
 <li><a href="#6-performance-indicators">Performance indicators</a></li>
-<li><a href="#7-contributing-hypervolumes">Contributing hypervolume</a></li>
+<li><a href="#7-contributing-hypervolumes">Contributing hypervolumes</a></li>
 <li><a href="#8-hypervolume-improvement">Hypervolume improvement</a></li>
-<li><a href="#9-distance-to-pareto-front">Distance to pareto front</a></li>
-<li><a href="#10-turning-fractions-on-and-off">Fractions</a></li>
-<li><a href="#11-additional-functionalities">Additional functions</a></li>
-<li><a href="#12-visualization-of-indicators">Indicator visualizations</a></li>
+<li><a href="#9-distance-to-the-pareto-front">Distance to the Pareto front</a></li>
+<li><a href="#10-enabling-or-disabling-fractions">Enabling or disabling fractions</a></li>
+<li><a href="#11-additional-functions">Additional functions</a></li>
+<li><a href="#12-visualization-of-indicator-values">Visualization of indicator values</a></li>
 <li><a href="#13-performance-tests">Performance tests</a></li>
 </ol>
 </div>
@@ -7580,7 +7580,7 @@ Ran 7 tests in 0.001s
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="1.-Initialization">1. Initialization<a class="anchor-link" href="#1.-Initialization">¶</a></h3><p>MOArchive object can be created using <code>get_archive</code> function providing a list of objective values, reference point or at least the number of objectives. Note that additional points can always be added using <code>add</code> or <code>add_list</code> functions, but reference point can not be changed once the object is initialized. A list of information strings can be provided for each point, which will be stored as long as the corresponding point stays in the archive (e.g. the x values used to generate the objective values). At any point the list of non-dominated points and their corresponding infos can be accessed.</p>
+<h3 id="1.-Initialization">1. Initialization<a class="anchor-link" href="#1.-Initialization">¶</a></h3><p>The MOArchive object can be created using the <code>get_archive</code> function by providing a list of objective values, a reference point, or at least the number of objectives. Note that additional solutions can always be added using <code>add</code> or <code>add_list</code> functions, but the reference point cannot be changed once the object is initialized. A list of information strings can be provided for each solution, which will be stored as long as the corresponding solution remains in the archive (e.g., the x values of the solution). At any time, the list of non-dominated solution and their corresponding information can be accessed.</p>
 </div>
 </div>
 </div>
@@ -7667,7 +7667,7 @@ points in the 4d archive: [[1, 3, 0, 1], [1, 2, 3, 4]]
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="2.-Constrained-MOArchive">2. Constrained MOArchive<a class="anchor-link" href="#2.-Constrained-MOArchive">¶</a></h3><p>Constrained MOArchive supports all the functionalities of a non-constrained MOArchive, with the additional handling of constraints when adding or initializing the archive (next to the objectives of a point we need to add the constraints in form of a list or a number).</p>
+<h3 id="2.-Constrained-MOArchive">2. Constrained MOArchive<a class="anchor-link" href="#2.-Constrained-MOArchive">¶</a></h3><p>Constrained MOArchive supports all the functionalities of a non-constrained MOArchive, with the added capability of handling constraints when adding or initializing the archive. In addition to the objective values of a solution, constraint values must be provided in the form of a list or a number. A solution is deemed feasible when all its constraint values are less than or equal to zero.</p>
 </div>
 </div>
 </div>
@@ -7709,7 +7709,7 @@ points in the 4d archive: [[1, 3, 0, 1], [1, 2, 3, 4]]
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="3.-Accessing-infos-of-the-archive">3. Accessing infos of the archive<a class="anchor-link" href="#3.-Accessing-infos-of-the-archive">¶</a></h3><p><code>archive.infos</code> is used to get the infos of the archive</p>
+<h3 id="3.-Accessing-solution-information">3. Accessing solution information<a class="anchor-link" href="#3.-Accessing-solution-information">¶</a></h3><p><code>archive.infos</code> is used to get the information on solutions in the archive.</p>
 </div>
 </div>
 </div>
@@ -7750,7 +7750,7 @@ infos of the constrained archive ['c', 'b']
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="4.-Adding-points">4. Adding points<a class="anchor-link" href="#4.-Adding-points">¶</a></h3><p>Points can be added to MOArchive at any time, using <code>add</code> (for one point) and <code>add_list</code> (for multiple points) functions.</p>
+<h3 id="4.-Adding-solutions">4. Adding solutions<a class="anchor-link" href="#4.-Adding-solutions">¶</a></h3><p>Solutions can be added to the MOArchive at any time using the <code>add</code> function (for a single solution) or the <code>add_list</code> function (for multiple solutions).</p>
 </div>
 </div>
 </div>
@@ -7797,7 +7797,7 @@ infos: ['b', 'd', 'a']
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>When adding to constrained archive, constraint violations must be added as well</p>
+<p>When adding to the constrained archive, constraint values must be added as well.</p>
 </div>
 </div>
 </div>
@@ -7838,7 +7838,7 @@ infos: ['c', 'e', 'b']
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="5.-Size-of-the-archive">5. Size of the archive<a class="anchor-link" href="#5.-Size-of-the-archive">¶</a></h3><p>The MOArchive implements some functionality of a list (In 2D case it actually extends the list class, but this is not the case in 3 and 4D), in particular the <code>len</code> method to get the number of points in the archive as well as the <code>in</code> keyword to check if a point is in the archive.</p>
+<h3 id="5.-Archive-size">5. Archive size<a class="anchor-link" href="#5.-Archive-size">¶</a></h3><p>The MOArchive implements some functionality of a list (in the 2D case, it actually extends the <code>list</code> class, though this is not the case in 3D and 4D).  In particular, it includes the <code>len</code> method to get the number of solutions in the archive as well as the <code>in</code> keyword to check if a point is in the archive.</p>
 </div>
 </div>
 </div>
@@ -7882,8 +7882,8 @@ Length of the archive: 3
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="6.-Performance-indicators">6. Performance indicators<a class="anchor-link" href="#6.-Performance-indicators">¶</a></h3><p>In order that all the performance indicators are easily comparable, we define all of them as a maximization indicators (by multiplying hypervolume plus and ICMOP indicators with -1). In that case when the archive is not empty, all the indicators are positive and have the same value.</p>
-<p>Accessing the hypervolume of the archive is done using the <code>hypervolume</code> attribute or the <code>hypervolume_plus</code> attribute for the hypervolume plus indicator.</p>
+<h3 id="6.-Performance-indicators">6. Performance indicators<a class="anchor-link" href="#6.-Performance-indicators">¶</a></h3><p>To ensure that all performance indicators are easily comparable, we define all of them as maximization indicators (by multiplying hypervolume plus and ICMOP indicators by -1). In this case, when the archive is not empty, all the indicators are positive and have the same value.</p>
+<p>The hypervolume of the archive can be accessed using the <code>hypervolume</code> attribute, or the <code>hypervolume_plus</code> attribute for the hypervolume plus indicator.</p>
 </div>
 </div>
 </div>
@@ -7923,7 +7923,7 @@ Hypervolume plus of the archive: 12
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>In case of a constrained MOArchive the <code>icmop</code> attribute can be accessed as well.</p>
+<p>In case of a constrained MOArchive, the <code>icmop</code> attribute can be accessed as well.</p>
 </div>
 </div>
 </div>
@@ -7965,7 +7965,7 @@ ICMOP of the constrained archive: 14
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="7.-Contributing-hypervolumes">7. Contributing hypervolumes<a class="anchor-link" href="#7.-Contributing-hypervolumes">¶</a></h3><p>Returns a list of contributions for each point of the archive. Alternatively can also be computed for a single point using <code>contributing_hypervolume(point)</code> method.</p>
+<h3 id="7.-Contributing-hypervolumes">7. Contributing hypervolumes<a class="anchor-link" href="#7.-Contributing-hypervolumes">¶</a></h3><p>The <code>contributing_hypervolumes</code> attribute provides a list of hypervolume contributions for each point of the archive. Alternatively, the contribution for a single point can be computed using the <code>contributing_hypervolume(point)</code> method.</p>
 </div>
 </div>
 </div>
@@ -8010,7 +8010,7 @@ All contributing hypervolumes: [Fraction(2, 1), Fraction(2, 1), Fraction(2, 1)]
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="8.-Hypervolume-improvement">8. Hypervolume improvement<a class="anchor-link" href="#8.-Hypervolume-improvement">¶</a></h3><p>Returns the improvement of the hypervolume if we would add the point to the archive.</p>
+<h3 id="8.-Hypervolume-improvement">8. Hypervolume improvement<a class="anchor-link" href="#8.-Hypervolume-improvement">¶</a></h3><p>The <code>hypervolume_improvement(point)</code> method returns the improvement of the hypervolume if we would add the point to the archive.</p>
 </div>
 </div>
 </div>
@@ -8054,7 +8054,7 @@ hypervolume after adding [1, 3, 0]: 18
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="9.-Distance-to-pareto-front">9. Distance to pareto front<a class="anchor-link" href="#9.-Distance-to-pareto-front">¶</a></h3><p>Returns the distance between a dominated point and the pareto front.</p>
+<h3 id="9.-Distance-to-the-Pareto-front">9. Distance to the Pareto front<a class="anchor-link" href="#9.-Distance-to-the-Pareto-front">¶</a></h3><p>The <code>distance_to_pareto_front(point)</code> method returns the distance between the given point and the Pareto front.</p>
 </div>
 </div>
 </div>
@@ -8096,7 +8096,7 @@ Distance of [3, 2, 2] to pareto front: 1.0
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="10.-Turning-fractions-on-and-off">10. Turning fractions on and off<a class="anchor-link" href="#10.-Turning-fractions-on-and-off">¶</a></h3><p>To avoid the loss of precision, fractions are used by default. Changing this to float can be done by setting function attributes <code>hypervolume_final_float_type</code> and <code>hypervolume_computation_float_type</code>.</p>
+<h3 id="10.-Enabling-or-disabling-fractions">10. Enabling or disabling fractions<a class="anchor-link" href="#10.-Enabling-or-disabling-fractions">¶</a></h3><p>To avoid loss of precision, fractions are used by default. This can be changed to floats by setting the <code>hypervolume_final_float_type</code> and <code>hypervolume_computation_float_type</code> function attributes.</p>
 </div>
 </div>
 </div>
@@ -8146,11 +8146,11 @@ Distance of [3, 2, 2] to pareto front: 1.0
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="11.-Additional-functionalities:">11. Additional functionalities:<a class="anchor-link" href="#11.-Additional-functionalities:">¶</a></h3><p>MOArchive also implements additional functions to check for the given point not in the archive:</p>
+<h3 id="11.-Additional-functions">11. Additional functions<a class="anchor-link" href="#11.-Additional-functions">¶</a></h3><p>MOArchive also implements additional functions to check whether a given point is in the archive:</p>
 <ul>
-<li><code>in_domain</code>: point is in domain?</li>
-<li><code>dominates</code>: point is dominated by the archive?</li>
-<li><code>dominators</code>: which/how many points dominate the given point?</li>
+<li><code>in_domain</code>: Is the point in the domain?</li>
+<li><code>dominates</code>: Is the point dominated by the archive?</li>
+<li><code>dominators</code>: Which points (and how many) dominate the given point?</li>
 </ul>
 </div>
 </div>
@@ -8201,7 +8201,7 @@ point     | in domain | dominates | num of dominators | dominators
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="12.-Visualization-of-indicators">12. Visualization of indicators<a class="anchor-link" href="#12.-Visualization-of-indicators">¶</a></h3><p>By saving the values of indicators for each point added to the archive, we can visualize the behavior of the archive over time.</p>
+<h3 id="12.-Visualization-of-indicator-values">12. Visualization of indicator values<a class="anchor-link" href="#12.-Visualization-of-indicator-values">¶</a></h3><p>By saving the values of indicators for each solution added to the archive, we can visualize their change over time.</p>
 </div>
 </div>
 </div>
@@ -8285,7 +8285,7 @@ point     | in domain | dominates | num of dominators | dominators
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="13.-performance-tests">13. performance tests<a class="anchor-link" href="#13.-performance-tests">¶</a></h3>
+<h3 id="13.-Performance-tests">13. Performance tests<a class="anchor-link" href="#13.-Performance-tests">¶</a></h3>
 </div>
 </div>
 </div>
@@ -8316,7 +8316,7 @@ point     | in domain | dominates | num of dominators | dominators
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="13.1.-Initializing-archive">13.1. Initializing archive<a class="anchor-link" href="#13.1.-Initializing-archive">¶</a></h4>
+<h4 id="13.1.-Initializing-the-archive">13.1. Initializing the archive<a class="anchor-link" href="#13.1.-Initializing-the-archive">¶</a></h4>
 </div>
 </div>
 </div>
@@ -8398,7 +8398,7 @@ Testing 4 objectives
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h4 id="13.2.-Adding-a-point-to-existing-archive">13.2. Adding a point to existing archive<a class="anchor-link" href="#13.2.-Adding-a-point-to-existing-archive">¶</a></h4>
+<h4 id="13.2.-Adding-a-solution-to-an-existing-archive">13.2. Adding a solution to an existing archive<a class="anchor-link" href="#13.2.-Adding-a-solution-to-an-existing-archive">¶</a></h4>
 </div>
 </div>
 </div>
